@@ -152,7 +152,7 @@ async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeout
     const requestStartedAt = Date.now();
     let response;
     try {
-      const endpoint = \`https://generativelanguage.googleapis.com/v1beta/models/\${encodeURIComponent(requestModel)}:generateContent\`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(requestModel)}:generateContent`;
       response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
@@ -160,22 +160,22 @@ async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeout
         signal: AbortSignal.timeout(timeoutMs),
       });
     } catch (error) {
-      const reason = error instanceof Error ? \`\${error.name}: \${error.message}\` : String(error);
-      console.error(\`[PLAYFORGE AI] Gemini native connection failed model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} reason=\${reason.replace(/\s+/g, ' ').slice(0, 400)}\`);
+      const reason = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      console.error(`[PLAYFORGE AI] Gemini native connection failed model=${requestModel} elapsedMs=${Date.now() - requestStartedAt} reason=${reason.replace(/\s+/g, ' ').slice(0, 400)}`);
       throw error;
     }
 
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const message = payload.error?.message || \`Gemini native API returned HTTP \${response.status}.\`;
+      const message = payload.error?.message || `Gemini native API returned HTTP ${response.status}.`;
 
       if (response.status === 503 && attempt < modelsToTry.length - 1) {
         lastOverloadMessage = message;
-        console.warn(\`[PLAYFORGE AI] Gemini model unavailable model=\${requestModel} httpStatus=503 elapsedMs=\${Date.now() - requestStartedAt}; trying \${modelsToTry[attempt + 1]}\`);
+        console.warn(`[PLAYFORGE AI] Gemini model unavailable model=${requestModel} httpStatus=503 elapsedMs=${Date.now() - requestStartedAt}; trying ${modelsToTry[attempt + 1]}`);
         continue;
       }
 
-      console.error(\`[PLAYFORGE AI] Gemini native HTTP \${response.status} model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} message=\${String(message).replace(/\s+/g, ' ').slice(0, 500)}\`);
+      console.error(`[PLAYFORGE AI] Gemini native HTTP ${response.status} model=${requestModel} elapsedMs=${Date.now() - requestStartedAt} message=${String(message).replace(/\s+/g, ' ').slice(0, 500)}`);
       throw Object.assign(new Error(message), { status: response.status >= 500 ? 502 : response.status });
     }
 
@@ -185,14 +185,14 @@ async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeout
       : '';
     if (!reply) {
       const reason = candidate?.finishReason || payload.promptFeedback?.blockReason || 'no text candidate';
-      console.error(\`[PLAYFORGE AI] Gemini native returned no text model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} reason=\${String(reason).slice(0, 160)}\`);
-      throw Object.assign(new Error(\`Gemini returned no text (\${String(reason)}).\`), { status: 502 });
+      console.error(`[PLAYFORGE AI] Gemini native returned no text model=${requestModel} elapsedMs=${Date.now() - requestStartedAt} reason=${String(reason).slice(0, 160)}`);
+      throw Object.assign(new Error(`Gemini returned no text (${String(reason)}).`), { status: 502 });
     }
 
     if (requestModel !== model) {
-      console.warn(\`[PLAYFORGE AI] Gemini fallback succeeded configuredModel=\${model} actualModel=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt}\`);
+      console.warn(`[PLAYFORGE AI] Gemini fallback succeeded configuredModel=${model} actualModel=${requestModel} elapsedMs=${Date.now() - requestStartedAt}`);
     } else {
-      console.info(\`[PLAYFORGE AI] Gemini native request succeeded model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} jsonMode=\${jsonMode}\`);
+      console.info(`[PLAYFORGE AI] Gemini native request succeeded model=${requestModel} elapsedMs=${Date.now() - requestStartedAt} jsonMode=${jsonMode}`);
     }
     return reply;
   }

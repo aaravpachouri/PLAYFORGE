@@ -115,10 +115,19 @@ async function askOllama(messages, systemPrompt, jsonMode = false, timeoutMs = 1
 
 async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, timeoutMs = 120000) {
   if (!apiKey) throw Object.assign(new Error('No AI_API_KEY is configured. Copy .env.example to .env and add your provider key, or use local Ollama mode.'), { status: 503 });
+  const requestBody = {
+    model,
+    messages: [{ role: 'system', content: systemPrompt }, ...messages],
+    ...(jsonMode ? { response_format: { type: 'json_object' }, max_tokens: 5200 } : {}),
+  };
+  // Gemini 3 models no longer use legacy temperature/top_p sampling parameters.
+  // Keep those parameters for other OpenAI-compatible providers.
+  const isGemini3 = /generativelanguage\.googleapis\.com/i.test(openAIBase) && /^gemini-3/i.test(model);
+  if (!isGemini3) requestBody.temperature = jsonMode ? 0.2 : 0.65;
   const response = await fetch(`${openAIBase}/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({ model, messages: [{ role: 'system', content: systemPrompt }, ...messages], temperature: jsonMode ? 0.2 : 0.65, ...(jsonMode ? { response_format: { type: 'json_object' }, max_tokens: 5200 } : {}) }),
+    body: JSON.stringify(requestBody),
     signal: AbortSignal.timeout(timeoutMs),
   });
   const payload = await response.json().catch(() => ({}));
@@ -130,7 +139,6 @@ async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, tim
   if (typeof reply !== 'string' || !reply.trim()) throw new Error('The model returned an empty response. Try again.');
   return reply.trim();
 }
-
 async function assertLocalNutritionModelReady() {
   let response;
   try {

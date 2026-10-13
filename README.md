@@ -4,6 +4,15 @@ PLAYFORGE is a local-first fitness-gaming and habit-tracking prototype. It pairs
 
 > PLAYFORGE is a wellness prototype, not a medical device or clinically validated exercise planner. Records are self-reported. It does not diagnose, independently verify activity, or replace qualified professional guidance.
 
+
+## Live deployment
+
+- **Web app:** https://playforge-aaravpachouri.vercel.app
+- **Render API:** https://playforge-je9z.onrender.com
+- **API health check:** https://playforge-je9z.onrender.com/api/health
+
+The Vercel frontend forwards same-origin `/api/*` requests to the Render service. The default model setting is local Ollama; a cloud host cannot reach a developer's `127.0.0.1:11434` Ollama instance. Nutrition planning can use the labelled local fallback, while live Coach Nexus AI responses require a reachable hosted model/API provider configured with server-side environment variables.
+
 ## What changed in this version
 
 - **Game World:** floating realm art and portal-style navigation, with destinations for each of the main experiences.

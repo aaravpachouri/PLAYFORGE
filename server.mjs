@@ -113,23 +113,78 @@ async function askOllama(messages, systemPrompt, jsonMode = false, timeoutMs = 1
   return reply.trim();
 }
 
-async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, timeoutMs = 120000) {
+async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeoutMs = 45000) {
+  if (!apiKey) throw Object.assign(new Error('No AI_API_KEY is configured in the server environment.'), { status: 503 });
+
+  // Gemini's native REST API avoids the OpenAI-compatibility translation layer.
+  // Merge adjacent same-role messages to satisfy the native contents format.
+  const contents = [];
+  for (const message of messages) {
+    const role = message.role === 'assistant' ? 'model' : 'user';
+    const previous = contents[contents.length - 1];
+    if (previous && previous.role === role) previous.parts.push({ text: message.content });
+    else contents.push({ role, parts: [{ text: message.content }] });
+  }
+
+  const requestBody = {
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    contents,
+    generationConfig: {
+      maxOutputTokens: jsonMode ? 5200 : 1000,
+      thinkingConfig: { thinkingLevel: 'LOW' },
+      ...(jsonMode ? { responseMimeType: 'application/json' } : {}),
+    },
+  };
+  const requestStartedAt = Date.now();
+  let response;
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    console.error(`[PLAYFORGE AI] Gemini native connection failed model=${model} elapsedMs=${Date.now() - requestStartedAt} reason=${reason.replace(/\s+/g, ' ').slice(0, 400)}`);
+    throw error;
+  }
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = payload.error?.message || `Gemini native API returned HTTP ${response.status}.`;
+    console.error(`[PLAYFORGE AI] Gemini native HTTP ${response.status} model=${model} elapsedMs=${Date.now() - requestStartedAt} message=${String(message).replace(/\s+/g, ' ').slice(0, 500)}`);
+    throw Object.assign(new Error(message), { status: response.status >= 500 ? 502 : response.status });
+  }
+
+  const candidate = payload.candidates?.[0];
+  const reply = Array.isArray(candidate?.content?.parts)
+    ? candidate.content.parts.map(part => typeof part.text === 'string' ? part.text : '').join('').trim()
+    : '';
+  if (!reply) {
+    const reason = candidate?.finishReason || payload.promptFeedback?.blockReason || 'no text candidate';
+    console.error(`[PLAYFORGE AI] Gemini native returned no text model=${model} elapsedMs=${Date.now() - requestStartedAt} reason=${String(reason).slice(0, 160)}`);
+    throw Object.assign(new Error(`Gemini returned no text (${String(reason)}).`), { status: 502 });
+  }
+  console.info(`[PLAYFORGE AI] Gemini native request succeeded model=${model} elapsedMs=${Date.now() - requestStartedAt} jsonMode=${jsonMode}`);
+  return reply;
+}
+
+async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, timeoutMs = 45000) {
   if (!apiKey) throw Object.assign(new Error('No AI_API_KEY is configured. Copy .env.example to .env and add your provider key, or use local Ollama mode.'), { status: 503 });
+
+  const isGemini3 = /generativelanguage\.googleapis\.com/i.test(openAIBase) && /^gemini-3/i.test(model);
+  if (isGemini3) {
+    return askGeminiNative(messages, systemPrompt, jsonMode, timeoutMs);
+  }
+
   const requestBody = {
     model,
     messages: [{ role: 'system', content: systemPrompt }, ...messages],
     ...(jsonMode ? { response_format: { type: 'json_object' }, max_tokens: 5200 } : {}),
+    temperature: jsonMode ? 0.2 : 0.65,
   };
-  // Gemini 3 models no longer use legacy temperature/top_p sampling parameters.
-  // Use low reasoning effort for faster responses in chat and quest generation.
-  const isGemini3 = /generativelanguage\.googleapis\.com/i.test(openAIBase) && /^gemini-3/i.test(model);
-  if (isGemini3) {
-    requestBody.reasoning_effort = 'low';
-    // Keep ordinary Coach responses concise; structured plans retain their larger output allowance.
-    if (!jsonMode) requestBody.max_tokens = 1000;
-  } else {
-    requestBody.temperature = jsonMode ? 0.2 : 0.65;
-  }
   const requestStartedAt = Date.now();
   let response;
   try {
@@ -141,13 +196,13 @@ async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, tim
     });
   } catch (error) {
     const reason = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-    console.error(`[PLAYFORGE AI] upstream connection failed provider=${provider} model=${model} elapsedMs=${Date.now() - requestStartedAt} reason=${reason.replace(/\\s+/g, ' ').slice(0, 400)}`);
+    console.error(`[PLAYFORGE AI] upstream connection failed provider=${provider} model=${model} elapsedMs=${Date.now() - requestStartedAt} reason=${reason.replace(/\s+/g, ' ').slice(0, 400)}`);
     throw error;
   }
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const message = payload.error?.message || `The configured AI provider returned HTTP ${response.status}.`;
-    console.error(`[PLAYFORGE AI] upstream HTTP ${response.status} provider=${provider} model=${model} elapsedMs=${Date.now() - requestStartedAt} message=${String(message).replace(/\\s+/g, ' ').slice(0, 500)}`);
+    console.error(`[PLAYFORGE AI] upstream HTTP ${response.status} provider=${provider} model=${model} elapsedMs=${Date.now() - requestStartedAt} message=${String(message).replace(/\s+/g, ' ').slice(0, 500)}`);
     throw Object.assign(new Error(message), { status: response.status >= 500 ? 502 : response.status });
   }
   const reply = payload.choices?.[0]?.message?.content;

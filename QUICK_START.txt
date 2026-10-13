@@ -1,0 +1,23 @@
+PLAYFORGE 2.8.0 — QUICK START
+
+1. Extract the ZIP and open the folder that contains package.json and server.mjs in VS Code.
+2. Requirements: Node.js 20+ and npm.
+3. Install packages:
+
+   npm install
+
+4. (Default AI setup) Install Ollama, run `ollama pull llama3.2:latest`, and make sure Ollama is running. See AI_SETUP.md for options.
+5. Start PLAYFORGE and its chat API together:
+
+   npm run dev
+
+6. Open http://localhost:5173. If the top badge says AI OFFLINE, open http://localhost:5173/api/health and follow the displayed instructions.
+
+Optional hosted model: copy .env.example to .env and set AI_PROVIDER=openai-compatible, AI_BASE_URL, AI_MODEL and AI_API_KEY. Keep AI_API_KEY server-side and never commit .env.
+
+Shortcuts: Ctrl+K or / opens the command palette. Esc closes overlays.
+Coach Nexus is a multi-turn fitness, nutrition, recovery and habit companion. Your PLAYFORGE profile/activity summary is only included when you enable “Include my PLAYFORGE data”.
+
+Training Arena offers three options per calendar day with a four-week progression block. Nutrition Station asks your preferences, then generates and saves a seven-day plan with two alternatives per meal. A new week can be generated with the saved preferences after the current week ends. Backend research status says whether the official ICMR–NIN and WHO pages were retrieved or only referenced.
+
+Meal visuals: each planned meal and alternative loads a matching Wikimedia Commons photo when available, with source/licence information. A labelled Unsplash food-inspiration fallback appears if no appropriate match is found. Logging the first item in each meal slot each day grants +12 Meal XP.

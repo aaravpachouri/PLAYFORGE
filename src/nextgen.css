@@ -1,0 +1,904 @@
+/* PLAYFORGE NEXT-GEN EXPERIENCE — motion, world UI, commands, and coach */
+:root{
+  --pf-cyan:#62eaff;--pf-mint:#82ffd1;--pf-violet:#9b82ff;--pf-blue:#51a9ff;--pf-ember:#ff9d65;--pf-gold:#ffd47c;
+  --pf-shadow:0 22px 70px rgba(0,0,0,.28);--pf-glass:rgba(13,22,38,.76);--pf-glass-line:rgba(136,196,235,.17)
+}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:#070b14}
+.app-shell{position:relative;isolation:isolate;background:radial-gradient(ellipse at 82% 2%,rgba(39,61,141,.14),transparent 35%),radial-gradient(ellipse at 20% 64%,rgba(35,164,172,.055),transparent 36%),#090c15}
+.app-shell:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.17;background-image:linear-gradient(rgba(105,174,220,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(105,174,220,.055) 1px,transparent 1px);background-size:70px 70px;mask-image:linear-gradient(180deg,#000,transparent 82%)}
+.sidebar{background:linear-gradient(180deg,rgba(9,14,25,.98),rgba(12,14,24,.97));border-right-color:rgba(91,157,198,.18);box-shadow:12px 0 38px rgba(0,0,0,.15)}
+.brand-mark{background:linear-gradient(145deg,#b9ffeb,#50dff2 58%,#9279ff);box-shadow:0 0 28px rgba(80,225,230,.17),inset 0 1px rgba(255,255,255,.55)}
+.brand-name{letter-spacing:.08em}
+.nav-link{border-radius:11px;position:relative;transition:background .22s,border .22s,color .22s,transform .22s;}
+.nav-link:hover{transform:translateX(2px);background:linear-gradient(100deg,rgba(46,93,125,.16),rgba(94,63,156,.12));border-color:rgba(100,217,231,.1)}
+.nav-link.active{background:linear-gradient(105deg,rgba(28,104,112,.24),rgba(47,53,103,.28));border-color:rgba(101,245,218,.23);box-shadow:inset 3px 0 0 var(--pf-mint),0 5px 26px rgba(41,205,208,.055);color:#c4fff0}
+.nav-link.active:after{content:"";position:absolute;right:0;top:12px;bottom:12px;width:2px;border-radius:2px;background:var(--pf-cyan);box-shadow:0 0 12px var(--pf-cyan)}
+.main-area{position:relative;z-index:1;background:transparent}
+.topbar-enhanced{height:73px;padding:0 clamp(18px,2.7vw,38px);gap:18px;background:rgba(8,12,21,.76);border-bottom:1px solid rgba(120,179,220,.13);backdrop-filter:blur(22px);box-shadow:0 8px 35px rgba(0,0,0,.08)}
+.topbar-enhanced .breadcrumb{flex-shrink:0;font-size:9px;letter-spacing:.14em}
+.top-search-trigger{display:flex;align-items:center;gap:10px;min-width:180px;width:min(440px,38vw);height:38px;margin-left:clamp(4px,1vw,16px);border:1px solid rgba(123,176,220,.17);border-radius:12px;padding:0 11px;background:linear-gradient(115deg,rgba(22,38,59,.72),rgba(25,24,48,.63));color:#b1becd;text-align:left;transition:border-color .2s,background .2s,box-shadow .2s}
+.top-search-trigger:hover{border-color:rgba(96,234,255,.48);background:rgba(19,38,59,.95);box-shadow:0 0 0 3px rgba(89,221,249,.055),0 0 26px rgba(54,146,221,.08)}
+.top-search-trigger span{font-size:10px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-search-trigger>svg{color:#73dff0}
+.top-search-trigger kbd{display:flex;align-items:center;gap:3px;padding:4px 6px;border:1px solid rgba(148,174,199,.16);border-radius:5px;background:rgba(7,11,21,.55);color:#8296ad;font:600 9px 'DM Sans',sans-serif}
+.topbar-right{gap:12px;position:relative}
+.local-badge{border-color:rgba(114,255,196,.18);background:rgba(77,255,193,.035);font-size:8px;white-space:nowrap;letter-spacing:.12em}
+.coach-top-button{height:34px;display:flex;align-items:center;gap:7px;border:1px solid rgba(102,232,242,.22);border-radius:10px;background:linear-gradient(120deg,rgba(26,116,121,.2),rgba(81,61,148,.19));color:#c2fff2;padding:0 11px;font-size:10px;font-weight:700;transition:.2s;position:relative;overflow:hidden}
+.coach-top-button:before{content:"";position:absolute;top:0;bottom:0;left:-50%;width:32%;transform:skewX(-25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);transition:left .55s}
+.coach-top-button:hover{border-color:rgba(106,246,225,.55);box-shadow:0 0 24px rgba(73,235,220,.09);transform:translateY(-1px)}
+.coach-top-button:hover:before{left:130%}
+.coach-top-button>svg{color:var(--pf-cyan)}
+.coach-top-button i{width:5px;height:5px;border-radius:50%;background:#75ffc3;box-shadow:0 0 10px #75ffc3}
+.notification-wrap{position:relative}
+.top-icon-button{width:35px;height:35px;display:grid;place-items:center;border-radius:10px;border:1px solid transparent;background:transparent;color:#96a4b8;position:relative;transition:.2s}
+.top-icon-button:hover,.top-icon-button.is-open{color:#e8fcff;background:rgba(82,157,210,.11);border-color:rgba(115,210,244,.22)}
+.notification-dot{position:absolute;width:6px;height:6px;right:7px;top:7px;border-radius:50%;background:#ff997c;box-shadow:0 0 8px #ff997c}
+.notification-popover{position:absolute;right:0;top:47px;width:300px;padding:13px;border:1px solid rgba(123,184,224,.2);border-radius:16px;background:rgba(10,17,30,.97);box-shadow:0 24px 80px rgba(0,0,0,.45);backdrop-filter:blur(26px);z-index:80;animation:pf-pop .18s ease-out}
+.notification-heading{display:flex;justify-content:space-between;align-items:center;padding:4px 3px 12px;border-bottom:1px solid rgba(136,178,212,.12);gap:10px}
+.notification-heading strong{display:block;color:#eef6ff;font-size:12px;margin-top:5px}
+.notification-glow{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;color:#a99bff;background:rgba(135,102,255,.13);border:1px solid rgba(162,129,255,.17)}
+.notification-popover>button:not(.notification-coach){width:100%;display:flex;align-items:center;gap:9px;text-align:left;border:0;border-bottom:1px solid rgba(136,178,212,.1);background:transparent;color:#96a7bd;padding:11px 2px;transition:.18s}
+.notification-popover>button:not(.notification-coach):hover{color:white;background:rgba(80,170,217,.055)}
+.notification-popover>button>span:nth-child(2){flex:1}
+.notification-popover>button strong{display:block;font-size:10px;color:#e7f2ff}
+.notification-popover>button small{display:block;font-size:9px;color:#8497ad;margin-top:4px}
+.notification-item-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:9px;background:rgba(118,243,204,.1);color:var(--pf-mint)}
+.notification-item-icon.purple{background:rgba(164,124,255,.12);color:#baa3ff}
+.notification-coach{width:100%;margin-top:9px;border:1px solid rgba(105,227,217,.2);border-radius:8px;background:rgba(57,201,183,.07);padding:9px;color:#a8f9e8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.top-profile{border-left:1px solid rgba(126,166,198,.16);padding-left:12px}
+.top-profile .avatar{background:linear-gradient(140deg,#2bc5bc,#6255d5);box-shadow:0 0 0 2px rgba(101,228,226,.1),0 0 20px rgba(84,169,255,.12)}
+.tab-transition{min-width:0;position:relative;transform-origin:50% 0}
+.page-content{position:relative;max-width:1620px;margin:0 auto;padding:28px clamp(17px,2.6vw,38px) 20px;gap:0}
+/* Page welcome */
+.home-topline{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:19px}
+.home-welcome{min-width:0}
+.home-eyebrow{display:flex;align-items:center;gap:8px;font-size:9px;letter-spacing:.15em;color:#7892a9;margin-bottom:10px}
+.live-pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:#71ffd0;box-shadow:0 0 11px #71ffd0;animation:pf-pulse 1.8s infinite}
+.eyebrow-divider{width:1px;height:10px;background:#263e55;margin:0 4px}
+.home-welcome h1{font:700 clamp(26px,2.7vw,39px)/1.05 var(--font-display);letter-spacing:-.055em;color:#edf5ff;margin:0}
+.gradient-text{background:linear-gradient(105deg,#a0ffdd 0%,#5be9ee 38%,#9f8cff 84%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.home-welcome p{margin:10px 0 0;color:#8fa0b6;font-size:11px;line-height:1.7;max-width:650px}
+.home-action-stack{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+.home-primary-action{box-shadow:0 5px 20px rgba(90,243,202,.1)}
+.home-coach-action{display:flex;align-items:center;gap:6px;height:37px;padding:0 12px;border:1px solid rgba(151,128,255,.23);border-radius:9px;background:rgba(125,95,221,.085);color:#d2c9ff;font-size:10px;font-weight:700;transition:.2s}
+.home-coach-action:hover{border-color:rgba(151,128,255,.58);background:rgba(125,95,221,.16);transform:translateY(-2px)}
+/* Immersive game world */
+.world-stage{position:relative;isolation:isolate;min-height:397px;overflow:hidden;border-radius:22px;border:1px solid rgba(103,207,239,.22);background:#0a1325;box-shadow:0 20px 60px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);margin-bottom:21px}
+.world-stage:before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(5,12,23,.98) 0%,rgba(6,15,30,.9) 26%,rgba(6,15,30,.45) 48%,rgba(8,12,25,.05) 70%,rgba(9,14,29,.22) 100%),linear-gradient(0deg,rgba(7,11,21,.84),transparent 36%,rgba(8,14,25,.12))}
+.world-stage-image{position:absolute;inset:-1%;z-index:0;background-image:url('/playforge-world.svg');background-size:cover;background-position:center 52%;opacity:.92;transform:scale(1.03);animation:pf-world-drift 26s ease-in-out infinite alternate}
+.world-vignette{position:absolute;z-index:1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 73% 48%,transparent 0%,rgba(5,9,19,.03) 38%,rgba(5,9,20,.3) 100%)}
+.world-scanline{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.12;background:linear-gradient(transparent 50%,rgba(117,218,255,.11) 50%);background-size:100% 4px;mix-blend-mode:screen}
+.world-star{position:absolute;z-index:2;width:4px;height:4px;border-radius:50%;background:#a7fff1;box-shadow:0 0 13px 3px rgba(105,255,232,.55);animation:pf-twinkle 3.5s ease-in-out infinite}
+.world-star-one{top:23%;right:34%;animation-delay:.4s}.world-star-two{top:51%;right:23%;width:3px;height:3px;animation-delay:1.5s}.world-star-three{top:34%;right:47%;animation-delay:2.3s}.world-star-four{top:16%;right:13%;width:2px;height:2px;animation-delay:.8s}
+.world-hud-top{position:absolute;z-index:4;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.world-season,.world-sync{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;background:rgba(9,19,35,.65);border:1px solid rgba(137,200,232,.17);color:#a7bcd2;font-size:8px;font-weight:700;letter-spacing:.13em;backdrop-filter:blur(10px)}
+.season-glyph{width:20px;height:20px;display:grid;place-items:center;border-radius:5px;background:linear-gradient(135deg,#4bbcff22,#9a7bff2f);color:#b0a1ff}.world-season b{color:#61798f}
+.world-sync{font-size:7px;color:#99d8c5;letter-spacing:.12em}.world-sync i{width:5px;height:5px;border-radius:50%;background:#7effbe;box-shadow:0 0 9px #7effbe}
+.world-story{position:absolute;z-index:4;top:78px;left:clamp(19px,2.2vw,34px);width:43%;max-width:490px}
+.world-kicker{display:flex;align-items:center;gap:8px;color:#7fe8e8;font-size:8px;font-weight:700;letter-spacing:.18em}
+.world-kicker-line{width:22px;height:1px;background:linear-gradient(90deg,#63f7db,#7c8aff);box-shadow:0 0 10px #66eee7}
+.world-story h2{font:700 clamp(28px,3vw,43px)/1.01 var(--font-display);letter-spacing:-.055em;color:#f4f8ff;margin:14px 0 11px;text-shadow:0 4px 22px rgba(0,0,0,.38)}
+.world-story h2 em{font-style:normal;background:linear-gradient(90deg,#9cffde,#62e7ed 43%,#b59bff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.world-story>p{font-size:11px;color:#a8b9cc;line-height:1.75;max-width:340px;margin:0 0 17px}
+.world-cta-row{display:flex;gap:8px;flex-wrap:wrap}
+.world-cta-row .btn-primary{padding:10px 12px;font-size:10px;box-shadow:0 7px 20px rgba(84,238,211,.12)}
+.world-ghost-button{display:flex;align-items:center;gap:7px;border:1px solid rgba(139,185,223,.2);border-radius:9px;padding:9px 11px;background:rgba(10,21,38,.55);color:#b8c9de;font-size:9px;font-weight:700;transition:.2s}
+.world-ghost-button:hover{border-color:rgba(155,132,255,.55);color:#e0d9ff;background:rgba(42,32,71,.7);transform:translateY(-2px)}
+.world-mini-hud{display:flex;align-items:center;gap:13px;margin-top:24px;padding-top:14px;border-top:1px solid rgba(155,198,227,.16);max-width:400px}
+.world-mini-hud>div:not(.world-hud-separator){display:flex;flex-direction:column;gap:7px;min-width:0}.world-mini-hud span{font-size:7px;color:#8a9fb4;letter-spacing:.13em;font-weight:700}.world-mini-hud strong{display:flex;align-items:center;gap:5px;font:700 15px var(--font-display);color:#f1f7ff;white-space:nowrap}.world-mini-hud strong small{font:600 8px 'DM Sans',sans-serif;color:#8296ae;letter-spacing:.06em}.world-mini-hud strong svg{color:#ffb26f}.world-hud-separator{height:31px;width:1px;background:rgba(144,190,225,.17)}
+.world-orbit-label{position:absolute;z-index:4;display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid rgba(120,227,241,.27);border-radius:10px;background:rgba(8,18,34,.68);box-shadow:0 6px 20px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.04);backdrop-filter:blur(13px);animation:pf-float 5s ease-in-out infinite;min-width:126px}
+.world-orbit-label>span:nth-child(2){display:flex;flex-direction:column;gap:3px}.world-orbit-label small{font-size:7px;color:#77b9d1;letter-spacing:.12em}.world-orbit-label b{font-size:10px;color:#eaf4ff}.world-orbit-label>i{margin-left:auto;width:5px;height:5px;border-radius:50%;background:#81ffcd;box-shadow:0 0 8px #81ffcd}
+.orbit-mark{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:rgba(79,229,222,.12);color:#69f6df}.orbit-mark.purple{background:rgba(158,121,255,.16);color:#bba4ff}.orbit-mark.ember{background:rgba(255,151,99,.15);color:#ffad7c}
+.world-orbit-a{top:27%;right:18%;animation-delay:.2s}.world-orbit-b{top:45%;right:31%;animation-delay:1.1s}.world-orbit-c{top:58%;right:11%;animation-delay:2s}
+.world-rank-card{position:absolute;right:17px;bottom:16px;z-index:5;width:268px;padding:12px 13px;border:1px solid rgba(125,196,236,.25);border-radius:13px;background:linear-gradient(135deg,rgba(8,18,33,.9),rgba(20,20,45,.83));backdrop-filter:blur(18px);box-shadow:0 12px 42px rgba(0,0,0,.25)}
+.rank-card-top{display:flex;align-items:center;gap:8px}.rank-avatar{width:31px;height:31px;display:grid;place-items:center;border-radius:9px;color:#8cfbe2;border:1px solid rgba(101,248,223,.24);background:linear-gradient(135deg,rgba(76,205,214,.17),rgba(138,101,255,.19));box-shadow:0 0 20px rgba(63,229,227,.08)}.rank-card-top>span:nth-child(2){display:flex;flex-direction:column;gap:4px;flex:1}.rank-card-top small{font-size:7px;color:#80a2be;letter-spacing:.13em}.rank-card-top strong{font-size:10px;color:#f0f7ff}.rank-badge{display:grid;place-items:center;width:26px;height:26px;border:1px solid rgba(255,207,115,.25);background:rgba(255,196,80,.1);color:#ffd884;border-radius:8px}
+.rank-progress-head{display:flex;justify-content:space-between;margin-top:13px;color:#8da6be;font-size:8px}.rank-progress-head b{color:#bdfbe6;font-weight:700}.rank-progress-track,.nextgen-stat-track,.nextgen-progress-track,.nextgen-habit-progress>div{height:5px;overflow:hidden;border-radius:20px;background:rgba(113,145,178,.15)}.rank-progress-track{margin-top:7px}.rank-progress-track span,.nextgen-stat-track span,.nextgen-progress-track span,.nextgen-habit-progress>div i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#54eec5,#62dfff 57%,#9a82ff);box-shadow:0 0 13px rgba(90,246,212,.35);transition:width .65s cubic-bezier(.2,.8,.2,1)}
+.rank-card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;color:#829ab0;font-size:8px}.rank-card-foot button{display:flex;align-items:center;gap:3px;border:0;background:none;padding:0;color:#80dbe9;font-size:8px}.rank-card-foot button:hover{color:white}.rank-xp-note{font-size:8px;line-height:1.55;color:#9eacbf;margin:10px 0 0;border-top:1px solid rgba(137,191,225,.12);padding-top:8px}
+.world-bottom-fade{position:absolute;bottom:0;left:0;right:0;height:65px;z-index:2;pointer-events:none;background:linear-gradient(0deg,rgba(6,10,20,.55),transparent)}
+/* Realm selector */
+.realm-selector-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 0 11px}.realm-selector-heading h3,.achievement-heading h3{margin:5px 0 0;color:#ecf4ff;font:700 16px var(--font-display);letter-spacing:-.025em}.tiny-asterisk{color:#8a9cff;font-size:14px;margin-left:3px}.realm-hint{display:flex;align-items:center;gap:6px;color:#778da7;font-size:9px}.realm-hint svg{color:#b8a3ff}
+.realm-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.realm-card{position:relative;isolation:isolate;display:flex;align-items:center;gap:10px;min-width:0;overflow:hidden;text-align:left;border:1px solid rgba(127,165,209,.16);border-radius:13px;padding:12px 12px 15px;background:linear-gradient(120deg,rgba(22,34,53,.8),rgba(13,19,33,.94));color:#c5d5e7;box-shadow:0 7px 25px rgba(0,0,0,.08);transition:border-color .2s,background .2s,box-shadow .2s}
+.realm-card:before{content:"";position:absolute;z-index:-1;inset:0;opacity:0;background:radial-gradient(ellipse at 0 0,rgba(101,251,219,.12),transparent 58%);transition:opacity .2s}.realm-card:hover:before,.realm-card.realm-active:before{opacity:1}.realm-card.realm-active{border-color:rgba(108,242,218,.46);box-shadow:0 0 0 1px rgba(101,243,220,.07),0 12px 35px rgba(46,170,187,.07)}
+.realm-card-bg{position:absolute;z-index:-1;right:-30px;top:-30px;width:84px;height:84px;border:1px solid rgba(105,255,228,.08);border-radius:50%;box-shadow:0 0 0 12px rgba(105,255,228,.018),0 0 0 26px rgba(105,255,228,.012)}
+.realm-icon{width:36px;height:36px;display:grid;place-items:center;flex-shrink:0;border:1px solid rgba(112,235,218,.2);border-radius:10px;background:rgba(71,226,204,.1);color:#8ff9e4;box-shadow:0 0 20px rgba(75,230,220,.06)}
+.realm-card-copy{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}.realm-card-copy small{font-size:7px;letter-spacing:.14em;color:#7fb4bd;font-weight:700}.realm-card-copy strong{font:700 11px var(--font-display);color:#eaf2ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.realm-card-copy em{font-style:normal;font-size:8px;color:#7f94ad;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.realm-arrow{display:grid;place-items:center;flex-shrink:0;color:#6f96b3;transition:.2s}.realm-card:hover .realm-arrow{color:#aafbe7;transform:translate(2px,-2px)}.realm-progress{position:absolute;left:12px;right:12px;bottom:6px;height:2px;background:rgba(127,159,191,.13);border-radius:10px;overflow:hidden}.realm-progress i{display:block;height:100%;background:linear-gradient(90deg,#68f5d7,#5dc5fa,#9b86ff);box-shadow:0 0 8px #5cddec;transition:width .45s}
+.realm-ember .realm-icon{background:rgba(255,149,99,.12);border-color:rgba(255,149,99,.2);color:#ffb083}.realm-violet .realm-icon{background:rgba(158,125,255,.13);border-color:rgba(158,125,255,.22);color:#c0adff}.realm-gold .realm-icon{background:rgba(255,206,115,.1);border-color:rgba(255,206,115,.22);color:#ffd990}
+.realm-active-bar{display:flex;align-items:center;gap:11px;min-width:0;margin-bottom:19px;padding:10px 12px;border:1px solid rgba(119,172,211,.12);border-radius:11px;background:linear-gradient(90deg,rgba(20,30,48,.67),rgba(14,18,31,.46));}
+.active-realm-symbol{width:31px;height:31px;display:grid;place-items:center;flex-shrink:0;border-radius:9px;color:#99f9e0;background:rgba(81,223,197,.11)}.active-realm-symbol.ember{color:#ffb083;background:rgba(255,149,99,.11)}.active-realm-symbol.violet{color:#c0adff;background:rgba(158,125,255,.12)}.active-realm-symbol.gold{color:#ffd990;background:rgba(255,206,115,.11)}
+.active-realm-copy{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.active-realm-copy span{font-size:7px;letter-spacing:.15em;color:#7194ad;font-weight:700}.active-realm-copy strong{font-size:10px;color:#e8f3ff}.active-realm-copy small{font-size:8px;color:#8095ac}.realm-active-bar>.btn-secondary{font-size:9px;padding:8px 10px;white-space:nowrap}
+/* Stat cards */
+.nextgen-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:0 0 17px}
+.nextgen-stat-card{position:relative;min-width:0;overflow:hidden;border:1px solid rgba(117,168,210,.15);border-radius:14px;padding:14px;background:linear-gradient(138deg,rgba(23,33,51,.92),rgba(14,19,32,.94));box-shadow:0 12px 30px rgba(0,0,0,.1);transition:border-color .2s,box-shadow .2s}
+.nextgen-stat-card:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;background:radial-gradient(ellipse at 110% -20%,var(--stat-halo,rgba(95,235,212,.12)),transparent 61%)}.mint-stat{--stat-halo:rgba(85,246,204,.15);--stat-color:#89f8d1}.purple-stat{--stat-halo:rgba(164,121,255,.16);--stat-color:#b7a0ff}.blue-stat{--stat-halo:rgba(84,179,255,.16);--stat-color:#7dc7ff}.gold-stat{--stat-halo:rgba(255,206,111,.15);--stat-color:#ffd68b}
+.nextgen-stat-card:hover{border-color:rgba(115,225,236,.31);box-shadow:0 16px 38px rgba(0,0,0,.18),0 0 27px rgba(71,190,218,.045)}
+.nextgen-stat-top{position:relative;display:flex;align-items:center;justify-content:space-between}.nextgen-stat-icon{width:32px;height:32px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--stat-color),transparent 77%);background:color-mix(in srgb,var(--stat-color),transparent 91%);color:var(--stat-color);border-radius:10px}.stat-sparkline{font:700 22px var(--font-display);letter-spacing:-.15em;color:var(--stat-color);opacity:.6;transform:rotate(-10deg)}.stat-micro-chip{font-size:7px;letter-spacing:.11em;font-weight:700;color:var(--stat-color);padding:5px 6px;border:1px solid color-mix(in srgb,var(--stat-color),transparent 82%);border-radius:6px;background:color-mix(in srgb,var(--stat-color),transparent 94%)}
+.nextgen-stat-label{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-top:13px;color:#91a4ba;font-size:8px;letter-spacing:.1em;font-weight:700;white-space:nowrap}.nextgen-stat-label span{font-size:6px;letter-spacing:.08em;color:#647b95}
+.nextgen-stat-number{font:700 clamp(24px,2.2vw,30px)/1.1 var(--font-display);letter-spacing:-.06em;color:#f5f8ff;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nextgen-stat-number small{font:500 9px 'DM Sans',sans-serif;letter-spacing:0;color:#869bb4;margin-left:5px}
+.nextgen-stat-foot{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-top:8px;color:#7f94ab;font-size:8px}.stat-arrow{display:grid;place-items:center;width:21px;height:21px;color:var(--stat-color);border-radius:7px;background:rgba(120,164,205,.08)}.nextgen-stat-track{position:relative;margin-top:9px;height:3px;background:rgba(128,160,195,.13)}.nextgen-stat-track span{background:linear-gradient(90deg,var(--stat-color),color-mix(in srgb,var(--stat-color),#6f80ff 27%))}
+/* Panels and motion-enhanced layouts */
+.nextgen-dashboard-grid{grid-template-columns:minmax(0,1.07fr) minmax(0,.93fr);gap:13px;margin-bottom:13px}
+.nextgen-panel{position:relative;overflow:hidden;border-color:rgba(121,167,209,.14);border-radius:15px;background:linear-gradient(140deg,rgba(19,29,46,.93),rgba(13,18,31,.97));box-shadow:0 10px 35px rgba(0,0,0,.1)}
+.nextgen-panel:after{content:"";position:absolute;top:0;left:14%;right:14%;height:1px;background:linear-gradient(90deg,transparent,rgba(128,241,226,.22),transparent);pointer-events:none}
+.nextgen-panel .panel-header{margin-bottom:13px}.nextgen-panel .panel-header h3{font-size:15px}.nextgen-quest-progress{margin:-1px 0 7px;padding:10px;border:1px solid rgba(124,166,208,.1);border-radius:9px;background:rgba(8,15,27,.42)}.nextgen-quest-progress>div:first-child{display:flex;align-items:center;justify-content:space-between;color:#7891aa;font-size:7px;letter-spacing:.11em;font-weight:700}.nextgen-quest-progress strong{font:700 13px var(--font-display);color:#a9ffe2;letter-spacing:0}.nextgen-progress-track{margin-top:8px;height:4px}
+.nextgen-panel .quest-list.compact{gap:1px}.nextgen-panel .quest-row{border-bottom-color:rgba(120,162,199,.1);padding:12px 0}.nextgen-panel .quest-row:hover{background:rgba(94,145,183,.045)}.nextgen-panel .quest-row-icon{border-radius:10px;box-shadow:inset 0 1px rgba(255,255,255,.04)}.nextgen-panel .quest-check{transition:transform .2s,background .2s,border-color .2s}.nextgen-panel .quest-check:hover{transform:scale(1.09);border-color:rgba(112,255,211,.65)}
+.nextgen-chart-live{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:7px;background:rgba(94,255,191,.06);color:#89edc6;border:1px solid rgba(94,255,191,.14);font-size:7px;letter-spacing:.1em;font-weight:700}.nextgen-chart-live i{width:5px;height:5px;border-radius:50%;background:#80ffc0;box-shadow:0 0 8px #80ffc0;animation:pf-pulse 1.8s infinite}
+.nextgen-week-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:7px 0 7px;padding:12px;border:1px solid rgba(119,165,204,.11);border-radius:11px;background:linear-gradient(105deg,rgba(23,55,65,.25),rgba(29,24,51,.25))}.nextgen-week-hero>div:first-child>span{font-size:7px;font-weight:700;letter-spacing:.15em;color:#7da2b4}.nextgen-week-hero>div:first-child>strong{display:block;font:700 29px/1 var(--font-display);letter-spacing:-.06em;color:#eefff9;margin-top:8px}.nextgen-week-hero>div:first-child>strong small{font:500 10px 'DM Sans',sans-serif;letter-spacing:0;color:#8da7ba}.nextgen-week-hero p{font-size:8px;color:#819ab0;margin:5px 0 0;line-height:1.5;max-width:190px}
+.week-ring{--ring-progress:0%;position:relative;width:72px;height:72px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:conic-gradient(from -90deg,#6bffdb var(--ring-progress),rgba(111,151,181,.13) var(--ring-progress));box-shadow:0 0 24px rgba(74,245,214,.06)}.week-ring:before{content:"";position:absolute;inset:6px;border:1px solid rgba(121,191,208,.12);border-radius:50%;background:#101c2a}.week-ring>div{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px}.week-ring strong{font:700 15px var(--font-display);color:#b9ffe5}.week-ring small{font-size:6px;color:#809cb4;white-space:nowrap}
+.nextgen-weekly-chart{height:126px;padding-top:3px}.nextgen-weekly-chart .bar-wrap{border-radius:6px 6px 3px 3px;background:rgba(91,132,164,.065)}.nextgen-weekly-chart .activity-bar{border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,#69f4d2,#3988c9 78%,#785eff);box-shadow:0 0 13px rgba(93,225,222,.15);transition:height .5s ease}.nextgen-weekly-chart .activity-bar.current{background:linear-gradient(180deg,#d0fff3,#59e0e7,#9282ff);box-shadow:0 0 15px rgba(99,243,225,.26)}.nextgen-weekly-chart .chart-col:hover .activity-bar{filter:brightness(1.25)}.nextgen-panel .chart-footer{font-size:8px;color:#718ba5}
+.nextgen-lower-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.94fr);gap:13px;margin:0 0 18px}.nextgen-habits-panel,.nextgen-coach-panel{position:relative;overflow:hidden;border:1px solid rgba(121,167,209,.14);border-radius:15px;padding:17px;background:linear-gradient(140deg,rgba(18,28,45,.93),rgba(13,18,31,.97));box-shadow:0 10px 35px rgba(0,0,0,.1)}
+.nextgen-panel-intro{font-size:9px;color:#8299b0;margin:-4px 0 10px}.nextgen-habit-progress{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-bottom:5px;color:#7590a9;font-size:7px}.nextgen-habit-progress>div{width:100%;height:3px;margin-top:2px}.nextgen-habit-progress>div i{display:block}
+.nextgen-habits-panel .habit-preview{margin-top:5px}.nextgen-habits-panel .habit-preview-row{border-bottom-color:rgba(121,164,200,.1);padding:10px 1px}.nextgen-habits-panel .habit-preview-row:hover{background:rgba(96,171,184,.05)}.nextgen-habits-panel .habit-icon{border:1px solid rgba(123,214,214,.1);background:rgba(79,193,189,.07);color:#8ce7df;border-radius:9px}.nextgen-habits-panel .habit-label strong{font-size:10px}.nextgen-habits-panel .habit-label small{font-size:8px}.habit-panel-cta{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:9px;border:1px dashed rgba(124,194,218,.22);border-radius:9px;background:rgba(82,166,199,.055);padding:10px;color:#9deedc;font-size:9px;font-weight:700;transition:.2s}.habit-panel-cta svg:last-child{margin-left:auto}.habit-panel-cta:hover{border-color:rgba(118,254,218,.48);background:rgba(82,229,201,.09)}
+.nextgen-coach-panel{padding:0;background:linear-gradient(134deg,#152b44,#1a2141 58%,#10222f);border-color:rgba(140,126,255,.2);min-height:100%;display:flex;flex-direction:column}.coach-panel-background{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 85% 8%,rgba(80,222,255,.14),transparent 35%),radial-gradient(circle at 8% 100%,rgba(130,87,255,.12),transparent 43%)}.coach-panel-background:before,.coach-panel-background:after{content:"";position:absolute;width:140px;height:140px;border:1px solid rgba(109,231,243,.07);border-radius:50%;right:-55px;top:-75px;box-shadow:0 0 0 15px rgba(101,223,255,.018),0 0 0 31px rgba(153,117,255,.018);animation:pf-orbit-pulse 8s ease-in-out infinite}.coach-panel-background:after{width:90px;height:90px;right:-30px;top:-48px;animation-delay:1.3s}
+.coach-panel-header{position:relative;z-index:1;display:flex;align-items:center;gap:10px;padding:15px 16px 6px}.coach-icon-orb{position:relative;width:36px;height:36px;display:grid;place-items:center;border-radius:12px;color:#9df7f3;background:linear-gradient(140deg,rgba(57,210,225,.15),rgba(153,105,255,.19));border:1px solid rgba(120,236,236,.2);box-shadow:0 0 22px rgba(82,220,231,.1)}.coach-icon-orb:after{content:"";position:absolute;inset:-4px;border:1px solid rgba(97,227,245,.17);border-radius:15px;animation:pf-orbit-pulse 3s ease-in-out infinite}.coach-icon-orb i{position:absolute;right:1px;bottom:1px;width:6px;height:6px;border-radius:50%;background:#8affc8;box-shadow:0 0 8px #8affc8}.coach-beta{display:flex;flex-direction:column;gap:4px;color:#aebbd4;font-size:8px;letter-spacing:.13em;font-weight:700}.coach-beta b{font-size:7px;color:#bdadff;letter-spacing:.08em}.coach-mini-button{display:grid;place-items:center;width:27px;height:27px;margin-left:auto;border:1px solid rgba(149,139,255,.2);border-radius:8px;background:rgba(141,111,255,.08);color:#c6b6ff;transition:.2s}.coach-mini-button:hover{transform:translate(2px,-2px);background:rgba(141,111,255,.18)}
+.coach-panel-content{position:relative;z-index:1;padding:8px 16px 16px;display:flex;flex-direction:column;align-items:flex-start;flex:1}.coach-panel-content .panel-kicker{color:#80d9e6;font-size:7px}.coach-panel-content h3{font:700 16px/1.35 var(--font-display);letter-spacing:-.03em;color:#f1f5ff;margin:8px 0 7px;max-width:320px}.coach-panel-content p{font-size:9px;line-height:1.75;color:#a4b6ce;max-width:400px;margin:0 0 14px}.coach-full-button{width:100%;justify-content:center;padding:10px 12px;font-size:9px;margin-top:auto}.coach-local-note{display:flex;align-items:center;gap:5px;color:#6e8da4;font-size:7px;margin-top:9px}.coach-local-note svg{color:#7eb8bb}
+.achievement-section{margin:0 0 17px}.achievement-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px}.achievement-heading h3{font-size:15px}.achievement-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.achievement-tile{display:flex;align-items:center;gap:9px;min-width:0;padding:10px 11px;border:1px solid rgba(123,165,203,.13);border-radius:11px;background:linear-gradient(110deg,rgba(22,30,46,.8),rgba(14,19,31,.88));transition:border-color .2s,background .2s}.achievement-tile.achievement-unlocked{border-color:rgba(103,239,195,.2);background:linear-gradient(110deg,rgba(26,63,58,.27),rgba(14,25,33,.88))}.achievement-art{position:relative;display:grid;place-items:center;flex-shrink:0;width:33px;height:33px;border:1px solid rgba(125,160,206,.17);border-radius:10px;background:rgba(118,139,185,.08);color:#8d9eb9}.achievement-unlocked .achievement-art{color:#9dffdb;border-color:rgba(105,255,201,.22);background:rgba(78,231,180,.1);box-shadow:0 0 17px rgba(80,230,183,.055)}.achievement-art i{position:absolute;right:-4px;top:-4px;width:14px;height:14px;display:grid;place-items:center;border:1px solid #0f1a22;border-radius:50%;background:#65f2ba;color:#10241d}.achievement-copy{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.achievement-copy strong{font-size:9px;color:#e2eefc}.achievement-copy small{font-size:8px;color:#758da5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.achievement-status{font-size:6px;letter-spacing:.09em;color:#7689a1;font-weight:700}.achievement-unlocked .achievement-status{color:#7ef2bf}
+.nextgen-impact-note{margin-top:3px;border:1px solid rgba(118,183,211,.13);background:linear-gradient(100deg,rgba(17,31,45,.8),rgba(21,21,40,.72))}.nextgen-impact-note .note-icon{background:rgba(80,209,197,.1);color:#8aeee2;border:1px solid rgba(80,209,197,.14)}
+/* Transition-friendly action buttons */
+.btn-primary,.btn-secondary,.btn-glass,.wide-outline,.text-link{transition:transform .18s,box-shadow .18s,border-color .18s,background .18s}
+.btn-primary{background:linear-gradient(105deg,#91ffd3,#68e9dc 58%,#72d9ff);color:#07161b;border:1px solid rgba(183,255,235,.62);font-weight:800;box-shadow:0 5px 18px rgba(79,236,205,.08);position:relative;overflow:hidden}
+.btn-primary:before{content:"";position:absolute;top:-20%;bottom:-20%;left:-35%;width:25%;transform:skewX(-22deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transition:left .58s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(79,236,205,.19),0 0 0 3px rgba(79,236,205,.055)}.btn-primary:hover:before{left:135%}.btn-primary:active{transform:translateY(0) scale(.985)}
+.btn-secondary:hover,.wide-outline:hover{border-color:rgba(117,233,222,.4);background:rgba(73,173,180,.09);transform:translateY(-1px)}.text-link:hover{color:#a7ffdf;transform:translateX(2px)}
+/* Command palette */
+.command-overlay,.coach-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-start;justify-content:center;background:rgba(2,5,12,.68);backdrop-filter:blur(13px);padding:13vh 16px 20px}
+.command-dialog{width:min(590px,100%);overflow:hidden;border:1px solid rgba(111,204,236,.27);border-radius:18px;background:linear-gradient(145deg,rgba(15,25,41,.99),rgba(13,15,29,.99));box-shadow:0 35px 100px rgba(0,0,0,.56),0 0 45px rgba(61,184,227,.07)}
+.command-input-row{display:flex;align-items:center;gap:12px;padding:15px 16px;border-bottom:1px solid rgba(129,175,217,.14);color:#76eaf0}.command-input-row input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#edf7ff;font-size:14px}.command-input-row input::placeholder{color:#61758e}.command-esc{padding:5px 7px;border:1px solid rgba(139,173,207,.18);border-radius:6px;background:rgba(108,139,176,.06);color:#8da0b7;font-size:8px;letter-spacing:.08em}
+.command-list-heading{display:flex;justify-content:space-between;padding:12px 16px 7px;color:#68849d;font-size:7px;letter-spacing:.16em;font-weight:700}.command-list-heading span:last-child{color:#5f7d96}
+.command-results{max-height:min(390px,55vh);overflow-y:auto;padding:2px 8px 10px}.command-result{width:100%;display:flex;align-items:center;gap:10px;padding:10px 9px;border:1px solid transparent;border-radius:10px;background:transparent;text-align:left;color:#b3c2d6;transition:.16s}.command-result:hover,.command-result:focus-visible{background:linear-gradient(90deg,rgba(46,143,157,.14),rgba(96,78,166,.12));border-color:rgba(112,218,227,.16);color:white}.command-result-icon{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;border:1px solid rgba(124,190,225,.14);border-radius:9px;background:rgba(81,158,201,.09);color:#8ae9ed}.command-result-copy{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.command-result-copy strong{font-size:11px;color:#e4efff}.command-result-copy small{font-size:9px;color:#8498af}.command-result kbd{font:700 12px var(--font-display);color:#758ca5}.command-empty{padding:28px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;color:#6e8ba3;font-size:10px}.command-empty strong{color:#dce9f8;font-size:12px}.command-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 15px;border-top:1px solid rgba(129,175,217,.1);background:rgba(7,12,23,.45);color:#738ba3;font-size:8px}.command-footer span{display:flex;align-items:center;gap:4px}
+/* Smart Coach drawer */
+.coach-overlay{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(2,5,12,.54)}.coach-drawer{position:relative;width:min(440px,100%);height:100%;display:flex;flex-direction:column;overflow-y:auto;border-left:1px solid rgba(104,221,240,.23);background:radial-gradient(ellipse at 70% 0%,rgba(58,75,151,.21),transparent 37%),linear-gradient(180deg,#0c1525,#0a0f1c 66%,#0a101a);box-shadow:-30px 0 90px rgba(0,0,0,.4);padding:22px 21px 15px}
+.coach-drawer-top{display:flex;align-items:center;gap:13px}.coach-avatar-stage{position:relative;width:62px;height:62px;flex-shrink:0;display:grid;place-items:center}.coach-avatar-core{z-index:2;display:grid;place-items:center;width:42px;height:42px;border:1px solid rgba(103,240,235,.35);border-radius:14px;background:linear-gradient(135deg,rgba(47,191,204,.17),rgba(128,92,255,.22));color:#9bfaf0;box-shadow:0 0 29px rgba(83,216,235,.15),inset 0 1px rgba(255,255,255,.1)}.coach-avatar-ring{position:absolute;inset:3px;border:1px solid rgba(95,228,238,.25);border-radius:50%;animation:pf-spin 12s linear infinite}.coach-avatar-ring.ring-two{inset:-4px;border-color:rgba(155,127,255,.25);border-style:dashed;animation-direction:reverse;animation-duration:18s}.coach-avatar-stage:after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(83,230,221,.12),transparent 70%);animation:pf-orbit-pulse 3s ease-in-out infinite}.coach-avatar-stage>i{position:absolute;z-index:3;right:2px;bottom:2px;width:8px;height:8px;border:2px solid #0d1725;border-radius:50%;background:#79ffc5;box-shadow:0 0 9px #79ffc5}
+.coach-title-copy{flex:1;min-width:0}.coach-title-copy h2{margin:4px 0 3px;color:#f1f5ff;font:700 22px var(--font-display);letter-spacing:-.04em}.coach-title-copy h2 span{font:700 9px 'DM Sans',sans-serif;color:#b7a5ff;border:1px solid rgba(166,137,255,.23);border-radius:5px;padding:3px 4px;vertical-align:middle;letter-spacing:.08em}.coach-title-copy p{margin:0;color:#7890a8;font-size:9px}.coach-close{display:grid;place-items:center;width:33px;height:33px;flex-shrink:0;border:1px solid rgba(128,172,208,.17);border-radius:10px;background:rgba(109,144,182,.06);color:#91a7c1;transition:.2s}.coach-close:hover{color:white;background:rgba(255,255,255,.08)}
+.coach-status-row{display:flex;align-items:center;justify-content:space-between;gap:9px;margin:19px 0 14px;padding:9px 10px;border:1px solid rgba(120,166,203,.12);border-radius:8px;background:rgba(118,160,204,.035);color:#7c98b1;font-size:7px;letter-spacing:.06em}.coach-status-row span{display:flex;align-items:center;gap:5px}.coach-status-row span:first-child{color:#93e9ca}.coach-status-row i{width:5px;height:5px;border-radius:50%;background:#8bffcb;box-shadow:0 0 7px #8bffcb}.coach-welcome-card{position:relative;overflow:hidden;border:1px solid rgba(111,199,229,.19);border-radius:14px;padding:15px;background:linear-gradient(135deg,rgba(28,62,81,.33),rgba(39,30,68,.32));box-shadow:0 10px 38px rgba(0,0,0,.11)}.coach-welcome-card:before{content:"";position:absolute;right:-23px;top:-32px;width:100px;height:100px;border:1px solid rgba(104,233,227,.12);border-radius:50%;box-shadow:0 0 0 12px rgba(104,233,227,.025),0 0 0 25px rgba(104,233,227,.015)}.coach-message-label{position:relative;z-index:1;display:flex;align-items:center;gap:6px;color:#8bf3e6;font-size:7px;font-weight:700;letter-spacing:.13em}.coach-welcome-card p{position:relative;z-index:1;margin:11px 0;color:#dce8f7;font-size:11px;line-height:1.82;white-space:pre-line}.coach-welcome-card small{display:block;position:relative;z-index:1;padding-top:9px;border-top:1px solid rgba(130,180,214,.12);color:#7691a7;font-size:8px;line-height:1.6}
+.coach-prompt-heading{display:flex;justify-content:space-between;gap:8px;margin:23px 0 10px;color:#a6b7cc;font-size:8px;letter-spacing:.13em;font-weight:700}.coach-prompt-heading small{color:#617d97;font-size:7px}.coach-prompt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.coach-prompt-grid button{display:flex;align-items:center;gap:6px;min-width:0;padding:11px 9px;border:1px solid rgba(125,168,204,.14);border-radius:10px;background:rgba(26,37,55,.57);text-align:left;color:#adbed2;font-size:9px;line-height:1.3;transition:.2s}.coach-prompt-grid button:hover{border-color:rgba(120,234,224,.35);background:rgba(35,65,80,.6);color:white}.coach-prompt-grid button>span{display:grid;place-items:center;flex-shrink:0;width:24px;height:24px;border-radius:7px;background:rgba(91,221,214,.08);color:#8cfff0}.coach-prompt-grid button>svg:last-child{margin-left:auto;flex-shrink:0;color:#668ba6}
+.coach-safety-tip{display:flex;gap:8px;margin-top:16px;padding:11px;border:1px solid rgba(255,203,119,.14);border-radius:10px;background:rgba(255,189,92,.04);color:#8fa1b4}.coach-safety-tip>span{color:#f5cd81;flex-shrink:0}.coach-safety-tip p{font-size:8px;line-height:1.7;margin:0}.coach-composer{display:flex;gap:8px;margin-top:auto;padding-top:20px}.coach-composer input{flex:1;min-width:0;border:1px solid rgba(125,181,216,.18);border-radius:10px;background:rgba(17,29,45,.92);outline:0;padding:12px;color:#e5f1ff;font-size:10px}.coach-composer input:focus{border-color:rgba(102,238,222,.5);box-shadow:0 0 0 3px rgba(102,238,222,.055)}.coach-composer input::placeholder{color:#657f98}.coach-composer button{width:42px;display:grid;place-items:center;border:1px solid rgba(134,245,222,.3);border-radius:10px;background:linear-gradient(140deg,#8effd3,#55dbe7);color:#09202a;transition:.2s}.coach-composer button:disabled{opacity:.38;cursor:not-allowed}.coach-composer button:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(90,232,213,.15)}.coach-drawer-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:12px;margin-top:12px;border-top:1px solid rgba(126,167,204,.1);color:#6e879d;font-size:7px}.coach-drawer-footer span,.coach-drawer-footer button{display:flex;align-items:center;gap:5px}.coach-drawer-footer button{border:0;background:transparent;color:#93dce4;font-size:8px}
+.floating-coach{position:fixed;z-index:120;right:22px;bottom:22px;display:flex;align-items:center;gap:7px;height:45px;padding:0 14px;border:1px solid rgba(106,239,223,.3);border-radius:15px;background:linear-gradient(135deg,rgba(12,43,55,.97),rgba(28,26,60,.97));box-shadow:0 10px 34px rgba(0,0,0,.28),0 0 25px rgba(75,226,219,.09);color:#a6fff1;transition:.2s;overflow:hidden}.floating-coach:hover{transform:translateY(-3px);border-color:rgba(128,255,225,.66);box-shadow:0 14px 38px rgba(0,0,0,.33),0 0 33px rgba(75,226,219,.15)}.floating-coach>svg{position:relative;z-index:2}.floating-coach-label{position:relative;z-index:2;font-size:9px;letter-spacing:.1em;font-weight:800}.floating-coach-orbit{position:absolute;inset:-28px auto -28px -34px;width:100px;border-radius:50%;background:radial-gradient(circle,rgba(91,244,229,.15),transparent 70%);animation:pf-orbit-pulse 3s ease-in-out infinite}
+/* Toasts and modals */
+.toast{z-index:1500;border:1px solid rgba(120,242,213,.22);background:rgba(14,28,39,.97);backdrop-filter:blur(18px);box-shadow:0 15px 55px rgba(0,0,0,.42),0 0 22px rgba(74,217,202,.065);animation:pf-toast-in .32s cubic-bezier(.2,.9,.25,1)}
+.modal-backdrop{z-index:1001;backdrop-filter:blur(12px);background:rgba(2,5,12,.7)}.modal{border:1px solid rgba(133,197,225,.2);background:linear-gradient(145deg,#172439,#0e1522);box-shadow:0 30px 90px rgba(0,0,0,.45)}
+/* Small motion utilities */
+@keyframes pf-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.76)}}
+@keyframes pf-world-drift{0%{transform:scale(1.025) translate3d(-.25%,0,0)}100%{transform:scale(1.07) translate3d(.45%,-.5%,0)}}
+@keyframes pf-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pf-twinkle{0%,100%{opacity:.34;transform:scale(.7)}50%{opacity:1;transform:scale(1.4)}}
+@keyframes pf-spin{to{transform:rotate(360deg)}}
+@keyframes pf-orbit-pulse{0%,100%{opacity:.5;transform:scale(.97)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes pf-pop{from{opacity:0;transform:translateY(-5px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes pf-toast-in{from{opacity:0;transform:translate(12px,8px) scale(.97)}to{opacity:1;transform:translate(0,0) scale(1)}}
+/* Responsive refinements */
+@media(max-width:1250px){.world-stage{min-height:375px}.world-story{width:45%}.world-story h2{font-size:34px}.world-orbit-label{transform:scale(.91);transform-origin:right center}.world-orbit-a{right:14%}.world-orbit-b{right:28%}.world-orbit-c{right:9%}.world-rank-card{width:244px}.realm-card{gap:7px;padding-left:9px;padding-right:8px}.realm-icon{width:31px;height:31px}.realm-card-copy strong{font-size:10px}.nextgen-stat-card{padding:12px}.nextgen-stat-label{font-size:7px}.nextgen-stat-number{font-size:26px}}
+@media(max-width:1100px){.topbar-enhanced{gap:11px}.top-search-trigger{width:min(320px,30vw)}.local-badge{display:none}.world-stage{min-height:355px}.world-story{top:74px;width:46%}.world-story h2{font-size:31px}.world-orbit-label{scale:.85}.world-orbit-a{right:8%;top:28%}.world-orbit-b{right:23%;top:46%}.world-orbit-c{right:4%;top:58%}.world-rank-card{width:220px;right:12px;bottom:12px}.world-mini-hud{gap:9px;margin-top:18px}.nextgen-stat-grid{gap:8px}.nextgen-stat-card{padding:10px}.nextgen-stat-label span{display:none}.nextgen-lower-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:980px){.world-stage{min-height:370px}.world-story{width:47%;top:74px}.world-story h2{font-size:30px}.world-orbit-label{display:none}.world-rank-card{width:235px}.realm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nextgen-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nextgen-dashboard-grid{grid-template-columns:1fr}.nextgen-lower-grid{grid-template-columns:1fr 1fr}.achievement-strip{grid-template-columns:1fr 1fr}.nextgen-stat-label span{display:inline}.top-search-trigger{width:min(300px,32vw)}}
+@media(max-width:700px){.topbar-enhanced{height:59px;padding:0 13px;gap:8px}.topbar-enhanced .breadcrumb{display:none}.top-search-trigger{width:auto;min-width:38px;height:35px;padding:0 9px;margin-left:0;flex:1}.top-search-trigger span,.top-search-trigger kbd{display:none}.top-search-trigger svg{margin:auto}.coach-top-button{height:33px;padding:0 8px}.coach-top-button span,.coach-top-button i{display:none}.topbar-right{gap:5px;margin-left:0}.top-profile{padding-left:5px}.top-profile>svg{display:none}.top-profile .avatar{width:29px;height:29px}.page-content{padding:20px 13px 16px}.home-topline{align-items:flex-start;flex-direction:column;gap:14px;margin-bottom:16px}.home-welcome h1{font-size:29px}.home-welcome p{font-size:10px}.home-action-stack{width:100%;justify-content:flex-start}.home-action-stack>.btn-primary{flex:1;justify-content:center}.home-action-stack .btn-secondary,.home-coach-action{padding:0 10px}.world-stage{min-height:505px;border-radius:17px;margin-bottom:16px}.world-stage-image{inset:0;background-size:auto 75%;background-repeat:no-repeat;background-position:68% 40%;opacity:.92}.world-stage:before{background:linear-gradient(180deg,rgba(5,12,23,.28) 0%,rgba(5,12,23,.28) 25%,rgba(5,12,23,.74) 51%,rgba(5,12,23,.98) 80%,rgba(5,12,23,.99) 100%),linear-gradient(90deg,rgba(5,12,23,.38),transparent 85%)}.world-hud-top{top:11px;left:10px;right:10px}.world-season{font-size:6px;padding:5px 6px;gap:4px;letter-spacing:.05em}.season-glyph{width:17px;height:17px}.world-sync{font-size:6px;padding:6px}.world-story{top:160px;left:16px;right:14px;width:auto;max-width:none}.world-kicker{font-size:7px}.world-story h2{font-size:30px;margin:9px 0}.world-story>p{font-size:10px;max-width:330px;margin-bottom:12px}.world-cta-row{gap:6px}.world-cta-row .btn-primary{font-size:9px;padding:9px 10px}.world-ghost-button{font-size:8px;padding:8px}.world-mini-hud{margin-top:14px;padding-top:10px;gap:10px;max-width:370px}.world-mini-hud span{font-size:6px}.world-mini-hud strong{font-size:13px}.world-mini-hud strong small{font-size:7px}.world-hud-separator{height:27px}.world-rank-card{left:12px;right:12px;bottom:12px;width:auto;padding:10px}.rank-card-top small{font-size:6px}.rank-card-top strong{font-size:9px}.rank-card-foot{font-size:7px}.world-rank-card .rank-progress-head{margin-top:9px}.world-orbit-label{display:none}.world-star{display:none}.realm-selector-heading{align-items:flex-start;flex-direction:column;gap:6px}.realm-selector-heading h3,.achievement-heading h3{font-size:14px}.realm-hint{font-size:8px}.realm-grid{gap:7px}.realm-card{padding:10px 8px 14px;gap:7px;border-radius:11px}.realm-icon{width:28px;height:28px;border-radius:8px}.realm-icon svg{width:15px;height:15px}.realm-card-copy small{font-size:6px}.realm-card-copy strong{font-size:9px}.realm-card-copy em{font-size:7px}.realm-arrow{display:none}.realm-progress{left:9px;right:9px}.realm-active-bar{padding:9px;gap:8px;margin-bottom:14px}.active-realm-symbol{width:28px;height:28px}.active-realm-copy span{font-size:6px}.active-realm-copy strong{font-size:9px}.active-realm-copy small{font-size:7px;line-height:1.45}.realm-active-bar>.btn-secondary{font-size:8px;padding:7px 8px}.nextgen-stat-grid{gap:8px;margin-bottom:13px}.nextgen-stat-card{padding:10px;border-radius:12px}.nextgen-stat-icon{width:27px;height:27px}.nextgen-stat-icon svg{width:14px}.nextgen-stat-label{font-size:6px;margin-top:10px}.nextgen-stat-label span{display:none}.nextgen-stat-number{font-size:25px}.nextgen-stat-number small{font-size:8px}.nextgen-stat-foot{font-size:7px}.stat-micro-chip{font-size:6px;padding:4px}.nextgen-dashboard-grid,.nextgen-lower-grid{gap:10px;margin-bottom:10px}.nextgen-panel,.nextgen-habits-panel,.nextgen-coach-panel{padding:13px;border-radius:13px}.nextgen-panel .panel-header h3{font-size:14px}.nextgen-panel .quest-row{padding:11px 0}.nextgen-panel .quest-main-copy>strong{font-size:10px}.nextgen-panel .quest-main-copy>p{font-size:9px}.nextgen-week-hero{padding:9px}.nextgen-week-hero>div:first-child>strong{font-size:25px}.week-ring{width:63px;height:63px}.week-ring strong{font-size:13px}.nextgen-weekly-chart{height:116px}.nextgen-lower-grid{grid-template-columns:1fr}.coach-panel-content h3{font-size:15px}.coach-panel-content p{font-size:9px}.achievement-strip{grid-template-columns:1fr}.achievement-tile{padding:9px}.achievement-status{font-size:6px}.nextgen-impact-note{padding:12px}.floating-coach{right:12px;bottom:12px;height:40px;padding:0 11px;border-radius:13px}.notification-popover{right:-50px;width:min(300px,calc(100vw - 28px))}.command-overlay{padding:9vh 9px 12px}.command-dialog{border-radius:14px}.command-input-row{padding:12px}.command-input-row input{font-size:12px}.command-results{max-height:60vh}.command-result{padding:9px 7px}.command-result-copy strong{font-size:10px}.command-result-copy small{font-size:8px}.command-footer{font-size:7px}.coach-drawer{padding:17px 14px 12px}.coach-title-copy h2{font-size:20px}.coach-welcome-card p{font-size:10px}.coach-prompt-grid button{font-size:8px;padding:9px 7px}.coach-prompt-heading{font-size:7px}.coach-prompt-heading small{font-size:6px}.coach-drawer-footer{font-size:6px}.coach-drawer-footer button{font-size:7px}.footer{padding-bottom:65px}}
+@media(max-width:390px){.world-stage{min-height:530px}.world-story{top:164px}.world-story h2{font-size:28px}.world-mini-hud{gap:6px}.world-mini-hud strong{font-size:12px}.world-mini-hud span{letter-spacing:.06em}.world-hud-separator{margin:0 1px}.realm-card-copy em{white-space:normal;min-height:18px}.nextgen-stat-number{font-size:23px}.nextgen-stat-foot{font-size:6px}.active-realm-copy small{max-width:150px}.realm-active-bar>.btn-secondary{max-width:86px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.world-stage-image,.world-star,.world-orbit-label,.live-pulse,.nextgen-chart-live i,.coach-avatar-ring,.coach-avatar-stage:after,.coach-icon-orb:after,.coach-panel-background:before,.coach-panel-background:after,.floating-coach-orbit{animation:none!important}*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Bring the same tactile feel to the existing secondary screens. */
+.panel,.stat-card,.mini-metric,.quest-board-card,.science-card,.settings-profile-panel,.data-panel,.privacy-panel,.experiment-side-card,.experiment-form-panel,.experiment-result-card{transition:border-color .22s,box-shadow .22s,background .22s,transform .22s}
+.panel{border-color:rgba(120,169,207,.15);background:linear-gradient(145deg,rgba(22,29,44,.92),rgba(15,19,31,.96));box-shadow:0 12px 34px rgba(0,0,0,.09)}
+.panel:hover{border-color:rgba(111,217,226,.22);box-shadow:0 16px 42px rgba(0,0,0,.14)}
+.quest-board-card:hover,.science-card:hover,.mini-metric:hover,.stat-card:hover{transform:translateY(-2px);border-color:rgba(111,217,226,.29);box-shadow:0 12px 30px rgba(0,0,0,.18)}
+.habit-check-row,.data-action,.mood-options button,.choice-tile,.level-option,.filter-tabs button,.experiment-style-option{transition:background .18s,border-color .18s,color .18s,transform .18s,box-shadow .18s}
+.habit-check-row:hover,.data-action:hover,.choice-tile:hover,.level-option:hover{transform:translateX(2px)}
+.range-input{accent-color:#78f3d1}
+input[type="checkbox"]{accent-color:#75f3cc}
+::selection{background:rgba(89,236,220,.27);color:#f2ffff}
+:focus-visible{outline-color:#77f1d9;outline-offset:3px}
+
+/* PLAYFORGE 1.2 — richer secondary pages and model-backed conversational AI */
+.page-intelligence-strip{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:38px;margin:-9px 0 23px;padding:8px 12px;overflow:hidden;border:1px solid rgba(113,199,219,.13);border-radius:10px;background:linear-gradient(100deg,rgba(20,39,54,.64),rgba(22,23,43,.62));color:#7f9ab1}
+.page-intelligence-strip:before{content:"";position:absolute;top:0;bottom:0;left:-26%;width:22%;background:linear-gradient(90deg,transparent,rgba(103,244,219,.065),transparent);transform:skewX(-22deg);animation:pf-strip-sweep 8s ease-in-out infinite;pointer-events:none}
+.page-strip-live,.page-strip-message,.page-strip-privacy{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;min-width:0;font-size:8px;letter-spacing:.08em;font-weight:700}
+.page-strip-live{color:#9bffe0;white-space:nowrap}.page-strip-live i{width:6px;height:6px;border-radius:50%;background:#84ffd3;box-shadow:0 0 10px rgba(132,255,211,.7);animation:pf-pulse 2.1s ease-in-out infinite}
+.page-strip-message{font-size:9px;letter-spacing:0;color:#aabed2;font-weight:500}.page-strip-message svg{color:#b7a1ff;flex-shrink:0}.page-strip-privacy{color:#7f9ab1;white-space:nowrap}.page-strip-privacy svg{color:#8ee4ca}
+.page-content:not(.playforge-home){position:relative;isolation:isolate}.page-content:not(.playforge-home):before{content:"";position:absolute;z-index:-1;pointer-events:none;top:-10px;right:2%;width:min(600px,75%);height:290px;background:radial-gradient(ellipse,rgba(61,111,180,.10),rgba(94,63,177,.045) 36%,transparent 72%);filter:blur(3px);animation:pf-atmosphere 12s ease-in-out infinite alternate}
+.page-heading h1{letter-spacing:-.045em;text-wrap:balance}.page-heading p{max-width:720px}.page-intelligence-strip+.quest-banner,.page-intelligence-strip+.habit-top-stats,.page-intelligence-strip+.insight-kpis,.page-intelligence-strip+.experiment-hero,.page-intelligence-strip+.science-highlight,.page-intelligence-strip+.settings-layout{margin-top:0}
+.tab-transition .page-content:not(.playforge-home)>*:nth-child(n+3){animation:pf-page-item-in .55s cubic-bezier(.2,.75,.25,1) both}.tab-transition .page-content:not(.playforge-home)>*:nth-child(3){animation-delay:.035s}.tab-transition .page-content:not(.playforge-home)>*:nth-child(4){animation-delay:.075s}.tab-transition .page-content:not(.playforge-home)>*:nth-child(5){animation-delay:.115s}.tab-transition .page-content:not(.playforge-home)>*:nth-child(6){animation-delay:.155s}.tab-transition .page-content:not(.playforge-home)>*:nth-child(7){animation-delay:.195s}
+.panel,.quest-board-card,.mini-metric,.science-card,.data-action,.habit-check-row,.experiment-style,.realm-card,.nextgen-stat-card,.trend-day,.pattern-line,.completed-exp-row{will-change:transform}
+.panel{position:relative;overflow:hidden}.panel:after{content:"";position:absolute;top:0;left:12%;width:32%;height:1px;background:linear-gradient(90deg,transparent,rgba(126,244,230,.29),transparent);opacity:.55;pointer-events:none}.quest-board-card,.science-card,.data-action,.habit-check-row,.experiment-style,.trend-bar,.insight-next-step,.quest-banner,.experiment-hero,.science-highlight{transition:transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s,box-shadow .25s,background .25s}.quest-board-card:hover,.science-card:hover,.experiment-style:hover{transform:translateY(-3px)}.quest-board-card:active,.data-action:active,.habit-check-row:active{transform:scale(.995)}.quest-progress-outer span,.nextgen-stat-track span,.habit-trend-track span,.rank-progress-track span{transition:width .7s cubic-bezier(.2,.7,.2,1)}
+.btn-primary,.btn-secondary,.icon-button,.text-link,.filter-tabs button,.mood-options button,.rating-options button{touch-action:manipulation}.btn-secondary,.icon-button{transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}.btn-secondary:active,.icon-button:active{transform:scale(.97)}input,textarea,select{transition:border-color .18s,box-shadow .18s,background .18s}input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none;border-color:rgba(106,238,220,.58)!important;box-shadow:0 0 0 3px rgba(106,238,220,.075),0 0 24px rgba(106,238,220,.035)}
+
+/* Real multi-turn AI chat drawer */
+.coach-drawer-chat{width:min(520px,100%);height:100dvh;max-height:100dvh;overflow:hidden;gap:0;padding:18px 18px 12px}.coach-drawer-chat .coach-drawer-top{flex:0 0 auto}.coach-model-status{flex:0 0 auto;margin:13px 0 9px;gap:7px}.coach-model-status .status-ready{color:#97f8cf!important}.coach-model-status .status-ready i{background:#8bffcb;box-shadow:0 0 8px #8bffcb}.coach-model-status .status-disconnected{color:#ffbf9b!important}.coach-model-status .status-disconnected i{background:#ff9e8f;box-shadow:0 0 7px rgba(255,158,143,.6)}.coach-model-status .model-name-label{max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#7f94ac;font-size:8px;letter-spacing:0;text-transform:none}.coach-model-status>button{display:grid;place-items:center;width:26px;height:24px;flex-shrink:0;border:1px solid rgba(131,182,209,.17);border-radius:7px;background:rgba(89,136,168,.07);color:#99dde3}.coach-model-status>button:hover{background:rgba(89,209,195,.12)}.coach-model-status>button:disabled{opacity:.45}
+.coach-chat-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 1px 9px;color:#788da4;font-size:8px;flex:0 0 auto}.coach-chat-toolbar button{display:flex;align-items:center;gap:5px;padding:5px 7px;border:1px solid rgba(124,160,195,.13);border-radius:7px;background:rgba(124,160,195,.04);color:#95a9c0;font-size:8px;transition:.18s}.coach-chat-toolbar button:hover:not(:disabled){border-color:rgba(120,231,221,.28);color:#d9fff5}.coach-chat-toolbar button:disabled{opacity:.35;cursor:not-allowed}
+.coach-chat-scroll{flex:1 1 auto;min-height:90px;overflow:auto;overscroll-behavior:contain;padding:3px 3px 15px 1px;scrollbar-width:thin;scrollbar-color:rgba(110,169,195,.3) transparent}.coach-empty-state{min-height:100%;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:18px 3px 24px}.coach-empty-orb{position:relative;display:grid;place-items:center;width:74px;height:74px;margin:2px 0 18px;border:1px solid rgba(108,221,224,.27);border-radius:23px;background:radial-gradient(circle at 40% 30%,rgba(88,226,215,.18),rgba(121,83,239,.14) 65%,rgba(13,22,36,.7));color:#a5f9ef;box-shadow:0 0 35px rgba(79,218,222,.1),inset 0 0 18px rgba(110,226,231,.06);animation:pf-float 4.7s ease-in-out infinite}.coach-empty-orb:before,.coach-empty-orb:after{content:"";position:absolute;inset:-7px;border:1px solid rgba(99,231,228,.17);border-radius:29px;transform:rotate(18deg);animation:pf-orbit-pulse 4s ease-in-out infinite}.coach-empty-orb:after{inset:-13px;border-radius:35px;border-color:rgba(157,126,255,.15);transform:rotate(-28deg);animation-delay:-1.5s}.coach-empty-orb>span{position:absolute;width:5px;height:5px;top:2px;right:10px;border-radius:50%;background:#b4a1ff;box-shadow:0 0 12px #ad9cff}.coach-empty-state h3{margin:12px 0 8px;color:#f1f7ff;font:700 clamp(20px,3vw,26px)/1.22 var(--font-display);letter-spacing:-.04em}.coach-empty-state>p{max-width:390px;margin:0 0 17px;color:#9dafc3;font-size:11px;line-height:1.8}.coach-empty-state .coach-prompt-grid{width:100%;margin-top:4px}.coach-empty-state .coach-prompt-grid button{min-height:43px;font-size:9px}
+.coach-message-list{display:flex;flex-direction:column;gap:15px;padding:7px 0 14px}.coach-chat-message{display:flex;align-items:flex-start;gap:9px;min-width:0}.chat-message-avatar{display:grid;place-items:center;flex:0 0 29px;width:29px;height:29px;border:1px solid rgba(116,188,219,.19);border-radius:9px;background:rgba(69,151,176,.1);color:#a1f1e7;font-size:10px;font-weight:800}.from-user .chat-message-avatar{border-color:rgba(165,143,255,.25);background:linear-gradient(135deg,rgba(123,101,231,.23),rgba(75,161,218,.14));color:#d4c8ff}.chat-message-body{flex:1;min-width:0;padding:10px 11px;border:1px solid rgba(114,168,205,.13);border-radius:5px 13px 13px 13px;background:linear-gradient(140deg,rgba(21,34,53,.76),rgba(15,22,37,.86));box-shadow:0 9px 24px rgba(0,0,0,.08)}.from-user .chat-message-body{border-color:rgba(144,123,247,.19);border-radius:13px 5px 13px 13px;background:linear-gradient(140deg,rgba(51,45,82,.52),rgba(24,29,49,.89))}.chat-message-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px}.chat-message-meta strong{font-size:7px;letter-spacing:.12em;color:#8df2d7}.from-user .chat-message-meta strong{color:#bdadff}.chat-message-meta span{color:#657d96;font-size:7px}.chat-message-body p{margin:0;color:#dae7f7;font-size:10px;line-height:1.82;white-space:pre-wrap;overflow-wrap:anywhere}.coach-typing{display:flex;align-items:center;gap:9px;padding:8px 0 15px;color:#98aec0;font-size:9px}.coach-typing>div{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(114,168,205,.12);border-radius:7px 13px 13px 13px;background:rgba(24,34,53,.78)}.typing-dots{display:flex;gap:4px}.typing-dots i{width:5px;height:5px;border-radius:50%;background:#8ef2dc;animation:pf-thinking 1s ease-in-out infinite}.typing-dots i:nth-child(2){animation-delay:.15s}.typing-dots i:nth-child(3){animation-delay:.3s}
+.coach-error-card{margin:6px 0 12px;padding:11px;border:1px solid rgba(255,154,140,.25);border-radius:11px;background:rgba(98,35,43,.17);color:#d9a7a6}.coach-error-card>div{display:flex;align-items:center;gap:6px;color:#ffb5a8;font-size:9px}.coach-error-card p{margin:7px 0;color:#deb8b6;font-size:9px;line-height:1.65;overflow-wrap:anywhere}.coach-error-card button{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid rgba(255,160,144,.2);border-radius:7px;background:rgba(255,151,138,.08);color:#ffc6b9;font-size:8px}.coach-error-card small{display:block;margin-top:8px;color:#ac898e;font-size:8px;line-height:1.6}
+.coach-context-toggle{flex:0 0 auto;margin-top:8px;padding:9px 10px;border:1px solid rgba(115,171,207,.13);border-radius:10px;background:rgba(20,35,51,.52)}.coach-context-toggle label{display:flex;align-items:flex-start;gap:9px;cursor:pointer}.coach-context-toggle input{position:absolute;opacity:0;pointer-events:none}.context-toggle-check{display:grid;place-items:center;flex:0 0 18px;width:18px;height:18px;margin-top:1px;border:1px solid rgba(133,176,207,.28);border-radius:5px;background:rgba(16,24,39,.7);color:transparent;transition:.18s}.coach-context-toggle input:checked+.context-toggle-check{border-color:rgba(128,255,210,.65);background:#7df4ce;color:#071822;box-shadow:0 0 14px rgba(113,244,206,.14)}.coach-context-toggle label>span:last-child{display:flex;flex-direction:column;gap:3px}.coach-context-toggle strong{color:#d5e5f5;font-size:9px}.coach-context-toggle small{color:#7d94aa;font-size:8px;line-height:1.55}
+.coach-drawer-chat .coach-safety-tip{flex:0 0 auto;margin-top:8px;padding:8px 9px}.coach-drawer-chat .coach-safety-tip p{font-size:8px;line-height:1.55}.coach-drawer-chat .coach-composer{flex:0 0 auto;align-items:flex-end;gap:8px;margin-top:10px;padding-top:0}.coach-composer textarea{width:100%;flex:1;min-width:0;min-height:46px;max-height:140px;resize:vertical;border:1px solid rgba(125,181,216,.18);border-radius:11px;background:rgba(17,29,45,.92);outline:0;padding:12px;color:#e5f1ff;font:10px/1.6 'DM Sans',sans-serif}.coach-composer textarea:focus{border-color:rgba(102,238,222,.5);box-shadow:0 0 0 3px rgba(102,238,222,.055)}.coach-composer textarea::placeholder{color:#657f98}.coach-drawer-chat .coach-composer button{flex:0 0 42px;height:42px}.send-spinner{width:15px;height:15px;border:2px solid rgba(9,32,42,.25);border-top-color:#09202a;border-radius:50%;animation:pf-spin .7s linear infinite}.coach-drawer-chat .coach-drawer-footer{flex:0 0 auto;margin-top:9px;padding-top:9px}.coach-drawer-chat .coach-drawer-footer button{display:flex;align-items:center;gap:5px;padding:5px 7px;border:1px solid rgba(128,180,210,.12);border-radius:7px}.coach-drawer-chat .coach-drawer-footer button:hover{background:rgba(91,207,203,.08);color:#d8fff7}
+.local-badge.ai-online{border-color:rgba(92,239,183,.26);color:#94f2d0}.local-badge.ai-online>span{background:#7affc7;box-shadow:0 0 8px #7affc7}.local-badge.ai-offline{border-color:rgba(247,171,137,.2);color:#dba998}.local-badge.ai-offline>span{background:#efaa92;box-shadow:0 0 8px rgba(239,170,146,.4)}
+.settings-ai-status{display:flex;align-items:center;gap:10px;margin:0 0 13px;padding:10px;border:1px solid rgba(121,167,199,.15);border-radius:10px;background:rgba(15,26,42,.6)}.settings-ai-status.connected{border-color:rgba(112,245,202,.22);background:linear-gradient(100deg,rgba(49,119,101,.12),rgba(15,26,42,.6))}.settings-ai-status.disconnected{border-color:rgba(238,169,144,.18)}.settings-ai-icon{display:grid;place-items:center;flex-shrink:0;width:34px;height:34px;border-radius:9px;background:rgba(96,202,189,.1);color:#9ff2df}.settings-ai-status>div{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}.settings-ai-status strong{color:#dae8f6;font-size:10px}.settings-ai-status small{color:#8198ad;font-size:8px;line-height:1.5;overflow-wrap:anywhere}.settings-ai-status .icon-button{flex-shrink:0}
+@keyframes pf-strip-sweep{0%,22%{left:-26%;opacity:0}35%{opacity:1}75%,100%{left:120%;opacity:0}}@keyframes pf-page-item-in{from{opacity:0;transform:translateY(13px) scale(.995);filter:blur(3px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}@keyframes pf-atmosphere{0%{transform:translate3d(0,0,0) scale(.95);opacity:.55}100%{transform:translate3d(-4%,8px,0) scale(1.08);opacity:1}}@keyframes pf-thinking{0%,70%,100%{opacity:.28;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
+@media(max-width:700px){.page-intelligence-strip{align-items:flex-start;flex-direction:column;gap:6px;margin:-3px 0 16px;padding:9px 10px}.page-strip-message{font-size:8px}.page-strip-privacy{display:none}.coach-drawer-chat{padding:14px 12px 10px}.coach-empty-state h3{font-size:21px}.coach-empty-state>p{font-size:10px}.coach-context-toggle strong{font-size:8px}.coach-context-toggle small{font-size:7px}.coach-drawer-chat .coach-safety-tip p{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.page-intelligence-strip:before,.page-content:not(.playforge-home):before,.tab-transition .page-content:not(.playforge-home)>*,.coach-empty-orb,.coach-empty-orb:before,.coach-empty-orb:after,.typing-dots i,.send-spinner{animation:none!important}.page-intelligence-strip:before{display:none}}
+
+
+
+/* PLAYFORGE 2.0 UI integration — campaign quest map, habit console, full-page Coach Nexus */
+.pf2-quest-page,.pf2-coach-page{--pf2-border:rgba(130,190,230,.15);--pf2-panel:rgba(15,23,40,.82)}
+.pf2-quest-hero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:18px;align-items:center;overflow:hidden;min-height:300px;margin:8px 0 28px;padding:clamp(24px,3.2vw,38px);border:1px solid rgba(105,208,230,.21);border-radius:24px;background:radial-gradient(ellipse at 80% 40%,rgba(94,58,174,.25),transparent 34%),linear-gradient(120deg,rgba(13,31,47,.96),rgba(16,17,41,.94) 60%,rgba(13,24,44,.93));box-shadow:0 24px 65px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.045)}
+.pf2-quest-hero:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.22;background:url('/playforge-world.svg') center 42%/cover no-repeat;mask-image:linear-gradient(90deg,transparent 0%,#000 48%,#000 100%)}
+.pf2-quest-hero:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(8,15,28,.94) 0%,rgba(8,15,28,.75) 46%,rgba(8,15,28,.15) 100%)}
+.pf2-quest-hero-copy{position:relative;z-index:1;max-width:740px}
+.pf2-hero-eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#91f4df;font-size:9px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}
+.pf2-live-dot{width:7px;height:7px;border-radius:99px;background:#78ffd2;box-shadow:0 0 12px rgba(120,255,210,.9);animation:pf2-pulse-dot 2.3s ease-in-out infinite}
+.pf2-hero-separator{width:1px;height:12px;margin:0 4px;background:rgba(166,215,242,.26)}
+.pf2-quest-hero h2,.pf2-habit-hero h2,.pf2-coach-hero h2{max-width:650px;margin:17px 0 10px;color:#f1f7ff;font-size:clamp(25px,3vw,37px);line-height:1.12;letter-spacing:-.045em;font-weight:830}
+.pf2-quest-hero-copy>p,.pf2-habit-hero-copy>p,.pf2-coach-hero-content>p{max-width:630px;color:#a8b9d0;font-size:13px;line-height:1.75;margin:0}
+.pf2-quest-hero-metrics{display:flex;flex-wrap:wrap;gap:clamp(18px,3vw,32px);margin:24px 0 20px}
+.pf2-quest-hero-metrics>div{display:grid;gap:5px}
+.pf2-quest-hero-metrics span,.pf2-progress-caption,.pf2-reward>span{font-size:8px;font-weight:850;letter-spacing:.13em;color:#7f95af}
+.pf2-quest-hero-metrics strong{font-size:22px;font-weight:800;color:#f1f8ff;letter-spacing:-.03em}
+.pf2-quest-hero-metrics small{font-size:11px;color:#90a6bf;font-weight:650}
+.pf2-progress-caption{display:flex;justify-content:space-between;gap:15px;margin-bottom:9px}
+.pf2-progress-caption strong{color:#bfffe9;font-size:10px}
+.pf2-progress-track{height:7px;max-width:650px;overflow:hidden;border-radius:99px;background:rgba(146,173,208,.15);box-shadow:inset 0 1px 2px rgba(0,0,0,.24)}
+.pf2-progress-track>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#59e6da,#7dffcc 58%,#76caff);box-shadow:0 0 15px rgba(97,255,220,.27);transition:width .55s cubic-bezier(.2,.8,.2,1)}
+.pf2-quest-planet{position:relative;justify-self:center;width:min(100%,280px);aspect-ratio:1;display:grid;place-items:center;isolation:isolate}
+.pf2-planet-core{width:116px;height:116px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(128,255,225,.68);border-radius:50%;color:#a4ffe8;background:radial-gradient(circle at 34% 28%,rgba(123,255,221,.21),rgba(35,65,109,.56) 55%,rgba(15,22,47,.94));box-shadow:0 0 30px rgba(71,226,220,.19),inset 0 0 24px rgba(99,202,255,.12);animation:pf2-float 5.5s ease-in-out infinite}
+.pf2-planet-core span{font-size:8px;letter-spacing:.19em;font-weight:850;color:#b8c9f0}
+.pf2-planet-orbit{position:absolute;border:1px solid rgba(108,234,234,.28);border-radius:50%;transform:rotate(-24deg)}
+.pf2-planet-orbit.orbit-a{width:224px;height:112px;box-shadow:0 0 22px rgba(65,190,223,.08);animation:pf2-spin 22s linear infinite}
+.pf2-planet-orbit.orbit-b{width:184px;height:238px;transform:rotate(38deg);border-color:rgba(171,135,255,.27);animation:pf2-spin 30s linear infinite reverse}
+.pf2-planet-stars i{position:absolute;width:4px;height:4px;border-radius:50%;background:#b9ffe8;box-shadow:0 0 8px #68e8dc}
+.pf2-planet-stars i:nth-child(1){top:15%;left:35%}.pf2-planet-stars i:nth-child(2){top:29%;right:7%;background:#a68aff}.pf2-planet-stars i:nth-child(3){bottom:22%;left:7%}.pf2-planet-stars i:nth-child(4){bottom:13%;right:24%;background:#70d8ff}.pf2-planet-stars i:nth-child(5){top:52%;left:12%;width:3px;height:3px}
+.pf2-planet-badge{position:absolute;display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid rgba(146,221,245,.2);border-radius:10px;background:rgba(8,16,32,.78);box-shadow:0 8px 22px rgba(0,0,0,.2);font-size:8px;font-weight:850;letter-spacing:.08em;color:#bdece9;backdrop-filter:blur(14px)}
+.pf2-planet-badge.badge-left{left:-4%;top:25%}.pf2-planet-badge.badge-right{right:-8%;bottom:22%;color:#d0c1ff}
+.pf2-campaign-topline{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin:8px 0 18px}
+.pf2-campaign-topline h3{margin:5px 0 4px;font-size:22px;letter-spacing:-.025em;color:#edf5ff}
+.pf2-campaign-topline h3 span{margin-left:7px;padding:4px 8px;border:1px solid rgba(113,219,211,.18);border-radius:7px;background:rgba(64,184,171,.09);color:#9dffe3;font-size:11px;vertical-align:middle}
+.pf2-campaign-topline p{margin:0;color:#869ab4;font-size:12px}
+.pf2-campaign-controls{display:flex;justify-content:flex-end}
+.pf2-mission-path{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pf2-mission-card{position:relative;display:grid;grid-template-columns:43px minmax(0,1fr);gap:13px;min-height:178px;padding:19px 18px 17px;border:1px solid rgba(133,174,213,.14);border-radius:18px;background:linear-gradient(145deg,rgba(19,29,49,.86),rgba(12,19,34,.78));box-shadow:inset 0 1px rgba(255,255,255,.025);transition:transform .23s,border-color .23s,background .23s,box-shadow .23s;overflow:hidden}
+.pf2-mission-card:hover{transform:translateY(-3px);border-color:rgba(112,230,222,.31);box-shadow:0 16px 34px rgba(0,0,0,.16),0 0 24px rgba(74,205,206,.035)}
+.pf2-mission-card:after{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(114,238,220,.52),transparent);opacity:0;transition:opacity .2s}
+.pf2-mission-card.mission-current{border-color:rgba(112,246,214,.34);background:linear-gradient(145deg,rgba(18,49,54,.71),rgba(13,23,40,.88));box-shadow:inset 0 0 26px rgba(82,233,210,.035),0 0 22px rgba(72,211,203,.04)}
+.pf2-mission-card.mission-current:after{opacity:1}
+.pf2-mission-card.mission-complete{border-color:rgba(98,238,189,.24)}
+.pf2-mission-node{position:relative;display:flex;justify-content:center;align-items:flex-start}
+.pf2-mission-node>span{position:relative;z-index:2;width:37px;height:37px;display:grid;place-items:center;border:1px solid rgba(129,177,218,.26);border-radius:12px;color:#a9bed8;background:linear-gradient(145deg,rgba(49,67,95,.6),rgba(17,27,44,.96));font-size:11px;font-weight:850}
+.pf2-mission-card.mission-current .pf2-mission-node>span{color:#9fffe4;border-color:rgba(114,255,211,.5);box-shadow:0 0 21px rgba(96,255,215,.12)}
+.pf2-mission-card.mission-complete .pf2-mission-node>span{color:#091c20;background:linear-gradient(135deg,#a0ffda,#4ee1cc);border-color:transparent}
+.pf2-mission-node i{position:absolute;top:44px;bottom:-174px;left:50%;width:1px;background:linear-gradient(rgba(116,233,220,.35),rgba(110,150,193,.02));display:none}
+.pf2-mission-copy{min-width:0}
+.pf2-mission-meta-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.pf2-mission-tag{display:inline-flex;align-items:center;max-width:75%;padding:5px 7px;border:1px solid rgba(130,167,208,.15);border-radius:6px;background:rgba(74,100,139,.11);color:#94aac3;font-size:8px;font-weight:850;letter-spacing:.095em;line-height:1.25}
+.pf2-mission-tag.is-current{border-color:rgba(105,255,213,.26);color:#91f9dc;background:rgba(77,225,190,.075)}
+.pf2-mission-order{font-size:8px;font-weight:800;letter-spacing:.1em;color:#657a96;white-space:nowrap}
+.pf2-mission-copy h3{margin:0 0 7px;color:#eaf3ff;font-size:16px;line-height:1.35}
+.pf2-mission-copy p{margin:0;color:#9aacbf;font-size:11px;line-height:1.7;max-width:480px}
+.pf2-mission-facts{display:flex;flex-wrap:wrap;gap:10px 14px;margin-top:13px;color:#91a7bf;font-size:9px}
+.pf2-mission-facts span{display:inline-flex;align-items:center;gap:5px}
+.pf2-mission-facts svg{width:12px;height:12px;color:#87dfd4}
+.pf2-mission-action{grid-column:2;display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:12px;border-top:1px solid rgba(139,178,211,.1)}
+.pf2-reward{display:grid;gap:4px}
+.pf2-reward strong{display:flex;align-items:center;gap:4px;color:#9ff6d7;font-size:15px}
+.pf2-reward strong small{color:#83a3bb;font-size:9px}
+.pf2-mission-button{min-height:34px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;border-radius:9px;border:1px solid rgba(109,231,209,.24);background:linear-gradient(110deg,rgba(59,176,158,.17),rgba(68,117,196,.16));color:#c9fff2;font-size:10px;font-weight:800;cursor:pointer;transition:transform .2s,border .2s,background .2s}
+.pf2-mission-button:hover{transform:translateY(-1px);border-color:rgba(125,255,221,.5);background:linear-gradient(110deg,rgba(59,176,158,.25),rgba(68,117,196,.22))}
+.pf2-mission-button.is-complete{background:rgba(84,217,177,.08);border-color:rgba(84,217,177,.23);color:#8ceaca}
+.pf2-empty-missions{grid-column:1/-1;display:grid;justify-items:center;gap:9px;padding:35px;border:1px dashed rgba(124,178,218,.22);border-radius:18px;color:#93a9c2}
+.pf2-empty-missions strong{color:#e4f0ff}
+.pf2-quest-safety{margin-top:22px}
+
+/* Daily check-in becomes a player mission console without changing the saved-log model. */
+.pf2-habit-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(230px,.6fr);gap:22px;align-items:center;margin:8px 0 24px;padding:clamp(22px,3vw,33px);border:1px solid rgba(125,174,228,.19);border-radius:22px;background:radial-gradient(ellipse at 85% 12%,rgba(103,76,202,.2),transparent 34%),linear-gradient(130deg,rgba(17,27,47,.97),rgba(13,20,37,.96));box-shadow:0 20px 54px rgba(0,0,0,.17),inset 0 1px rgba(255,255,255,.035)}
+.pf2-habit-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:url('/playforge-world.svg') center/cover no-repeat;opacity:.11;mask-image:linear-gradient(90deg,transparent,black)}
+.pf2-habit-hero-copy{position:relative;z-index:1}
+.pf2-habit-hero h2{font-size:clamp(23px,2.6vw,33px);margin:14px 0 8px}
+.pf2-habit-status-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:19px}
+.pf2-habit-status-pills span{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid rgba(133,176,215,.15);border-radius:9px;background:rgba(8,16,31,.44);color:#b7c9dd;font-size:10px}
+.pf2-habit-status-pills svg{color:#82f5d8;width:14px;height:14px}
+.pf2-habit-readiness{--pf2-progress:0%;position:relative;min-height:160px;display:flex;align-items:center;justify-content:center;gap:18px}
+.pf2-habit-ring{position:relative;z-index:1;width:126px;height:126px;flex:none;display:grid;place-items:center;border-radius:50%;background:conic-gradient(#6ff0cf var(--pf2-progress),rgba(134,163,203,.15) var(--pf2-progress));box-shadow:0 0 34px rgba(85,233,205,.08)}
+.pf2-habit-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#1a3143,#0b1427 72%);border:1px solid rgba(151,220,240,.12)}
+.pf2-habit-ring>div{position:relative;display:grid;justify-items:center;gap:2px}
+.pf2-habit-ring strong{font-size:29px;color:#f0f8ff;letter-spacing:-.04em}
+.pf2-habit-ring small{font-size:14px;color:#9cf8df}
+.pf2-habit-ring span{font-size:8px;letter-spacing:.14em;color:#8199b4;font-weight:850}
+.pf2-readiness-label{display:grid;gap:5px;max-width:150px}
+.pf2-readiness-label span{font-size:8px;letter-spacing:.12em;color:#8a9eb7;font-weight:850}
+.pf2-readiness-label strong{color:#dcecff;font-size:12px}
+.pf2-readiness-label small{color:#8296b1;font-size:10px}
+.pf2-habit-orbit{position:absolute;width:174px;height:174px;border:1px solid rgba(102,230,223,.15);border-radius:50%;animation:pf2-spin 30s linear infinite}
+.pf2-habit-orbit i{position:absolute;width:6px;height:6px;border-radius:50%;background:#76f5db;box-shadow:0 0 12px rgba(118,245,219,.7)}
+.pf2-habit-orbit i:nth-child(1){left:19px;top:31px}.pf2-habit-orbit i:nth-child(2){right:10px;top:57px;background:#a18aff}.pf2-habit-orbit i:nth-child(3){bottom:6px;left:65px;background:#73dfff}
+.habit-top-stats{position:relative}
+
+/* A full-page Coach Nexus reuses the existing /api/chat state, endpoint, privacy toggle, and error handling. */
+.pf2-coach-page{padding-bottom:26px}
+.pf2-coach-status{display:inline-flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid rgba(137,184,222,.2);border-radius:10px;background:rgba(11,19,34,.7);font-size:8px;font-weight:850;letter-spacing:.1em;color:#a1b5ce;white-space:nowrap}
+.pf2-coach-status>span{width:6px;height:6px;border-radius:50%;background:#ffb18b;box-shadow:0 0 10px rgba(255,177,139,.45)}
+.pf2-coach-status.is-ready>span{background:#78ffd3;box-shadow:0 0 10px rgba(120,255,211,.8)}
+.pf2-coach-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(210px,.7fr);align-items:center;gap:24px;min-height:238px;padding:clamp(23px,3vw,34px);border:1px solid rgba(114,195,227,.22);border-radius:23px;background:radial-gradient(ellipse at 79% 49%,rgba(78,70,174,.29),transparent 35%),linear-gradient(120deg,rgba(13,30,46,.97),rgba(17,20,46,.96) 67%,rgba(13,23,42,.97));box-shadow:0 22px 60px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.04)}
+.pf2-coach-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:url('/playforge-world.svg') center 46%/cover no-repeat;opacity:.14;mask-image:linear-gradient(90deg,transparent,#000 55%)}
+.pf2-coach-hero h2{margin-top:14px;font-size:clamp(25px,3vw,36px)}
+.pf2-coach-hero-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:19px}
+.pf2-coach-hero-actions span{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border-radius:8px;border:1px solid rgba(138,184,220,.15);background:rgba(7,16,31,.4);color:#b1c6db;font-size:9px}
+.pf2-coach-hero-actions svg{color:#8fffe0;width:14px;height:14px}
+.pf2-coach-orb-wrap{position:relative;justify-self:center;width:min(100%,250px);aspect-ratio:1;display:grid;place-items:center}
+.pf2-coach-orb-core{position:relative;z-index:2;width:100px;height:100px;display:grid;place-items:center;align-content:center;gap:5px;border:1px solid rgba(118,255,224,.6);border-radius:50%;background:radial-gradient(circle at 33% 26%,rgba(128,255,224,.23),rgba(29,54,88,.94) 58%,#11192e);color:#a1ffe4;box-shadow:0 0 45px rgba(84,236,223,.18),inset 0 0 23px rgba(114,189,255,.12);animation:pf2-float 5.2s ease-in-out infinite}
+.pf2-coach-orb-core span{font-size:8px;font-weight:900;letter-spacing:.18em}
+.pf2-coach-orb-ring{position:absolute;border:1px solid rgba(108,230,224,.3);border-radius:50%;transform:rotate(-25deg)}
+.pf2-coach-orb-ring.ring-1{width:185px;height:82px;animation:pf2-spin 20s linear infinite}
+.pf2-coach-orb-ring.ring-2{width:155px;height:218px;border-color:rgba(164,131,255,.32);transform:rotate(38deg);animation:pf2-spin 25s linear infinite reverse}
+.pf2-coach-orb-ring.ring-3{width:219px;height:153px;border-color:rgba(97,201,255,.16);transform:rotate(65deg)}
+.pf2-coach-orb-chip{position:absolute;z-index:3;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(131,192,226,.22);border-radius:9px;background:rgba(8,17,31,.83);color:#aec7df;font-size:8px;letter-spacing:.08em;font-weight:850;box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.pf2-coach-orb-chip i{width:5px;height:5px;border-radius:50%;background:#79ffd4;box-shadow:0 0 9px #79ffd4}
+.pf2-coach-orb-chip.chip-a{left:-2%;top:27%}.pf2-coach-orb-chip.chip-b{right:-3%;bottom:25%;color:#d1c1ff}
+.pf2-coach-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,310px);align-items:start;gap:16px;margin-top:17px}
+.pf2-coach-chat-panel,.pf2-coach-side-card{min-width:0;border:1px solid rgba(126,177,216,.16);border-radius:17px;background:linear-gradient(145deg,rgba(16,25,43,.91),rgba(10,17,31,.9));box-shadow:inset 0 1px rgba(255,255,255,.024)}
+.pf2-coach-chat-panel{overflow:hidden}
+.pf2-coach-chat-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:19px 20px;border-bottom:1px solid rgba(132,174,214,.12);background:linear-gradient(90deg,rgba(34,73,88,.17),transparent)}
+.pf2-coach-chat-header h3{margin:5px 0 4px;color:#eaf4ff;font-size:16px}
+.pf2-coach-chat-header p{margin:0;font-size:10px;color:#849ab5}
+.pf2-chat-head-actions{display:flex;align-items:center;gap:7px}
+.pf2-chat-head-actions .btn-secondary{min-height:32px;padding:0 10px;font-size:10px}
+.pf2-icon-danger{width:33px;height:33px;display:grid;place-items:center;border:1px solid rgba(240,133,149,.2);border-radius:9px;background:rgba(120,40,59,.13);color:#eaa3ad;cursor:pointer}
+.pf2-icon-danger:disabled{opacity:.35;cursor:not-allowed}
+.pf2-coach-chat-scroll{min-height:380px;max-height:610px;overflow:auto;padding:19px;scrollbar-color:rgba(100,187,215,.27) transparent}
+.pf2-coach-empty{max-width:740px;margin:0 auto;padding:14px 0 3px}
+.pf2-empty-avatar{position:relative;width:56px;height:56px;display:grid;place-items:center;border:1px solid rgba(113,250,215,.36);border-radius:17px;color:#9dffe7;background:radial-gradient(circle at 32% 22%,rgba(120,255,223,.19),rgba(22,48,68,.85));box-shadow:0 0 24px rgba(103,247,219,.08)}
+.pf2-empty-avatar>span{position:absolute;right:-3px;bottom:-3px;width:10px;height:10px;border:2px solid #142235;border-radius:50%;background:#80ffd5;box-shadow:0 0 9px rgba(128,255,213,.75)}
+.pf2-coach-overline{display:block;margin-top:19px;color:#8bf4de;font-size:8px;font-weight:900;letter-spacing:.16em}
+.pf2-coach-empty h3{margin:9px 0 8px;color:#f0f6ff;font-size:23px;letter-spacing:-.03em}
+.pf2-coach-empty>p{max-width:590px;margin:0;color:#91a7c0;font-size:12px;line-height:1.7}
+.pf2-prompt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.pf2-prompt-card{position:relative;display:grid;grid-template-columns:37px minmax(0,1fr) 16px;align-items:center;gap:11px;min-height:81px;padding:13px;border:1px solid rgba(130,179,220,.16);border-radius:12px;background:linear-gradient(140deg,rgba(22,34,56,.78),rgba(13,21,37,.72));color:#e5f1ff;text-align:left;cursor:pointer;transition:border .2s,background .2s,box-shadow .2s}
+.pf2-prompt-card:hover{border-color:rgba(112,243,218,.37);background:linear-gradient(140deg,rgba(27,54,64,.78),rgba(19,27,51,.9));box-shadow:0 12px 28px rgba(0,0,0,.16)}
+.pf2-prompt-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:1px solid rgba(114,232,218,.2);background:rgba(75,208,190,.1);color:#8ff6df}
+.pf2-prompt-icon.prompt-1{color:#c8aaff;background:rgba(149,105,245,.11);border-color:rgba(172,133,255,.2)}
+.pf2-prompt-icon.prompt-2{color:#ffcf99;background:rgba(246,161,93,.1);border-color:rgba(255,196,124,.2)}
+.pf2-prompt-icon.prompt-3{color:#83ccff;background:rgba(90,169,255,.1);border-color:rgba(105,189,255,.2)}
+.pf2-prompt-copy{min-width:0;display:grid;gap:4px}
+.pf2-prompt-copy strong{font-size:11px;line-height:1.4;color:#ecf5ff}
+.pf2-prompt-copy small{font-size:9px;line-height:1.5;color:#8da5bf;white-space:normal;overflow-wrap:anywhere}
+.pf2-prompt-arrow{color:#7899b7}
+.pf2-coach-message-list{display:grid;gap:16px;max-width:800px;margin:0 auto}
+.pf2-coach-message{display:grid;grid-template-columns:30px minmax(0,1fr);gap:11px;align-items:start}
+.pf2-coach-message-avatar{width:29px;height:29px;display:grid;place-items:center;border-radius:9px;border:1px solid rgba(133,187,222,.2);background:rgba(32,53,76,.8);color:#a5e9e6;font-size:11px;font-weight:800}
+.pf2-coach-message.from-user .pf2-coach-message-avatar{background:rgba(90,71,145,.33);color:#d0bcff;border-color:rgba(164,135,255,.22)}
+.pf2-coach-message-body{min-width:0;padding:12px 14px;border:1px solid rgba(129,178,215,.12);border-radius:4px 12px 12px 12px;background:rgba(13,23,39,.66)}
+.pf2-coach-message.from-user .pf2-coach-message-body{background:rgba(48,49,89,.35);border-color:rgba(161,135,247,.18)}
+.pf2-coach-message-meta{display:flex;gap:10px;align-items:center;margin-bottom:7px}
+.pf2-coach-message-meta strong{font-size:9px;letter-spacing:.09em;color:#9ff4de}
+.pf2-coach-message-meta span{font-size:9px;color:#7089a3}
+.pf2-coach-message-body p{margin:0;color:#d4e2f1;font-size:12px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.pf2-coach-thinking{display:flex;align-items:center;gap:10px;margin:15px auto 0;max-width:800px;color:#9fb5cd;font-size:11px}
+.pf2-thinking-dots{display:inline-flex;gap:4px;margin-left:8px}.pf2-thinking-dots i{width:4px;height:4px;border-radius:50%;background:#85f6df;animation:pf2-thinking 1.2s ease-in-out infinite}.pf2-thinking-dots i:nth-child(2){animation-delay:.16s}.pf2-thinking-dots i:nth-child(3){animation-delay:.32s}
+.pf2-coach-error{display:flex;gap:10px;margin:13px 0;padding:12px;border:1px solid rgba(255,166,135,.2);border-radius:11px;background:rgba(116,56,43,.12);color:#f7c1a6}.pf2-coach-error p{margin:5px 0;color:#ddad9c;font-size:11px;line-height:1.6}.pf2-coach-error small{font-size:9px;color:#b48d85}
+.pf2-context-panel{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px;border-top:1px solid rgba(129,175,214,.12);background:rgba(10,18,32,.55)}
+.pf2-context-panel label{display:flex;align-items:center;gap:10px;cursor:pointer}
+.pf2-context-panel input{position:absolute;opacity:0;width:1px;height:1px}
+.pf2-context-toggle{display:grid;place-items:center;width:18px;height:18px;flex:none;border:1px solid rgba(136,183,221,.32);border-radius:5px;color:transparent;background:rgba(4,11,22,.75)}
+.pf2-context-panel input:checked+.pf2-context-toggle{background:#7df4d5;color:#102332;border-color:#7df4d5}
+.pf2-context-panel label>span:last-child{display:grid;gap:4px}
+.pf2-context-panel label strong{color:#d5e7f6;font-size:10px}
+.pf2-context-panel label small{max-width:480px;color:#839ab4;font-size:9px;line-height:1.5}
+.pf2-context-lock{display:inline-flex;align-items:center;gap:5px;color:#7f9ab1;font-size:9px;white-space:nowrap}
+.pf2-coach-composer{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:10px;padding:14px 16px 23px;background:linear-gradient(180deg,rgba(13,22,37,.94),rgba(9,16,28,.98))}
+.pf2-coach-composer textarea{width:100%;min-height:52px;max-height:150px;resize:vertical;padding:13px 14px;border:1px solid rgba(130,180,220,.22);border-radius:12px;background:rgba(5,12,23,.65);color:#e6f2ff;font:inherit;font-size:12px;line-height:1.65;outline:none;transition:border .2s,box-shadow .2s}
+.pf2-coach-composer textarea:focus{border-color:rgba(118,242,219,.46);box-shadow:0 0 0 3px rgba(100,224,205,.065)}
+.pf2-coach-composer textarea::placeholder{color:#657d98}
+.pf2-coach-composer>button{width:42px;height:42px;align-self:start;display:grid;place-items:center;border:0;border-radius:12px;background:linear-gradient(135deg,#8dffe2,#6acbf2);color:#09202c;cursor:pointer;box-shadow:0 8px 22px rgba(81,222,213,.16);transition:transform .2s,opacity .2s}
+.pf2-coach-composer>button:hover:not(:disabled){transform:translateY(-2px)}
+.pf2-coach-composer>button:disabled{opacity:.34;cursor:not-allowed}
+.pf2-coach-composer>small{position:absolute;left:19px;bottom:7px;color:#627b95;font-size:8px}
+.pf2-coach-side{display:grid;gap:13px}
+.pf2-coach-side-card{padding:17px}
+.pf2-side-icon{width:35px;height:35px;display:grid;place-items:center;margin-bottom:12px;border-radius:10px;border:1px solid rgba(116,234,210,.2);background:rgba(80,213,191,.09);color:#8cf1db}
+.pf2-side-icon.violet{margin:0;color:#c4a8ff;border-color:rgba(164,136,255,.22);background:rgba(148,111,243,.11)}
+.pf2-coach-goal-card h3{margin:7px 0;color:#eaf3ff;font-size:20px}
+.pf2-coach-goal-card p{margin:0;color:#899eb8;font-size:11px;line-height:1.7}
+.pf2-goal-stat{display:flex;justify-content:space-between;gap:12px;margin-top:16px;padding-top:13px;border-top:1px solid rgba(135,176,215,.12);color:#879fb9;font-size:10px}.pf2-goal-stat strong{color:#9df7df}
+.pf2-side-title{display:flex;align-items:center;gap:10px;margin-bottom:13px}.pf2-side-title h3{margin:4px 0 0;color:#e8f2fe;font-size:15px}.pf2-side-title .panel-kicker{font-size:8px}
+.pf2-mini-prompt{display:grid;grid-template-columns:25px minmax(0,1fr) 14px;align-items:center;gap:8px;width:100%;padding:11px 0;border:0;border-top:1px solid rgba(126,174,211,.1);background:none;text-align:left;cursor:pointer;color:#91a8c1}
+.pf2-mini-prompt>span{font-size:9px;color:#6f8ba8;font-weight:850}.pf2-mini-prompt strong{color:#cbdbea;font-size:10px;line-height:1.5;font-weight:600}.pf2-mini-prompt svg{color:#6e96b5;transition:transform .2s}.pf2-mini-prompt:hover strong{color:#c1ffec}.pf2-mini-prompt:hover svg{transform:translateX(2px)}
+.pf2-coach-privacy-card{display:grid;gap:7px;border-color:rgba(111,237,204,.14);background:linear-gradient(145deg,rgba(21,54,57,.28),rgba(11,20,34,.9));color:#8ff5dc}.pf2-coach-privacy-card strong{font-size:11px;color:#dcecf9}.pf2-coach-privacy-card p{margin:0;color:#879eb5;font-size:10px;line-height:1.7}
+
+@keyframes pf2-pulse-dot{0%,100%{opacity:1;box-shadow:0 0 10px rgba(120,255,210,.7)}50%{opacity:.55;box-shadow:0 0 3px rgba(120,255,210,.3)}}
+@keyframes pf2-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes pf2-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pf2-thinking{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-3px);opacity:1}}
+@media(max-width:1150px){.pf2-coach-workspace{grid-template-columns:minmax(0,1fr) 245px}.pf2-coach-side-card{padding:14px}.pf2-mission-path{grid-template-columns:1fr}}
+@media(max-width:900px){.pf2-quest-hero,.pf2-habit-hero,.pf2-coach-hero{grid-template-columns:minmax(0,1fr)}.pf2-quest-planet{position:absolute;right:2%;bottom:-18%;width:215px;opacity:.4}.pf2-quest-hero-copy{max-width:100%}.pf2-quest-hero:after{background:linear-gradient(90deg,rgba(8,15,28,.96),rgba(8,15,28,.6))}.pf2-habit-readiness{justify-content:flex-start;min-height:145px}.pf2-coach-orb-wrap{position:absolute;right:5%;bottom:-10%;width:190px;opacity:.35}.pf2-coach-hero-content{position:relative;z-index:1}.pf2-coach-workspace{grid-template-columns:1fr}.pf2-coach-side{grid-template-columns:1fr 1fr}.pf2-coach-side-card:last-child{grid-column:1/-1}}
+@media(max-width:650px){.pf2-quest-hero{padding:22px 18px}.pf2-quest-hero-metrics{gap:15px 21px;margin:19px 0}.pf2-quest-hero-metrics strong{font-size:19px}.pf2-quest-planet{width:165px;right:-7%;bottom:-18%;opacity:.26}.pf2-campaign-topline{align-items:flex-start;flex-direction:column}.pf2-campaign-controls{width:100%;justify-content:flex-start}.pf2-mission-card{grid-template-columns:33px minmax(0,1fr);gap:10px;padding:15px 12px}.pf2-mission-node>span{width:31px;height:31px;border-radius:10px}.pf2-mission-action{grid-column:2;align-items:flex-start;flex-direction:column}.pf2-mission-meta-top{align-items:flex-start}.pf2-mission-order{font-size:7px}.pf2-habit-hero{padding:20px 17px}.pf2-habit-readiness{gap:13px;justify-content:flex-start}.pf2-habit-ring{width:105px;height:105px}.pf2-habit-ring strong{font-size:24px}.pf2-coach-hero{padding:22px 18px}.pf2-coach-orb-wrap{right:-7%;bottom:-20%;width:155px;opacity:.2}.pf2-coach-chat-header{align-items:flex-start;padding:15px;gap:8px}.pf2-chat-head-actions{gap:5px}.pf2-chat-head-actions .btn-secondary{padding:0 8px;font-size:9px}.pf2-coach-chat-scroll{padding:14px;min-height:310px}.pf2-prompt-grid{grid-template-columns:1fr}.pf2-prompt-card{min-height:68px}.pf2-context-panel{align-items:flex-start;flex-direction:column;padding:12px}.pf2-context-lock{margin-left:28px}.pf2-coach-composer{padding:12px 12px 23px;grid-template-columns:minmax(0,1fr) 38px}.pf2-coach-composer>button{width:38px;height:38px}.pf2-coach-side{grid-template-columns:1fr}.pf2-coach-side-card:last-child{grid-column:auto}.pf2-coach-status{font-size:7px;padding:8px}}
+@media(prefers-reduced-motion:reduce){.pf2-live-dot,.pf2-planet-core,.pf2-planet-orbit,.pf2-habit-orbit,.pf2-coach-orb-core,.pf2-coach-orb-ring,.pf2-thinking-dots i{animation:none!important;transition:none!important}}
+
+/* PLAYFORGE 2.0 — expanded world pages: shared world art plus dedicated training, nutrition and observatory experiences. */
+.sidebar{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(99,190,216,.25) transparent}
+.realm-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.page-content.pf2-world-page{position:relative;isolation:isolate}
+.page-content.pf2-world-page:before{content:"";position:absolute;z-index:-1;left:0;right:0;top:0;height:440px;pointer-events:none;opacity:.2;background:linear-gradient(180deg,rgba(7,12,24,.04),rgba(7,12,24,.72) 80%,transparent),url('/playforge-world.png') center 24%/cover no-repeat;mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)}
+.pf2-quest-hero:before,.pf2-habit-hero:before{background-image:url('/playforge-world.png');opacity:.24;mask-image:linear-gradient(90deg,transparent 0%,#000 34%,#000 100%)}
+.pf2-coach-hero{background-image:linear-gradient(90deg,rgba(7,13,28,.95) 0%,rgba(10,19,39,.8) 48%,rgba(10,19,39,.2) 100%),url('/playforge-world.png');background-position:center, right 43%;background-size:cover,cover;border-color:rgba(97,210,238,.28);box-shadow:0 24px 70px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05)}
+.pf2-quest-hero,.pf2-habit-hero,.pf2-coach-hero{backdrop-filter:blur(4px)}
+.pf2-quest-hero:after{background:linear-gradient(90deg,rgba(5,12,25,.95) 0%,rgba(5,12,25,.8) 45%,rgba(5,12,25,.2) 100%)}
+.pf2-mission-card{background-size:cover;background-position:center,right center}
+.pf2-mission-card:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,rgba(8,15,29,.98) 0%,rgba(8,15,29,.94) 54%,rgba(8,15,29,.66) 100%)}
+.pf2-mission-node,.pf2-mission-copy,.pf2-mission-action{position:relative;z-index:1}
+
+/* Dedicated Training Arena */
+.pf2-training-page .page-heading{margin-bottom:19px}
+.pf2-workout-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);min-height:285px;position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(105,211,239,.25);border-radius:24px;background:linear-gradient(120deg,rgba(11,25,45,.98),rgba(17,23,48,.96) 58%,rgba(13,22,43,.95));box-shadow:0 24px 70px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.05);margin-bottom:17px}
+.pf2-workout-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:url('/playforge-world.png') center/cover no-repeat;opacity:.2;mask-image:linear-gradient(90deg,#000 0%,#000 52%,transparent 100%)}
+.pf2-workout-hero-copy{position:relative;z-index:2;padding:clamp(24px,3vw,37px);display:flex;align-items:flex-start;flex-direction:column;justify-content:center}
+.pf2-workout-hero h2,.pf2-nutrition-hero h2,.pf2-observatory-hero h2{font:800 clamp(28px,3.25vw,42px)/1.04 var(--font-display);letter-spacing:-.055em;margin:16px 0 12px;color:#f4f9ff}
+.pf2-workout-hero h2 em,.pf2-nutrition-hero h2 em,.pf2-observatory-hero h2 em{font-style:normal;background:linear-gradient(95deg,#80ffdd,#79cfff 58%,#bca6ff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.pf2-workout-hero-copy>p,.pf2-nutrition-hero-copy>p,.pf2-observatory-copy>p{margin:0;color:#a5b7d0;line-height:1.8;font-size:12px;max-width:520px}
+.pf2-workout-hero-tags,.pf2-nutrition-hero-facts{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.pf2-workout-hero-tags span,.pf2-nutrition-hero-facts span{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(140,191,229,.17);border-radius:9px;padding:8px 10px;background:rgba(5,14,28,.56);color:#b9cce0;font-size:9px}
+.pf2-workout-hero-tags svg,.pf2-nutrition-hero-facts svg{color:#85ffe0}
+.pf2-workout-hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:auto}
+.pf2-workout-hero-photo,.pf2-nutrition-hero-photo{min-height:285px;position:relative;overflow:hidden;background:#10192a}
+.pf2-workout-hero-photo img,.pf2-nutrition-hero-photo img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;filter:saturate(.82) contrast(1.06);transform:scale(1.015)}
+.pf2-workout-photo-vignette,.pf2-nutrition-photo-vignette{position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,25,45,.9),rgba(11,25,45,.2) 42%,rgba(8,13,26,.1)),linear-gradient(0deg,rgba(5,9,19,.84),transparent 48%)}
+.pf2-photo-chip,.pf2-nutrition-photo-badge{position:absolute;right:17px;top:17px;display:flex;align-items:center;gap:7px;border:1px solid rgba(162,222,238,.28);border-radius:99px;padding:8px 11px;background:rgba(7,17,33,.76);backdrop-filter:blur(13px);font-size:8px;font-weight:850;letter-spacing:.13em;color:#d7f9ff}
+.pf2-workout-photo-caption,.pf2-nutrition-photo-bottom{position:absolute;left:22px;right:18px;bottom:20px;display:grid;gap:5px}
+.pf2-workout-photo-caption strong,.pf2-nutrition-photo-bottom strong{font:800 17px var(--font-display);letter-spacing:.08em;color:#eff7ff}
+.pf2-workout-photo-caption span,.pf2-nutrition-photo-bottom span{font-size:8px;letter-spacing:.15em;font-weight:800;color:#89dbe4}
+.pf2-training-metrics,.pf2-nutrition-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.pf2-training-metric,.pf2-nutrition-kpis>div{display:flex;align-items:center;gap:12px;padding:14px 16px;min-width:0;border:1px solid rgba(132,179,219,.15);border-radius:15px;background:linear-gradient(135deg,rgba(17,29,49,.88),rgba(12,19,35,.84));box-shadow:inset 0 1px rgba(255,255,255,.025)}
+.pf2-training-metric-icon,.pf2-nutrition-kpi-icon{width:39px;height:39px;flex:none;border:1px solid rgba(134,193,225,.18);border-radius:12px;display:grid;place-items:center;background:rgba(65,97,136,.15);color:#b7e9ff}
+.pf2-training-metric-icon.mint,.pf2-nutrition-kpi-icon.mint{color:#8dffdb;background:rgba(67,198,160,.1);border-color:rgba(92,230,190,.17)}
+.pf2-training-metric-icon.violet,.pf2-nutrition-kpi-icon.violet{color:#c6adff;background:rgba(140,104,239,.12);border-color:rgba(159,129,255,.18)}
+.pf2-training-metric-icon.gold{color:#ffd88c;background:rgba(227,177,82,.1);border-color:rgba(242,202,113,.17)}
+.pf2-training-metric strong,.pf2-nutrition-kpis strong{display:block;font:800 21px var(--font-display);letter-spacing:-.04em;color:#f0f7ff}
+.pf2-training-metric small,.pf2-nutrition-kpis small{display:block;margin-top:3px;font-size:8px;letter-spacing:.13em;font-weight:850;color:#8198b5}
+.pf2-session-saved{display:flex;align-items:center;gap:12px;border:1px solid rgba(110,243,190,.25);border-radius:14px;background:rgba(32,93,77,.22);padding:14px 16px;margin-bottom:17px;color:#92ffda}
+.pf2-session-saved>div{display:grid;gap:4px;flex:1;min-width:0}.pf2-session-saved strong{font-size:12px;color:#c8ffe9}.pf2-session-saved span{font-size:10px;line-height:1.5;color:#9fbdc5}
+.pf2-training-workspace{display:grid;grid-template-columns:minmax(275px,.76fr) minmax(0,1.24fr);gap:16px;align-items:start}
+.pf2-exercise-rail,.pf2-active-session,.pf2-plate-panel,.pf2-hydration-panel,.pf2-meal-log-panel{border:1px solid rgba(130,180,219,.16);border-radius:18px;background:linear-gradient(140deg,rgba(16,26,45,.94),rgba(10,17,31,.93));box-shadow:0 13px 38px rgba(0,0,0,.12),inset 0 1px rgba(255,255,255,.025);overflow:hidden}
+.pf2-exercise-rail{padding:18px}
+.pf2-section-heading,.pf2-nutrition-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}
+.pf2-section-heading h3,.pf2-nutrition-section-head h3{font:750 18px var(--font-display);letter-spacing:-.035em;margin:5px 0 4px;color:#eff6ff}
+.pf2-section-heading p,.pf2-nutrition-section-head p{margin:0;font-size:10px;line-height:1.6;color:#8fa4bf}
+.pf2-route-badge{min-width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(111,235,214,.24);border-radius:11px;background:rgba(74,190,169,.1);color:#98ffe0;font:800 12px var(--font-display)}
+.pf2-exercise-list{display:grid;gap:8px}
+.pf2-exercise-row{display:flex;align-items:center;gap:10px;min-width:0;width:100%;text-align:left;padding:9px;border:1px solid rgba(134,178,216,.1);border-radius:12px;background:rgba(6,14,28,.38);color:#dbeafa;transition:transform .2s,border-color .2s,background .2s}
+.pf2-exercise-row:hover{transform:translateX(2px);border-color:rgba(109,225,216,.3)}
+.pf2-exercise-row.active{border-color:rgba(106,255,219,.47);background:linear-gradient(100deg,rgba(41,129,130,.24),rgba(40,69,117,.19));box-shadow:inset 0 0 22px rgba(70,229,209,.045)}
+.pf2-exercise-row.done{border-color:rgba(101,235,183,.22)}
+.pf2-exercise-thumb{width:47px;height:45px;flex:none;position:relative;border-radius:9px;overflow:hidden;background:#19263c}
+.pf2-exercise-thumb img{width:100%;height:100%;object-fit:cover;opacity:.68}
+.pf2-exercise-thumb span{position:absolute;inset:0;display:grid;place-items:center;font-size:10px;font-weight:850;color:#effbff;background:linear-gradient(0deg,rgba(4,12,25,.4),rgba(4,12,25,.12))}
+.pf2-exercise-copy{min-width:0;flex:1}.pf2-exercise-copy strong{display:block;font-size:10px;line-height:1.4;color:#e9f5ff}.pf2-exercise-copy small{display:block;font-size:8px;color:#8ba1ba;margin-top:4px;line-height:1.4}
+.pf2-exercise-state{width:25px;height:25px;flex:none;display:grid;place-items:center;border:1px solid rgba(128,174,214,.18);border-radius:8px;color:#7694b3}.pf2-exercise-state.done{border-color:rgba(115,247,192,.25);color:#90ffda;background:rgba(82,207,166,.1)}
+.pf2-exercise-rail-foot{display:flex;align-items:flex-start;gap:8px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(134,183,218,.12);color:#8196b1;font-size:9px;line-height:1.6}.pf2-exercise-rail-foot svg{flex:none;color:#88f2d1}
+.pf2-active-session{min-width:0}
+.pf2-active-photo{height:223px;position:relative;overflow:hidden;background:#152239}
+.pf2-active-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.8)}
+.pf2-active-photo-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,14,27,.65),transparent 60%),linear-gradient(0deg,rgba(6,12,24,.85),transparent 70%)}
+.pf2-active-photo-tag,.pf2-active-photo-count{position:absolute;top:14px;display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(151,207,236,.22);border-radius:8px;background:rgba(6,15,30,.7);font-size:8px;font-weight:850;letter-spacing:.1em;color:#d8f4ff}
+.pf2-active-photo-tag{left:14px}.pf2-active-photo-count{right:14px;color:#9dffe0}
+.pf2-active-session-copy{padding:19px}
+.pf2-active-session-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:#78ddd8;font-size:8px;font-weight:850;letter-spacing:.12em}
+.pf2-active-session-meta span:last-child{display:flex;align-items:center;gap:5px;color:#8ca6c0;letter-spacing:0;font-size:9px}
+.pf2-active-session-copy h3{font:800 clamp(20px,2vw,27px) var(--font-display);letter-spacing:-.04em;color:#eff7ff;margin:10px 0 6px}
+.pf2-active-session-copy>p{margin:0;color:#9aacc3;font-size:11px;line-height:1.75}
+.pf2-set-progress-label{display:flex;justify-content:space-between;gap:10px;margin-top:19px;color:#8199b5;font-size:8px;letter-spacing:.12em;font-weight:850}
+.pf2-set-progress-label strong{color:#9dffe1;letter-spacing:0;font-size:10px}
+.pf2-set-dots{display:flex;gap:8px;margin-top:9px}
+.pf2-set-dots span{width:29px;height:29px;border:1px solid rgba(131,177,215,.22);border-radius:9px;display:grid;place-items:center;background:rgba(30,46,70,.5);color:#87a1bd;font-size:10px;font-weight:800}
+.pf2-set-dots span.done{background:linear-gradient(135deg,#a0ffdf,#4cdac9);border-color:transparent;color:#092226;box-shadow:0 0 15px rgba(82,242,204,.13)}
+.pf2-rest-timer{display:flex;align-items:center;gap:13px;margin-top:15px;padding:12px;border:1px solid rgba(98,224,217,.2);border-radius:13px;background:rgba(24,68,76,.25)}
+.pf2-rest-ring{width:70px;height:70px;flex:none;border-radius:50%;border:4px solid rgba(91,241,214,.65);display:grid;align-content:center;justify-items:center;box-shadow:0 0 20px rgba(91,241,214,.08)}
+.pf2-rest-ring strong{font:800 14px var(--font-display);color:#e7fff8}.pf2-rest-ring small{font-size:7px;letter-spacing:.12em;color:#91e9d6}
+.pf2-rest-timer>div:last-child{flex:1}.pf2-rest-timer>div:last-child>strong{color:#dffaf4;font-size:11px}.pf2-rest-timer p{margin:4px 0 8px;color:#8eaeb7;font-size:9px;line-height:1.5}.pf2-rest-timer .btn-secondary{padding:7px 9px;font-size:9px}
+.pf2-session-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px;padding-top:14px;border-top:1px solid rgba(131,176,215,.1)}
+.pf2-session-actions button{flex:1;min-width:120px;padding:10px 9px;font-size:9px}
+.pf2-session-finalize{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin-top:14px;padding-top:14px;border-top:1px solid rgba(131,176,215,.1)}
+.pf2-session-finalize .field{margin:0;gap:7px}.pf2-session-finalize .field label{font-size:8px;letter-spacing:.1em;color:#8199b5}.pf2-session-finalize .segmented{flex-wrap:wrap}.pf2-session-finalize .segmented button{padding:8px 9px;font-size:9px}.pf2-form-help{display:block;color:#738aa5;font-size:8px;line-height:1.5;margin-top:6px;max-width:360px}
+.pf2-finish-session{min-height:40px;padding:10px 12px;white-space:nowrap;font-size:9px}
+
+/* Nutrition Station */
+.pf2-nutrition-page .page-heading{margin-bottom:19px}
+.pf2-nutrition-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.84fr);min-height:280px;position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(99,221,188,.22);border-radius:24px;background:linear-gradient(125deg,rgba(10,30,38,.98),rgba(13,24,42,.95) 62%,rgba(19,25,44,.93));box-shadow:0 24px 70px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.05);margin-bottom:17px}
+.pf2-nutrition-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:url('/playforge-world.png') center/cover no-repeat;opacity:.17;mask-image:linear-gradient(90deg,#000 0%,#000 50%,transparent 100%)}
+.pf2-nutrition-hero-copy{position:relative;z-index:2;padding:clamp(23px,3vw,36px);display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.pf2-nutrition-hero h2{font-size:clamp(27px,3vw,39px)}
+.pf2-nutrition-hero-note{margin-top:16px;padding-top:12px;border-top:1px solid rgba(128,215,201,.12);color:#8facbd;font-size:9px;line-height:1.6;max-width:480px}
+.pf2-nutrition-photo-vignette{background:linear-gradient(90deg,rgba(10,30,38,.85),rgba(10,30,38,.08) 52%),linear-gradient(0deg,rgba(4,14,20,.88),transparent 55%)}
+.pf2-nutrition-photo-badge{color:#d9fff1;border-color:rgba(127,255,205,.24)}
+.pf2-nutrition-photo-bottom span{color:#9bf4d6}
+.pf2-nutrition-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(290px,.72fr);gap:16px;align-items:start}
+.pf2-meal-library{min-width:0}
+.pf2-nutrition-section-head{align-items:flex-end;margin-bottom:15px}
+.pf2-nutrition-section-head.compact{align-items:center;margin-bottom:13px}
+.pf2-diet-filter{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}
+.pf2-diet-filter button,.pf2-slot-tabs button{border:1px solid rgba(130,178,217,.16);border-radius:9px;background:rgba(17,27,46,.8);color:#8ea4bd;padding:8px 10px;font-size:9px;font-weight:750;white-space:nowrap;transition:.18s}
+.pf2-diet-filter button.selected,.pf2-slot-tabs button.selected{border-color:rgba(100,245,211,.37);background:linear-gradient(110deg,rgba(56,197,171,.22),rgba(80,129,221,.13));color:#a0ffe2;box-shadow:0 0 18px rgba(84,221,193,.06)}
+.pf2-meal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.pf2-meal-card{min-width:0;overflow:hidden;border:1px solid rgba(129,180,220,.15);border-radius:17px;background:linear-gradient(150deg,rgba(16,28,47,.96),rgba(9,17,31,.94));box-shadow:0 14px 36px rgba(0,0,0,.11);transition:transform .23s,border-color .23s,box-shadow .23s}
+.pf2-meal-card:hover{transform:translateY(-4px);border-color:rgba(103,231,193,.34);box-shadow:0 19px 45px rgba(0,0,0,.17),0 0 24px rgba(70,215,178,.05)}
+.pf2-meal-photo{height:154px;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a3c43,#243451 54%,#362a54)}
+.pf2-meal-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,12,23,.78),transparent 70%),linear-gradient(90deg,rgba(7,15,28,.15),transparent)}
+.pf2-meal-photo img{width:100%;height:100%;object-fit:cover;transition:transform .55s;filter:saturate(.87) contrast(1.04)}.pf2-meal-card:hover .pf2-meal-photo img{transform:scale(1.055)}
+.pf2-meal-photo>span,.pf2-meal-photo>small{position:absolute;z-index:1;bottom:11px;border:1px solid rgba(171,224,232,.19);border-radius:7px;background:rgba(5,15,28,.66);backdrop-filter:blur(10px);padding:6px 7px;font-size:7px;font-weight:850;letter-spacing:.11em;color:#c7f8ee}
+.pf2-meal-photo>span{left:11px}.pf2-meal-photo>small{right:11px;color:#e1eaff;letter-spacing:0;font-size:8px}
+.pf2-meal-card-copy{padding:13px}
+.pf2-meal-tags{display:flex;gap:5px;flex-wrap:wrap}.pf2-meal-tags span{border:1px solid rgba(132,184,217,.13);border-radius:99px;background:rgba(54,92,126,.12);padding:4px 6px;font-size:7px;color:#88b5c7}
+.pf2-meal-card-copy h4{font:750 15px var(--font-display);margin:9px 0 6px;color:#eef7ff;letter-spacing:-.02em}
+.pf2-meal-card-copy p{min-height:51px;margin:0;color:#94a7bd;font-size:10px;line-height:1.65}
+.pf2-log-meal-button{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;padding:10px;border:1px solid rgba(100,240,198,.19);border-radius:10px;background:linear-gradient(100deg,rgba(57,171,144,.14),rgba(54,104,174,.12));color:#9bffdc;font-size:9px;font-weight:800;transition:.18s}
+.pf2-log-meal-button:hover{background:rgba(69,201,159,.21);border-color:rgba(101,246,208,.38)}
+.pf2-photo-credit{display:flex;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-top:12px;color:#7087a0;font-size:8px;line-height:1.6}.pf2-photo-credit svg{flex:none;margin-top:1px}.pf2-photo-credit button{border:0;background:transparent;color:#8cdccb;text-decoration:underline;font-size:8px;padding:0}.pf2-photo-source-links{display:flex;flex-basis:100%;gap:12px;flex-wrap:wrap;padding:6px 0 0 19px}.pf2-photo-source-links a{color:#95d9ff;font-size:9px}
+.pf2-nutrition-side{display:grid;gap:13px;min-width:0}
+.pf2-plate-panel,.pf2-hydration-panel,.pf2-meal-log-panel{padding:16px}
+.pf2-plate-visual{width:190px;height:190px;position:relative;overflow:hidden;margin:8px auto 15px;border:7px solid #1b3449;border-radius:50%;background:conic-gradient(from -90deg,#53bc8c 0deg 180deg,#f3c972 180deg 270deg,#6db4ed 270deg 360deg);box-shadow:0 0 0 1px rgba(159,224,228,.25),0 13px 35px rgba(0,0,0,.24),inset 0 0 16px rgba(0,0,0,.18)}
+.pf2-plate-visual:before{content:"";position:absolute;inset:8px;border-radius:50%;border:1px dashed rgba(246,255,255,.57)}
+.pf2-plate-half,.pf2-plate-quarter{position:absolute;display:grid;place-items:center;text-align:center;padding:9px;color:#071722;font-size:8px;line-height:1.5;font-weight:900;letter-spacing:.08em;text-shadow:0 1px rgba(255,255,255,.3)}
+.pf2-plate-half{left:0;top:0;width:50%;height:100%;background:rgba(27,155,105,.23)}.pf2-plate-quarter.grain{right:0;top:0;width:50%;height:50%;background:rgba(46,136,207,.2)}.pf2-plate-quarter.protein{right:0;bottom:0;width:50%;height:50%;background:rgba(240,178,66,.23)}
+.pf2-plate-legend{display:grid;gap:9px}.pf2-plate-legend span{display:flex;align-items:center;gap:8px;color:#98adc1;font-size:9px;line-height:1.5}.pf2-plate-legend i{width:9px;height:9px;flex:none;border-radius:3px}.pf2-plate-legend i.green{background:#53bc8c}.pf2-plate-legend i.blue{background:#6db4ed}.pf2-plate-legend i.gold{background:#f3c972}
+.pf2-plate-panel>p{margin:13px 0 0;color:#7f96ad;font-size:8px;line-height:1.65}
+.pf2-water-glasses{display:flex;justify-content:space-between;gap:5px;margin:18px 0 15px}.pf2-water-glasses span{display:grid;place-items:center;width:27px;height:35px;border:1px solid rgba(121,182,223,.16);border-radius:8px;background:rgba(29,49,76,.45);color:#486e91;transition:.2s}.pf2-water-glasses span.filled{border-color:rgba(81,205,248,.3);background:linear-gradient(180deg,rgba(57,161,220,.32),rgba(58,214,229,.12));color:#7be7ff;box-shadow:0 0 13px rgba(65,208,239,.07)}
+.pf2-water-control{display:flex;align-items:center;gap:9px}.pf2-water-control strong{flex:1;color:#e7f6ff;font:800 18px var(--font-display);text-align:center}.pf2-water-control strong small{display:block;color:#7d9ab7;font:700 8px 'DM Sans';letter-spacing:.1em}.pf2-water-control .btn-primary{padding:9px 12px;font-size:9px}.pf2-water-control .btn-secondary{padding:8px 11px}.pf2-water-note{display:block;color:#778ea8;font-size:8px;line-height:1.6;margin-top:12px}
+.pf2-slot-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:12px}.pf2-slot-tabs button{padding:8px 3px;font-size:8px}
+.pf2-logged-meals{display:grid;gap:7px}.pf2-logged-meal{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid rgba(130,184,220,.12);border-radius:11px;background:rgba(7,15,29,.38)}.pf2-logged-meal-icon{width:27px;height:27px;flex:none;display:grid;place-items:center;border-radius:8px;background:rgba(76,212,168,.12);color:#90ffda}.pf2-logged-meal>span:nth-child(2){flex:1;min-width:0}.pf2-logged-meal strong{display:block;overflow-wrap:anywhere;font-size:9px;color:#e0effb}.pf2-logged-meal small{display:block;color:#728ba5;font-size:8px;margin-top:4px}.pf2-logged-meal>button{width:27px;height:27px;flex:none;display:grid;place-items:center;border:1px solid rgba(135,177,214,.14);border-radius:8px;background:transparent;color:#8299b1}.pf2-logged-meal>button:hover{color:#ff9ead;border-color:rgba(255,141,157,.3)}
+.pf2-meal-empty{display:grid;justify-items:center;text-align:center;gap:7px;padding:18px 12px;border:1px dashed rgba(123,179,216,.17);border-radius:12px;color:#7e9ab4}.pf2-meal-empty strong{font-size:10px;color:#c1d3e7}.pf2-meal-empty span{max-width:210px;font-size:8px;line-height:1.5;color:#7d91aa}
+.pf2-add-custom-meal{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(135,181,216,.1)}.pf2-add-custom-meal label{grid-column:1/-1;color:#7892ac;font-size:8px;font-weight:850;letter-spacing:.12em}.pf2-add-custom-meal input{min-width:0;width:100%;border:1px solid rgba(133,180,216,.2);border-radius:9px;background:rgba(4,12,24,.55);padding:10px;color:#e9f7ff;font-size:9px}.pf2-add-custom-meal input::placeholder{color:#60758e}.pf2-add-custom-meal .btn-secondary{padding:8px 9px;font-size:8px}
+
+/* The Progress Observatory uses real log totals in its hero chart; existing charts below keep range controls and labels. */
+.pf2-observatory-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.85fr);gap:18px;align-items:center;min-height:246px;margin:6px 0 21px;padding:clamp(21px,3vw,34px);border:1px solid rgba(120,177,232,.21);border-radius:22px;overflow:hidden;background:linear-gradient(105deg,rgba(8,17,34,.96) 0%,rgba(13,22,44,.91) 57%,rgba(17,23,48,.8)),url('/playforge-world.png') center 43%/cover no-repeat;box-shadow:0 22px 60px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.04)}
+.pf2-observatory-hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 80% 10%,rgba(99,103,244,.16),transparent 33%),linear-gradient(0deg,rgba(4,10,22,.15),transparent)}
+.pf2-observatory-copy,.pf2-observatory-chart{position:relative;z-index:1}.pf2-observatory-hero h2{font-size:clamp(26px,3vw,36px);margin:14px 0 10px}.pf2-observatory-stats{display:flex;gap:25px;flex-wrap:wrap;margin-top:20px}.pf2-observatory-stats span{display:grid;gap:4px}.pf2-observatory-stats strong{font:800 23px var(--font-display);letter-spacing:-.04em;color:#eff8ff}.pf2-observatory-stats small{font-size:7px;letter-spacing:.12em;color:#87a2c0;font-weight:850}
+.pf2-observatory-chart{padding:16px 17px;border:1px solid rgba(140,195,238,.19);border-radius:16px;background:rgba(5,12,27,.57);backdrop-filter:blur(12px)}.pf2-observatory-chart-head{display:flex;align-items:center;justify-content:space-between;gap:9px;color:#c4e5ff;font-size:8px;font-weight:850;letter-spacing:.12em}.pf2-observatory-chart-head small{color:#7c9ab8;font-size:7px;letter-spacing:.05em}.pf2-observatory-bars{height:116px;display:flex;align-items:flex-end;gap:11px;margin-top:14px;padding:0 3px}.pf2-observatory-bar-col{height:100%;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px}.pf2-observatory-bar-track{height:94px;width:min(100%,24px);display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(106,174,225,.12);border-radius:7px;background:rgba(63,101,151,.12)}.pf2-observatory-bar-track i{display:block;width:100%;border-radius:6px;background:linear-gradient(180deg,#73f8d4 0%,#5cb5fa 58%,#8c7fff 100%);box-shadow:0 0 15px rgba(83,222,219,.14);transition:height .5s cubic-bezier(.2,.8,.2,1)}.pf2-observatory-bar-col small{font-size:7px;color:#8098b8}.pf2-observatory-chart-foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:9px;padding-top:10px;border-top:1px solid rgba(136,184,222,.11);color:#88a2bf;font-size:8px}.pf2-observatory-chart-foot span{display:flex;align-items:center;gap:6px}.pf2-observatory-chart-foot i{width:7px;height:7px;border-radius:50%;background:#79f6d3;box-shadow:0 0 9px rgba(121,246,211,.6)}.pf2-observatory-chart-foot small{color:#637f9b;font-size:7px}
+
+/* Shared responsive rules for the enlarged world navigation and newly added pages. */
+@media(max-width:1250px){.pf2-training-workspace{grid-template-columns:minmax(250px,.72fr) minmax(0,1.28fr)}.pf2-session-finalize{grid-template-columns:1fr}.pf2-finish-session{justify-self:stretch}.pf2-nutrition-layout{grid-template-columns:minmax(0,1.25fr) minmax(270px,.75fr)}}
+@media(max-width:980px){.realm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-workout-hero,.pf2-nutrition-hero{grid-template-columns:1fr 0.8fr}.pf2-training-workspace,.pf2-nutrition-layout{grid-template-columns:1fr}.pf2-exercise-list{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-observatory-hero{grid-template-columns:1fr}.pf2-observatory-chart{max-width:100%}.pf2-nutrition-side{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.pf2-meal-log-panel{grid-column:1/-1}}
+@media(max-width:700px){.realm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-workout-hero,.pf2-nutrition-hero{grid-template-columns:1fr}.pf2-workout-hero-copy,.pf2-nutrition-hero-copy{padding:22px 18px}.pf2-workout-hero h2,.pf2-nutrition-hero h2,.pf2-observatory-hero h2{font-size:29px}.pf2-workout-hero-photo,.pf2-nutrition-hero-photo{min-height:215px;height:215px}.pf2-training-metrics,.pf2-nutrition-kpis{gap:7px}.pf2-training-metric,.pf2-nutrition-kpis>div{padding:10px;gap:8px;align-items:flex-start;flex-direction:column}.pf2-training-metric-icon,.pf2-nutrition-kpi-icon{width:31px;height:31px;border-radius:9px}.pf2-training-metric strong,.pf2-nutrition-kpis strong{font-size:18px}.pf2-training-metric small,.pf2-nutrition-kpis small{font-size:6px;letter-spacing:.08em}.pf2-exercise-rail{padding:13px}.pf2-exercise-list{grid-template-columns:1fr}.pf2-active-photo{height:190px}.pf2-active-session-copy{padding:14px}.pf2-session-actions{display:grid;grid-template-columns:1fr 1fr}.pf2-session-actions button{min-width:0;padding:9px 5px}.pf2-session-finalize{grid-template-columns:1fr}.pf2-finish-session{width:100%}.pf2-nutrition-section-head{align-items:flex-start;flex-direction:column}.pf2-diet-filter{justify-content:flex-start}.pf2-meal-grid{grid-template-columns:1fr}.pf2-meal-photo{height:180px}.pf2-meal-card-copy p{min-height:0}.pf2-nutrition-side{grid-template-columns:1fr}.pf2-meal-log-panel{grid-column:auto}.pf2-observatory-hero{padding:19px 16px}.pf2-observatory-stats{gap:15px}.pf2-observatory-stats strong{font-size:20px}.pf2-observatory-chart{padding:12px}.pf2-observatory-bars{gap:7px}.pf2-session-saved{align-items:flex-start;flex-wrap:wrap}.pf2-session-saved .btn-secondary{margin-left:28px}.pf2-photo-credit{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.pf2-workout-hero-photo img,.pf2-meal-photo img,.pf2-meal-card,.pf2-exercise-row,.pf2-observatory-bar-track i{transition:none!important}}
+
+/* PLAYFORGE 2.2 — evidence-first quest completion */
+.quest-proof-backdrop{z-index:1100;background:rgba(2,6,15,.78);backdrop-filter:blur(14px)}
+.quest-proof-modal{width:min(590px,100%);max-height:min(90vh,780px);overflow-y:auto;padding:clamp(20px,3vw,30px);border-color:rgba(119,225,215,.28);background:radial-gradient(ellipse at 90% 0%,rgba(73,112,190,.2),transparent 42%),linear-gradient(145deg,#15263b,#0d1422 76%);box-shadow:0 35px 100px rgba(0,0,0,.58),0 0 60px rgba(63,194,205,.08)}
+.quest-proof-icon{color:#a4f4d0;background:linear-gradient(145deg,rgba(101,240,186,.19),rgba(69,157,199,.14));border:1px solid rgba(130,238,212,.24)}
+.quest-proof-modal .panel-kicker{margin-bottom:9px;color:#88e9cc;font-size:9px;letter-spacing:.15em;font-weight:800}
+.quest-proof-modal h2{font-size:clamp(22px,3vw,28px);line-height:1.2}
+.quest-proof-modal>p{font-size:12px;line-height:1.7;margin:11px 0 18px;color:#a5b4c6}
+.quest-proof-modal>p strong{color:#f0f7ff}
+.quest-proof-label{display:block;font-size:9px;font-weight:800;letter-spacing:.13em;color:#8ca4bd;margin-bottom:9px}
+.quest-proof-examples{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px}
+.quest-proof-examples button{border:1px solid rgba(132,171,211,.2);background:rgba(105,139,181,.08);color:#b8c9dd;border-radius:999px;padding:8px 10px;font-size:10px;transition:background .18s,border-color .18s,transform .18s}
+.quest-proof-examples button:hover,.quest-proof-examples button.selected{border-color:rgba(133,245,207,.47);background:rgba(94,226,175,.1);color:#d7ffed;transform:translateY(-1px)}
+.quest-proof-modal textarea{width:100%;resize:vertical;min-height:96px;border:1px solid rgba(133,174,208,.23);border-radius:12px;background:rgba(3,10,20,.52);color:#e5f3ff;padding:12px 13px;font:12px/1.65 'DM Sans',sans-serif;outline:none}
+.quest-proof-modal textarea:focus{border-color:rgba(118,242,219,.55);box-shadow:0 0 0 3px rgba(100,224,205,.075)}
+.quest-proof-modal textarea::placeholder{color:#687d96}
+.quest-proof-footnote{display:flex;align-items:flex-start;gap:8px;margin-top:11px;color:#8da5ba;font-size:10px;line-height:1.6}
+.quest-proof-footnote svg{flex:0 0 auto;color:#84e4c5;margin-top:1px}
+.quest-proof-charcount{text-align:right;color:#6f849b;font-size:9px;margin-top:6px}
+.quest-proof-modal .modal-actions{margin-top:19px;flex-wrap:wrap}
+.quest-proof-modal .modal-actions .btn-primary:disabled{opacity:.42;cursor:not-allowed;transform:none}
+@media(max-width:600px){.quest-proof-modal{padding:18px;border-radius:16px}.quest-proof-examples button{font-size:9px;padding:7px 9px}.quest-proof-modal .modal-actions{display:grid;grid-template-columns:1fr}.quest-proof-modal .modal-actions button{width:100%}}
+.pf2-mission-debrief{display:flex;align-items:flex-start;gap:8px;max-width:560px;margin-top:13px;padding:10px 12px;border:1px solid rgba(128,237,203,.18);border-radius:10px;background:rgba(9,28,37,.5);color:#c5e4de;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.pf2-mission-debrief>svg{flex:0 0 auto;color:#88e8c5;margin-top:2px}
+.pf2-mission-debrief span{display:grid;gap:3px}
+.pf2-mission-debrief small{font-size:8px;font-weight:800;letter-spacing:.12em;color:#80cdb7}
+
+
+/* PLAYFORGE final polish: clear, non-collapsing streak card and distinct realm art. */
+.sidebar{overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;overscroll-behavior:contain}
+.main-nav{flex:0 0 auto}
+.nav-link{flex-shrink:0;min-height:49px}
+.streak-card{flex:0 0 auto;min-width:0;margin:12px 3px 12px;padding:13px 12px 12px;border-radius:15px;overflow:visible;border-color:rgba(143,134,183,.24);background:radial-gradient(ellipse at 100% 0%,rgba(143,111,221,.16),transparent 52%),linear-gradient(145deg,rgba(34,31,49,.98),rgba(23,25,38,.98));box-shadow:inset 0 1px rgba(255,255,255,.035),0 8px 24px rgba(0,0,0,.1)}
+.streak-card:after{width:85px;height:85px;top:-45px;right:-30px;background:rgba(176,142,255,.055);pointer-events:none}
+.streak-top{position:relative;z-index:1;gap:7px;min-height:18px;font-size:8px;letter-spacing:.11em;color:#aaa8bd}
+.streak-icon{width:25px;height:25px;flex:0 0 25px;border:1px solid rgba(255,183,99,.2);border-radius:8px;background:rgba(255,169,65,.09);color:#ffc471}
+.streak-title{min-width:0;white-space:nowrap}
+.streak-status{margin-left:auto;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;border:1px solid rgba(129,243,202,.13);border-radius:99px;padding:4px 6px;background:rgba(91,219,177,.05);color:#8edbc1;font-size:6px;letter-spacing:.09em}
+.streak-main{position:relative;z-index:1;display:flex;align-items:baseline;gap:8px;margin-top:9px}
+.streak-number{display:block;margin:0;color:#f3f4ff;font:800 35px/.96 var(--font-display);letter-spacing:-.065em;font-variant-numeric:tabular-nums}
+.streak-unit{display:inline-flex;align-items:baseline;gap:4px;color:#d5d7e6;font-size:10px}
+.streak-unit b{font-size:11px;font-weight:700}
+.streak-unit small{color:#858ba2;font-size:9px}
+.streak-copy{position:relative;z-index:1;margin:8px 0 11px;color:#a3a4ba;font-size:9px;line-height:1.55;overflow-wrap:anywhere}
+.streak-week-heading{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:6px;padding-top:9px;border-top:1px solid rgba(157,159,199,.1);color:#8788a0;font-size:7px;font-weight:800;letter-spacing:.1em}
+.streak-week-heading small{font-size:7px;font-weight:500;letter-spacing:0;color:#737d95;white-space:nowrap}
+.streak-dots{position:relative;z-index:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:8px}
+.streak-dots span{width:auto;min-width:0;height:auto;min-height:31px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:5px 0;border:1px solid rgba(143,149,179,.08);border-radius:8px;background:rgba(50,49,68,.47);color:#87869d;font-size:8px;line-height:1}
+.streak-dots span small{font:700 8px/1 'DM Sans',sans-serif;color:inherit}
+.streak-dots span i{display:block;width:5px;height:5px;border-radius:50%;background:#52586c;box-shadow:none}
+.streak-dots span.lit{border-color:rgba(124,255,207,.16);background:rgba(115,239,190,.09);color:#bcf9df;font-weight:800}
+.streak-dots span.lit i{background:#85f6c6;box-shadow:0 0 8px rgba(133,246,198,.75)}
+.streak-dots span.today{outline:1px solid rgba(157,163,255,.55);outline-offset:1px}
+.pf2-habit-hero:before{background-image:none;mask-image:none;opacity:1}
+
+
+
+.pf2-habit-hero-copy,.pf2-habit-readiness{position:relative;z-index:1}
+.pf2-workout-hero-photo img{object-position:61% center!important;filter:saturate(.94) contrast(1.07)!important}
+.pf2-nutrition-hero-photo img{object-position:77% center!important;filter:saturate(1.02) contrast(1.04)!important}
+.pf2-workout-hero-photo:after,.pf2-nutrition-hero-photo:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(173,220,255,.08)}
+@media(max-height:790px) and (min-width:701px){.sidebar{padding-top:18px;padding-bottom:12px}.brand{padding-bottom:22px}.nav-link{min-height:45px;padding-top:8px;padding-bottom:8px}.streak-card{margin-top:8px;margin-bottom:8px;padding:10px}.streak-copy{margin:6px 0 8px;font-size:8px}.streak-dots span{min-height:27px}}
+@media(max-width:700px){.streak-card{margin-top:10px}.streak-copy{font-size:8.5px}}
+@media(prefers-reduced-motion:reduce){}
+
+/* PLAYFORGE 2.6 — personalised training choices and fixed, preference-led meal plans */
+.pf2-world-page .btn-primary,.pf2-world-page .btn-secondary,.pf2-world-page .btn-glass{min-height:38px;border-radius:11px;padding:10px 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.01em;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+.pf2-world-page .btn-primary{border:1px solid rgba(142,255,224,.72);color:#061d25;background:linear-gradient(105deg,#8cf8d3,#70ddfb);box-shadow:0 7px 23px rgba(74,228,206,.12),inset 0 1px rgba(255,255,255,.5);}
+.pf2-world-page .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 26px rgba(74,228,206,.2),inset 0 1px rgba(255,255,255,.56);filter:saturate(1.08)}
+.pf2-world-page .btn-primary:active:not(:disabled){transform:translateY(0) scale(.99)}
+.pf2-world-page .btn-secondary{border:1px solid rgba(137,173,218,.22);color:#d1deee;background:linear-gradient(135deg,rgba(31,49,77,.8),rgba(31,31,57,.78));}
+.pf2-world-page .btn-secondary:hover:not(:disabled){transform:translateY(-1px);border-color:rgba(118,225,237,.42);background:rgba(36,63,87,.85)}
+.pf2-world-page .btn-glass{border:1px solid rgba(156,181,225,.18);color:#c6d1e3;background:rgba(17,27,48,.65);}
+.pf2-world-page .btn-glass:hover:not(:disabled){border-color:rgba(166,152,255,.4);background:rgba(37,39,72,.8);transform:translateY(-1px)}
+.pf2-world-page button:focus-visible,.pf2-world-page a:focus-visible{outline:2px solid #7df4de;outline-offset:3px}
+.pf2-world-page button:disabled{opacity:.42;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.pf2-world-page .full-width{width:100%}
+
+/* Training: weekly route map, three meaningful choices, and a usable active-session view. */
+.pf2-program-path{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr);gap:16px 24px;margin:0 0 23px;padding:20px 22px;border:1px solid rgba(132,153,240,.2);border-radius:18px;background:radial-gradient(ellipse at 0% 0%,rgba(68,218,200,.08),transparent 44%),linear-gradient(140deg,rgba(17,27,47,.94),rgba(18,19,39,.91));box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.pf2-program-path-copy h3{margin:8px 0 7px;color:#f0f6ff;font:800 clamp(18px,2vw,24px)/1.15 var(--font-display);letter-spacing:-.035em}
+.pf2-program-path-copy p{max-width:690px;margin:0;color:#92a8c1;font-size:10px;line-height:1.7}
+.pf2-program-stages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-self:center;gap:7px}
+.pf2-program-stage{display:grid;justify-items:center;gap:7px;color:#7087a3;font-size:8px;text-align:center;position:relative}
+.pf2-program-stage:not(:last-child):after{content:"";position:absolute;top:15px;left:calc(50% + 19px);width:calc(100% - 25px);height:1px;background:rgba(136,168,210,.19)}
+.pf2-program-stage>span{position:relative;z-index:1;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(130,172,213,.22);border-radius:10px;background:#101a2d;color:#8399b3;font-size:10px;font-weight:850}
+.pf2-program-stage.active>span{color:#071f26;background:linear-gradient(140deg,#9effdc,#58cbe9);border-color:transparent;box-shadow:0 0 22px rgba(103,240,213,.2)}
+.pf2-program-stage.done>span{color:#abffe0;border-color:rgba(103,236,193,.34);background:rgba(54,167,131,.17)}
+.pf2-program-stage small{font-size:8px;color:inherit;font-weight:800;letter-spacing:.03em}
+.pf2-program-stage.active small{color:#adffe6}
+.pf2-program-footer{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid rgba(134,171,211,.11)}
+.pf2-program-footer>span{display:flex;align-items:flex-start;gap:7px;max-width:690px;color:#748ba6;font-size:8px;line-height:1.6}
+.pf2-program-footer>span svg{flex:none;margin-top:1px;color:#8bbde1}
+.pf2-program-footer .btn-secondary{flex:none;white-space:nowrap}
+.pf2-plan-schedule{margin:0 0 20px;scroll-margin-top:90px}
+.pf2-plan-section-heading,.pf2-day-plan-heading,.pf2-nutrition-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px}
+.pf2-plan-section-heading{margin-bottom:14px}
+.pf2-plan-section-heading h3,.pf2-day-plan-heading h3,.pf2-nutrition-section-head h3{margin:6px 0 5px;color:#eff6ff;font:800 clamp(17px,2vw,23px)/1.2 var(--font-display);letter-spacing:-.03em}
+.pf2-plan-section-heading p,.pf2-day-plan-heading>small,.pf2-nutrition-section-head p{margin:0;max-width:780px;color:#8da2bd;font-size:10px;line-height:1.65}
+.pf2-plan-count{display:inline-flex;align-items:center;gap:7px;flex:none;padding:8px 10px;border:1px solid rgba(116,235,203,.18);border-radius:999px;background:rgba(74,210,176,.055);color:#a0ebd2;font-size:8px;font-weight:850;letter-spacing:.08em;white-space:nowrap}
+.pf2-day-picker{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:12px 0 17px}
+.pf2-day-chip,.pf2-nutrition-day-chip{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:11px 5px;border:1px solid rgba(135,175,218,.15);border-radius:13px;background:linear-gradient(145deg,rgba(19,32,54,.83),rgba(19,22,43,.78));color:#8297b0;transition:transform .18s,border-color .18s,background .18s,box-shadow .18s;}
+.pf2-day-chip:hover,.pf2-nutrition-day-chip:hover{transform:translateY(-2px);border-color:rgba(112,228,223,.42)}
+.pf2-day-chip small,.pf2-nutrition-day-chip small{font-size:8px;font-weight:850;letter-spacing:.1em;color:#7c98b6}
+.pf2-day-chip strong,.pf2-nutrition-day-chip strong{font:800 23px/1 var(--font-display);letter-spacing:-.04em;color:#e9f3ff}
+.pf2-day-chip>span,.pf2-nutrition-day-chip>span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:7px;color:#667f9b}
+.pf2-day-chip.selected,.pf2-nutrition-day-chip.selected{border-color:rgba(122,247,220,.55);background:linear-gradient(145deg,rgba(38,105,109,.32),rgba(49,51,97,.38));box-shadow:inset 0 0 0 1px rgba(121,255,222,.08),0 8px 23px rgba(39,209,207,.06)}
+.pf2-day-chip.selected strong,.pf2-nutrition-day-chip.selected strong{color:#aaffdf}
+.pf2-day-chip.is-today>span,.pf2-nutrition-day-chip.is-today>span{color:#91f5d6;font-weight:900}
+.pf2-day-plan-heading{align-items:center;margin:0 0 12px;padding:0 1px}
+.pf2-day-plan-heading>small{max-width:260px;text-align:right}
+.pf2-session-option-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pf2-session-option{position:relative;min-width:0;display:flex;flex-direction:column;padding:16px;border:1px solid rgba(124,163,212,.17);border-radius:17px;background:linear-gradient(145deg,rgba(16,28,48,.93),rgba(18,20,39,.93));box-shadow:inset 0 1px rgba(255,255,255,.025);transition:transform .2s,border-color .2s,box-shadow .2s}
+.pf2-session-option:before{content:"";position:absolute;inset:0 0 auto;height:2px;border-radius:17px 17px 0 0;background:linear-gradient(90deg,transparent,rgba(118,233,219,.5),transparent);opacity:.5}
+.pf2-session-option:hover{transform:translateY(-3px);border-color:rgba(122,236,223,.35);box-shadow:0 14px 35px rgba(0,0,0,.18),0 0 30px rgba(57,198,200,.045)}
+.pf2-session-option.selected{border-color:rgba(125,255,221,.6);background:linear-gradient(145deg,rgba(23,62,68,.55),rgba(28,27,58,.95));box-shadow:inset 0 0 0 1px rgba(117,255,221,.08),0 0 25px rgba(78,227,204,.07)}
+.pf2-session-option-icon{display:grid;place-items:center;width:39px;height:39px;margin-bottom:12px;border:1px solid rgba(113,239,213,.2);border-radius:12px;background:rgba(85,222,189,.09);color:#86f6d4}
+.pf2-session-option-icon.tone-1{border-color:rgba(164,134,255,.24);background:rgba(151,111,244,.11);color:#c1aaff}
+.pf2-session-option-icon.tone-2{border-color:rgba(255,195,104,.24);background:rgba(234,157,72,.1);color:#ffd38c}
+.pf2-session-option-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:9px;color:#7996b5;font-size:7px;letter-spacing:.1em;font-weight:850}
+.pf2-session-option-top strong{padding:5px 7px;border:1px solid rgba(129,177,221,.13);border-radius:7px;background:rgba(5,13,26,.45);color:#bed5e9;font-size:9px;letter-spacing:0;white-space:nowrap}
+.pf2-session-option h4{margin:0 0 7px;color:#eef6ff;font:800 16px/1.3 var(--font-display);letter-spacing:-.025em}
+.pf2-session-option>p{min-height:49px;margin:0;color:#8ea2bc;font-size:9px;line-height:1.6}
+.pf2-session-option-tags{display:flex;flex-wrap:wrap;gap:5px;margin:11px 0 12px}
+.pf2-session-option-tags span{padding:5px 7px;border:1px solid rgba(130,175,217,.13);border-radius:7px;background:rgba(8,18,33,.6);color:#a6c5df;font-size:7px;line-height:1.3}
+.pf2-session-exercise-preview{display:grid;gap:7px;margin:0 0 14px;padding-top:11px;border-top:1px solid rgba(129,168,206,.1);flex:1}
+.pf2-session-exercise-preview span{display:flex;gap:6px;align-items:flex-start;color:#9cb4cc;font-size:8px;line-height:1.4}
+.pf2-session-exercise-preview svg{flex:none;color:#78eecb;margin-top:1px}
+.pf2-session-option>.btn-primary,.pf2-session-option>.btn-secondary{margin-top:auto;min-height:39px}
+.pf2-session-launchbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:13px;padding:14px 16px;border:1px solid rgba(110,229,214,.2);border-radius:15px;background:linear-gradient(100deg,rgba(22,60,66,.3),rgba(29,33,65,.44));}
+.pf2-session-launchbar>div{display:grid;gap:4px;min-width:0}
+.pf2-session-launchbar strong{color:#edf8ff;font-size:12px}
+.pf2-session-launchbar small{max-width:740px;color:#85a0b9;font-size:8px;line-height:1.55;overflow-wrap:anywhere}
+.pf2-live-workout{margin:19px 0;padding:16px;border:1px solid rgba(111,230,202,.2);border-radius:20px;background:linear-gradient(140deg,rgba(12,25,44,.96),rgba(14,17,34,.96));box-shadow:0 15px 42px rgba(0,0,0,.17)}
+.pf2-live-workout-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:15px;padding:3px 3px 14px;border-bottom:1px solid rgba(129,171,205,.12)}
+.pf2-live-workout-header h3{margin:6px 0;color:#f1f8ff;font:800 22px/1.2 var(--font-display);letter-spacing:-.03em}
+.pf2-live-workout-header p{margin:0;color:#8ea7c3;font-size:9px;line-height:1.6;max-width:740px}
+.pf2-training-disclaimer{display:flex;align-items:flex-start;gap:10px;margin:17px 0 5px;padding:12px 14px;border:1px solid rgba(141,178,217,.13);border-radius:12px;background:rgba(17,30,49,.48);color:#7f98b3;font-size:9px;line-height:1.65}
+.pf2-training-disclaimer svg{flex:none;margin-top:1px;color:#9fc9dc}
+
+/* Nutrition intake wizard: clear choice cards, safe review, and an explicitly saved plan. */
+.pf2-nutrition-intake{margin:18px 0 22px;padding:clamp(17px,2.4vw,25px);border:1px solid rgba(91,220,190,.19);border-radius:19px;background:radial-gradient(ellipse at 100% 0%,rgba(69,190,165,.065),transparent 42%),linear-gradient(145deg,rgba(13,30,39,.94),rgba(15,20,37,.94));}
+.pf2-nutrition-section-head{margin-bottom:13px}
+.pf2-nutrition-section-head.compact{margin-bottom:13px}
+.pf2-nutrition-section-head .pf2-nutrition-kpi-icon{flex:none}
+.pf2-preference-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 18px;margin-top:18px}
+.pf2-preference-grid>.field{min-width:0;margin:0;align-content:start}
+.pf2-preference-grid>.field.full{grid-column:1/-1}
+.pf2-preference-field.full{grid-column:1/-1}
+.pf2-preference-grid .field>label{display:block;margin-bottom:9px;color:#8da6c0;font-size:8px;font-weight:900;letter-spacing:.12em}
+.pf2-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pf2-choice-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pf2-choice-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pf2-choice-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.pf2-choice-card{position:relative;min-width:0;min-height:57px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;text-align:left;padding:11px 12px;border:1px solid rgba(129,168,209,.15);border-radius:11px;background:linear-gradient(140deg,rgba(17,33,53,.9),rgba(22,23,44,.86));color:#b4c7db;transition:transform .16s,border-color .16s,background .16s,box-shadow .16s}
+.pf2-choice-card:hover{transform:translateY(-1px);border-color:rgba(118,222,219,.39);background:rgba(29,52,72,.82)}
+.pf2-choice-card.selected{border-color:rgba(120,249,216,.58);background:linear-gradient(140deg,rgba(34,93,87,.45),rgba(42,44,79,.72));box-shadow:inset 0 0 0 1px rgba(123,255,222,.06),0 5px 18px rgba(45,213,192,.045);color:#e4fff7}
+.pf2-choice-card strong{font-size:10px;color:inherit;line-height:1.35}
+.pf2-choice-card small{font-size:8px;line-height:1.45;color:#829bb5}
+.pf2-choice-card.selected small{color:#a9d8ce}
+.pf2-choice-card>svg{position:absolute;top:8px;right:8px;flex:none;color:#8cf7d5}
+.pf2-preference-grid input:not([type=checkbox]){width:100%;min-width:0;min-height:39px;border:1px solid rgba(131,171,211,.19);border-radius:10px;background:rgba(4,12,24,.55);padding:10px 12px;color:#edf6ff;font-size:10px;outline:none}
+.pf2-preference-grid input:focus{border-color:rgba(119,246,218,.52);box-shadow:0 0 0 3px rgba(94,225,203,.07)}
+.pf2-preference-grid input::placeholder{color:#637c97}
+.pf2-preference-grid .field-hint{display:block;margin-top:6px;color:#768fa9;font-size:8px;line-height:1.55}
+.pf2-nutrition-intake-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-top:20px;padding-top:15px;border-top:1px solid rgba(129,180,211,.12)}
+.pf2-nutrition-intake-footer>div:first-child{display:flex;align-items:flex-start;gap:8px;max-width:600px;color:#8ca7b9;font-size:8px;line-height:1.65}
+.pf2-nutrition-intake-footer>div:first-child svg{flex:none;color:#8ef2cf;margin-top:1px}
+.pf2-nutrition-intake-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none}
+.pf2-nutrition-intake-actions .btn-primary{white-space:nowrap}
+.pf2-plan-error{display:flex;align-items:flex-start;gap:8px;margin-top:13px;padding:11px 12px;border:1px solid rgba(255,140,157,.24);border-radius:10px;background:rgba(92,33,49,.18);color:#ffc0cb;font-size:9px;line-height:1.6}
+.pf2-plan-error svg{flex:none;margin-top:1px}
+.pf2-fixed-plan-banner{display:flex;align-items:flex-start;gap:13px;margin:18px 0;padding:16px;border:1px solid rgba(122,233,206,.24);border-radius:16px;background:radial-gradient(ellipse at 0% 0%,rgba(84,220,183,.08),transparent 45%),linear-gradient(125deg,rgba(17,45,48,.7),rgba(18,24,45,.86));}
+.pf2-fixed-plan-icon{width:36px;height:36px;flex:none;display:grid;place-items:center;border:1px solid rgba(129,244,210,.2);border-radius:11px;background:rgba(83,220,183,.1);color:#9bffdb}
+.pf2-fixed-plan-banner>div{flex:1;min-width:0}
+.pf2-fixed-plan-banner strong{display:block;color:#effffb;font-size:12px}
+.pf2-fixed-plan-banner p{margin:7px 0;color:#a4bdc7;font-size:9px;line-height:1.6}
+.pf2-fixed-plan-banner small{display:block;color:#7d9caf;font-size:8px;line-height:1.5}
+.pf2-fixed-plan-banner>.btn-secondary{flex:none;white-space:nowrap}
+.pf2-personal-plan{padding:clamp(15px,2vw,22px);margin-bottom:18px;border-radius:18px;border-color:rgba(105,188,211,.17);background:linear-gradient(145deg,rgba(13,25,43,.94),rgba(17,20,38,.92))}
+.pf2-personal-plan .pf2-plan-section-heading{align-items:flex-start}
+.pf2-nutrition-day-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:13px 0 19px}
+.pf2-nutrition-day-chip{min-height:78px;padding:10px 5px}
+.pf2-nutrition-day-chip>span{max-width:100%;font-size:7px}
+.pf2-plan-day-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0 0 13px}
+.pf2-plan-day-title h3{margin:6px 0 0;color:#f0f7ff;font:800 20px/1.2 var(--font-display);letter-spacing:-.035em}
+.pf2-plan-slots-count{flex:none;padding:7px 9px;border:1px solid rgba(124,171,221,.16);border-radius:9px;color:#8fb1cc;background:rgba(12,26,44,.55);font-size:8px}
+.pf2-planned-meal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pf2-planned-meal-card{position:relative;min-width:0;padding:15px;border:1px solid rgba(128,174,219,.16);border-radius:15px;background:linear-gradient(150deg,rgba(18,31,52,.92),rgba(20,21,40,.9));overflow:hidden}
+.pf2-planned-meal-card:before{content:"";position:absolute;top:0;left:15px;right:15px;height:2px;background:linear-gradient(90deg,transparent,rgba(116,239,206,.65),transparent)}
+.pf2-planned-meal-card.tone-1:before{background:linear-gradient(90deg,transparent,rgba(126,195,255,.75),transparent)}
+.pf2-planned-meal-card.tone-2:before{background:linear-gradient(90deg,transparent,rgba(197,156,255,.75),transparent)}
+.pf2-planned-meal-card.tone-3:before{background:linear-gradient(90deg,transparent,rgba(255,201,118,.75),transparent)}
+.pf2-planned-meal-top{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:12px;color:#8da9c5;font-size:8px;font-weight:850;letter-spacing:.12em}
+.pf2-planned-meal-top span:last-child{display:flex;align-items:center;gap:5px;white-space:nowrap;letter-spacing:0;font-weight:650;color:#9bb6c9}
+.pf2-planned-meal-content{display:grid;grid-template-columns:33px minmax(0,1fr);gap:10px;align-items:start}
+.pf2-planned-meal-number{display:grid;place-items:center;width:31px;height:31px;border:1px solid rgba(120,235,207,.18);border-radius:9px;background:rgba(77,209,173,.08);color:#8be9cc;font:800 11px var(--font-display)}
+.pf2-planned-meal-content h4{margin:0;color:#f0f7ff;font:800 15px/1.35 var(--font-display);letter-spacing:-.02em;overflow-wrap:anywhere}
+.pf2-planned-meal-content p{margin:6px 0 7px;color:#91a7bf;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.pf2-portion-cue{display:block;padding-left:8px;border-left:2px solid rgba(104,221,200,.32);color:#81a69f;font-size:8px;line-height:1.55}
+.pf2-planned-meal-footer{display:flex;align-items:center;justify-content:space-between;gap:9px;margin:13px 0 11px;padding-bottom:11px;border-bottom:1px solid rgba(131,169,207,.1)}
+.pf2-planned-meal-footer .btn-primary{min-height:32px;padding:8px 11px;font-size:9px}
+.pf2-planned-meal-footer>span{color:#829bb3;font-size:8px;white-space:nowrap}
+.pf2-meal-alternatives{display:grid;gap:6px}
+.pf2-meal-alternatives>small{font-size:7px;font-weight:900;letter-spacing:.13em;color:#728da8;margin-bottom:1px}
+.pf2-meal-alternatives button{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:9px 10px;border:1px solid rgba(130,169,206,.12);border-radius:10px;background:rgba(6,14,27,.38);color:#92aac2;text-align:left;transition:border-color .18s,background .18s}
+.pf2-meal-alternatives button:hover{border-color:rgba(108,222,207,.3);background:rgba(23,47,57,.5)}
+.pf2-meal-alternatives button>span{min-width:0;display:grid;gap:4px}
+.pf2-meal-alternatives button strong{color:#c5d9e8;font-size:9px;font-weight:750;overflow-wrap:anywhere}
+.pf2-meal-alternatives button small{color:#728da6;font-size:8px;line-height:1.45;overflow-wrap:anywhere}
+.pf2-meal-alternatives button>svg{flex:none;color:#81dfc7}
+.pf2-research-panel{display:flex;gap:13px;margin:16px 0 21px;padding:16px;border:1px solid rgba(130,179,218,.17);border-radius:16px;background:linear-gradient(145deg,rgba(15,28,48,.86),rgba(17,20,38,.85))}
+.pf2-research-icon{width:36px;height:36px;flex:none;display:grid;place-items:center;border:1px solid rgba(120,192,246,.18);border-radius:11px;background:rgba(90,165,223,.09);color:#8bd7f6}
+.pf2-research-copy{min-width:0;flex:1}
+.pf2-research-copy h3{margin:6px 0;color:#edf7ff;font:800 16px/1.3 var(--font-display)}
+.pf2-research-copy>p{margin:0 0 12px;color:#8ba2b9;font-size:9px;line-height:1.65}
+.pf2-research-sources{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pf2-research-sources a{min-width:0;display:grid;grid-template-columns:23px minmax(0,1fr) 14px;grid-template-rows:auto auto;align-items:center;gap:4px 7px;padding:10px;border:1px solid rgba(127,169,209,.14);border-radius:10px;background:rgba(5,13,25,.4);text-decoration:none}
+.pf2-research-sources a>span{grid-row:1/3;display:grid;place-items:center;width:23px;height:23px;border-radius:7px;background:rgba(89,174,228,.09);color:#81bce1}
+.pf2-research-sources a.retrieved>span{background:rgba(89,220,172,.1);color:#86f5c7}
+.pf2-research-sources a strong{min-width:0;color:#bad2e5;font-size:8px;line-height:1.5;overflow-wrap:anywhere}
+.pf2-research-sources a small{color:#6f8ca6;font-size:7px}
+.pf2-research-sources a>svg{grid-column:3;grid-row:1/3;color:#758ea9}
+.pf2-nutrition-logging-layout{display:grid;grid-template-columns:minmax(250px,.76fr) minmax(0,1.24fr);gap:14px;align-items:start;margin-top:17px}
+.pf2-nutrition-side{display:grid;gap:13px;min-width:0}
+.pf2-plate-panel,.pf2-hydration-panel,.pf2-meal-log-panel{min-width:0}
+.pf2-meal-log-panel{border:1px solid rgba(128,176,219,.14);border-radius:16px;background:rgba(14,23,39,.74);padding:16px}
+.pf2-nutrition-logging-layout .pf2-nutrition-section-head{align-items:center}
+.pf2-nutrition-logging-layout .pf2-nutrition-section-head h3{font-size:16px}
+
+@media(max-width:1100px){.pf2-session-option-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-session-option-grid .pf2-session-option:last-child{grid-column:1/-1}.pf2-nutrition-logging-layout{grid-template-columns:1fr}.pf2-nutrition-side{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-meal-log-panel{grid-column:1/-1}}
+@media(max-width:800px){.pf2-program-path{grid-template-columns:1fr}.pf2-program-footer{align-items:flex-start;flex-direction:column}.pf2-program-footer .btn-secondary{width:100%}.pf2-program-stages{max-width:540px;width:100%}.pf2-preference-grid{gap:14px}.pf2-choice-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-fixed-plan-banner{flex-wrap:wrap}.pf2-fixed-plan-banner>.btn-secondary{width:100%}.pf2-planned-meal-grid{grid-template-columns:1fr}.pf2-plan-section-heading{align-items:flex-start;flex-direction:column}.pf2-research-sources{grid-template-columns:1fr}}
+@media(max-width:560px){.pf2-program-path{padding:15px}.pf2-program-stages{gap:4px}.pf2-program-stage:not(:last-child):after{left:calc(50% + 16px);width:calc(100% - 19px)}.pf2-program-stage>span{width:27px;height:27px}.pf2-program-stage small{font-size:7px}.pf2-day-picker,.pf2-nutrition-day-strip{grid-template-columns:repeat(7,minmax(43px,1fr));overflow-x:auto;padding:2px 2px 6px;scroll-snap-type:x mandatory}.pf2-day-chip,.pf2-nutrition-day-chip{scroll-snap-align:start}.pf2-session-option-grid{grid-template-columns:1fr}.pf2-session-option-grid .pf2-session-option:last-child{grid-column:auto}.pf2-session-option>p{min-height:0}.pf2-session-launchbar{align-items:stretch;flex-direction:column}.pf2-session-launchbar .btn-primary{width:100%}.pf2-live-workout{padding:12px}.pf2-live-workout-header{flex-direction:column}.pf2-live-workout-header .btn-glass{width:100%}.pf2-preference-grid{grid-template-columns:1fr}.pf2-preference-grid>.field.full,.pf2-preference-field.full{grid-column:auto}.pf2-choice-grid,.pf2-choice-grid.three{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-choice-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-choice-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-nutrition-intake-footer{align-items:stretch;flex-direction:column}.pf2-nutrition-intake-actions{display:grid;grid-template-columns:1fr}.pf2-nutrition-intake-actions button{width:100%}.pf2-nutrition-day-chip{min-height:72px}.pf2-plan-day-title{align-items:flex-start;flex-direction:column}.pf2-fixed-plan-banner{padding:12px}.pf2-research-panel{padding:12px;gap:9px}.pf2-research-icon{width:31px;height:31px}.pf2-nutrition-side{grid-template-columns:1fr}.pf2-slot-tabs{gap:4px}.pf2-slot-tabs button{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.pf2-world-page .btn-primary,.pf2-world-page .btn-secondary,.pf2-world-page .btn-glass,.pf2-session-option,.pf2-day-chip,.pf2-nutrition-day-chip,.pf2-choice-card,.pf2-meal-alternatives button{transition:none!important}}
+.pf2-player-control-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}.pf2-player-control-row .btn-secondary,.pf2-player-control-row .btn-primary{min-width:125px}
+.pf2-habit-page,.pf2-progress-page{min-width:0}
+@media(max-width:560px){.pf2-player-control-row{display:grid;grid-template-columns:1fr}.pf2-player-control-row button{width:100%}}
+
+/* Expired nutrition plans stay readable until a replacement week is successfully generated. */
+.pf2-next-menu-callout{display:flex;align-items:center;gap:13px;margin:0 0 16px;padding:15px 17px;border-color:rgba(123,218,194,.24);background:linear-gradient(115deg,rgba(21,55,56,.72),rgba(20,25,44,.94))}
+.pf2-next-menu-callout>.pf2-fixed-plan-icon{width:38px;height:38px}
+.pf2-next-menu-callout>div{flex:1;min-width:0}
+.pf2-next-menu-callout strong{display:block;color:#f0fff9;font-size:12px}
+.pf2-next-menu-callout p{margin:5px 0 0;color:#9db6c2;font-size:9px;line-height:1.6}
+.pf2-next-menu-callout>.btn-primary{flex:none;white-space:nowrap}
+@media(max-width:700px){.pf2-next-menu-callout{align-items:flex-start;flex-wrap:wrap}.pf2-next-menu-callout>div{flex:1 1 calc(100% - 58px)}.pf2-next-menu-callout>.btn-primary{width:100%}}
+
+/* PLAYFORGE 2.7: original realm imagery + accessible player guide */
+.top-help-button{height:36px;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;border:1px solid rgba(130,255,209,.24);border-radius:11px;padding:0 12px;background:linear-gradient(125deg,rgba(28,54,65,.72),rgba(29,27,51,.7));color:#c5f5e8;font-size:10px;font-weight:750;white-space:nowrap;transition:transform .18s,border-color .18s,background .18s,box-shadow .18s}
+.top-help-button svg{color:var(--pf-mint)}
+.top-help-button:hover{transform:translateY(-1px);border-color:rgba(130,255,209,.56);background:linear-gradient(125deg,rgba(31,73,78,.9),rgba(37,34,66,.9));box-shadow:0 6px 22px rgba(75,229,211,.1)}
+.playforge-help-backdrop{z-index:1200;padding:20px}
+.playforge-help-modal{width:min(920px,100%);max-height:min(88vh,900px);overflow:auto;padding:clamp(18px,3vw,28px);border-radius:22px;background:radial-gradient(ellipse at 95% 0%,rgba(91,104,224,.15),transparent 32%),linear-gradient(145deg,#15243a,#0b1220);scrollbar-width:thin;scrollbar-color:rgba(103,222,227,.4) transparent}
+.playforge-help-header{display:grid;grid-template-columns:46px minmax(0,1fr) 35px;align-items:start;gap:14px;padding-bottom:20px;border-bottom:1px solid rgba(137,188,224,.15)}
+.playforge-help-header .modal-icon{width:44px;height:44px;margin:0;color:#8af6df;background:rgba(72,157,157,.15);border:1px solid rgba(125,255,220,.16)}
+.playforge-help-header h2{margin:4px 0 6px;font:800 clamp(22px,3vw,30px)/1.12 'Space Grotesk',sans-serif;letter-spacing:-.045em;color:#eff6ff}
+.playforge-help-header p{margin:0;color:#9cadc5;font-size:12px;line-height:1.6}
+.playforge-help-header .icon-button{width:34px;height:34px}
+.playforge-help-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:18px 0}
+.playforge-help-step{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:start;gap:12px;padding:15px;border:1px solid rgba(130,185,225,.14);border-radius:15px;background:linear-gradient(135deg,rgba(23,40,61,.74),rgba(18,23,39,.78));min-width:0}
+.playforge-help-step>span{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;color:#89ffe2;background:rgba(82,218,196,.11);border:1px solid rgba(120,255,220,.2);font:800 10px 'Space Grotesk',sans-serif}
+.playforge-help-step>div{min-width:0}
+.playforge-help-step strong{display:block;color:#e8f2ff;font-size:12px;line-height:1.45;margin:0 0 6px}
+.playforge-help-step p{margin:0;color:#9bacbf;font-size:10px;line-height:1.72}
+.playforge-help-step button{display:inline-flex;align-items:center;gap:5px;margin-top:11px;border:0;background:transparent;color:#82f5df;padding:0;font-size:10px;font-weight:800}
+.playforge-help-step button:hover{color:#e5fffc}
+.playforge-help-footer{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:center;gap:12px;padding-top:16px;border-top:1px solid rgba(137,188,224,.15);color:#83efd6}
+.playforge-help-footer p{margin:0;color:#91a5bc;font-size:10px;line-height:1.7}
+.playforge-help-footer .btn-primary{min-height:39px;padding:0 15px;white-space:nowrap}
+@media(max-width:900px){.top-help-button{padding:0 9px}.playforge-help-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.top-help-button{width:35px;height:35px;padding:0;gap:0;border-radius:10px}.top-help-button span{display:none}.playforge-help-backdrop{padding:9px}.playforge-help-modal{max-height:92vh;padding:16px;border-radius:16px}.playforge-help-header{grid-template-columns:37px minmax(0,1fr) 30px;gap:9px;padding-bottom:15px}.playforge-help-header .modal-icon{width:36px;height:36px;border-radius:10px}.playforge-help-header h2{font-size:21px}.playforge-help-header p{font-size:10px}.playforge-help-header .icon-button{width:30px;height:30px}.playforge-help-grid{grid-template-columns:1fr;gap:8px;padding:12px 0}.playforge-help-step{padding:12px;grid-template-columns:28px minmax(0,1fr);gap:10px}.playforge-help-step>span{width:27px;height:27px}.playforge-help-step strong{font-size:11px}.playforge-help-step p{font-size:9px}.playforge-help-footer{grid-template-columns:18px minmax(0,1fr);gap:9px}.playforge-help-footer .btn-primary{grid-column:1/-1;justify-content:center;width:100%}}
+
+/* PLAYFORGE 2.8 — meal photography, attribution, and visible daily rewards. */
+.pf2-habit-reward-deck{
+  position:relative;isolation:isolate;overflow:hidden;margin:-7px 0 18px;padding:17px 18px 14px;
+  border:1px solid rgba(111,232,203,.2);border-radius:16px;
+  background:radial-gradient(ellipse at 88% 0%,rgba(114,93,218,.17),transparent 34%),linear-gradient(120deg,rgba(16,47,54,.84),rgba(18,24,43,.93) 58%,rgba(25,21,44,.91));
+  box-shadow:0 12px 32px rgba(0,0,0,.14),inset 0 1px rgba(255,255,255,.035)
+}
+.pf2-habit-reward-deck:after{content:"";position:absolute;right:-47px;top:-78px;width:180px;height:180px;border-radius:50%;border:1px solid rgba(142,137,255,.13);box-shadow:0 0 0 18px rgba(135,125,255,.025),0 0 0 38px rgba(135,125,255,.02);pointer-events:none;z-index:-1}
+.pf2-habit-reward-header{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;min-width:0}
+.pf2-reward-icon{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,207,121,.2);border-radius:12px;background:linear-gradient(145deg,rgba(255,193,91,.17),rgba(255,145,104,.08));color:#ffd47c;box-shadow:0 0 20px rgba(255,188,94,.06)}
+.pf2-habit-reward-header>div{min-width:0;display:grid;gap:4px}
+.pf2-habit-reward-header .panel-kicker{font-size:8px;color:#8dcdbf;letter-spacing:.17em}
+.pf2-habit-reward-header strong{display:block;color:#effffb;font:850 20px/1.15 var(--font-display);letter-spacing:-.035em}
+.pf2-habit-reward-header strong small{font:650 9px/1.4 'DM Sans',sans-serif;color:#8ba8ba;letter-spacing:0}
+.pf2-habit-reward-header p{margin:0;color:#8ea7b9;font-size:9px;line-height:1.55;max-width:590px}
+.pf2-reward-milestone{max-width:210px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border:1px solid rgba(142,132,255,.2);border-radius:99px;background:rgba(108,93,207,.09);color:#c9c1ff;text-align:center;font-size:8px;font-weight:800;line-height:1.45}
+.pf2-reward-milestone svg{flex:none;color:#ab9dff}
+.pf2-reward-progress{height:7px;overflow:hidden;margin-top:15px;border:1px solid rgba(128,176,202,.12);border-radius:99px;background:rgba(3,12,23,.68);box-shadow:inset 0 1px 3px rgba(0,0,0,.28)}
+.pf2-reward-progress>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#69f0c7,#63dfff 65%,#aa91ff);box-shadow:0 0 15px rgba(99,233,213,.29);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.pf2-reward-track-caption{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:7px;color:#7f9aae;font-size:8px}
+.pf2-reward-track-caption span:last-child{color:#84d8c3}
+.pf2-reward-token-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(134,190,211,.1)}
+.pf2-reward-token-row>div{display:flex;align-items:center;gap:8px;min-width:0}
+.pf2-reward-token{width:29px;height:29px;display:grid;place-items:center;flex:none;border:1px solid rgba(129,180,212,.12);border-radius:9px}
+.pf2-reward-token.mint{background:rgba(80,214,168,.1);color:#83edc6}.pf2-reward-token.purple{background:rgba(165,130,255,.11);color:#b9a0ff}.pf2-reward-token.blue{background:rgba(93,180,255,.11);color:#8bcaff}.pf2-reward-token.gold{background:rgba(255,200,100,.1);color:#ffd27e}
+.pf2-reward-token-row>div>span:last-child{display:grid;min-width:0;gap:3px}
+.pf2-reward-token-row strong{color:#e5f5ff;font:800 12px/1.1 var(--font-display)}
+.pf2-reward-token-row small{color:#8098ad;font-size:7px;line-height:1.3}
+.pf2-meal-reward-strip{display:grid;grid-template-columns:minmax(190px,.75fr) minmax(0,1.25fr);gap:14px;align-items:center;margin:0 0 17px;padding:14px 15px;border:1px solid rgba(112,232,199,.17);border-radius:15px;background:linear-gradient(110deg,rgba(16,48,52,.6),rgba(19,25,44,.8) 58%,rgba(24,22,43,.78));box-shadow:inset 0 1px rgba(255,255,255,.025)}
+.pf2-meal-reward-intro{display:grid;grid-template-columns:35px minmax(0,1fr);gap:10px;align-items:center;min-width:0}
+.pf2-meal-reward-intro>span{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(255,208,120,.18);border-radius:10px;background:rgba(255,192,90,.1);color:#ffd27e}
+.pf2-meal-reward-intro>div{display:grid;gap:5px;min-width:0}
+.pf2-meal-reward-intro strong{color:#f0fff9;font:800 12px/1.4 var(--font-display)}
+.pf2-meal-reward-intro small{color:#8eabba;font-size:8px;line-height:1.55}
+.pf2-meal-reward-slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;min-width:0}
+.pf2-meal-reward-slots>span{display:grid;justify-items:center;gap:4px;min-width:0;padding:9px 4px 8px;border:1px solid rgba(126,173,208,.12);border-radius:10px;background:rgba(6,14,27,.36);text-align:center;transition:border-color .2s,background .2s,transform .2s}
+.pf2-meal-reward-slots>span.logged{border-color:rgba(98,236,193,.26);background:linear-gradient(145deg,rgba(38,130,104,.19),rgba(38,63,94,.18));box-shadow:inset 0 0 16px rgba(87,221,179,.035)}
+.pf2-meal-reward-slots i{width:21px;height:21px;display:grid;place-items:center;border:1px solid rgba(132,178,209,.15);border-radius:7px;color:#7e9cb8;font-style:normal}
+.pf2-meal-reward-slots .logged i{border-color:rgba(114,255,207,.23);background:rgba(81,224,174,.1);color:#83f5cc}
+.pf2-meal-reward-slots b{font-size:8px;color:#c1d7e5}
+.pf2-meal-reward-slots small{font-size:7px;color:#8097aa;line-height:1.3}
+.pf2-meal-reward-slots .logged small{color:#86eac8}
+.pf2-planned-meal-card{padding:0;display:flex;flex-direction:column}
+.pf2-planned-meal-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 14px 10px}
+.pf2-planned-meal-top>span:first-child{color:#94f4dc;font-size:8px;font-weight:900;letter-spacing:.14em}
+.pf2-planned-meal-top>span:last-child{display:inline-flex;align-items:center;gap:4px;color:#8ba4bb;font-size:8px}
+.pf2-planned-meal-card .pf2-meal-photo{width:100%;height:176px;flex:none;aspect-ratio:16/9;border-top:1px solid rgba(148,194,221,.08);border-bottom:1px solid rgba(148,194,221,.08)}
+.pf2-meal-photo:after{z-index:0;pointer-events:none}
+.pf2-meal-photo>img{display:block}
+.pf2-meal-photo-label{position:absolute;z-index:2;top:10px;left:10px;bottom:auto!important;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(171,224,232,.21);border-radius:7px;background:rgba(5,15,28,.7);backdrop-filter:blur(10px);padding:6px 8px;color:#c7f8ee;font-size:7px;font-weight:900;letter-spacing:.1em}
+.pf2-meal-photo-credit{position:absolute;z-index:3;left:9px;right:9px;bottom:8px!important;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:fit-content;max-width:calc(100% - 18px);margin-left:auto;border:1px solid rgba(171,224,232,.2);border-radius:7px;background:rgba(5,15,28,.76);backdrop-filter:blur(10px);padding:5px 7px;color:#c2e8f4;font-size:7px;font-weight:750;line-height:1.3;text-decoration:none;overflow-wrap:anywhere}
+.pf2-meal-photo-credit:hover{border-color:rgba(120,255,219,.45);color:#97ffdc}
+.pf2-planned-meal-content{display:grid;grid-template-columns:27px minmax(0,1fr);gap:9px;padding:14px 14px 8px;align-items:start}
+.pf2-planned-meal-number{display:grid;place-items:center;width:26px;height:26px;border:1px solid rgba(117,206,211,.16);border-radius:8px;background:rgba(53,145,147,.1);color:#9bf0db;font:800 9px var(--font-display)}
+.pf2-planned-meal-content h4{margin:1px 0 6px;color:#f0f8ff;font:800 14px/1.35 var(--font-display);letter-spacing:-.02em;overflow-wrap:anywhere}
+.pf2-planned-meal-content p{margin:0;color:#9aadc1;font-size:9px;line-height:1.65;overflow-wrap:anywhere}
+.pf2-portion-cue{display:block;margin-top:8px;color:#75bea9;font-size:8px;line-height:1.55}
+.pf2-planned-meal-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px 13px;margin-top:auto}
+.pf2-planned-meal-footer .btn-primary{min-height:36px;padding:0 11px;font-size:9px}
+.pf2-planned-meal-footer>span{color:#8096ab;font-size:8px;white-space:nowrap}
+.pf2-meal-alternatives{padding:0 14px 14px;margin-top:0}
+.pf2-meal-alternatives>small{display:block;padding:9px 0 7px;border-top:1px solid rgba(134,184,215,.1)}
+.pf2-meal-alternative-row{display:grid;grid-template-columns:74px minmax(0,1fr);gap:7px;align-items:stretch;min-width:0}
+.pf2-meal-alternative-row+.pf2-meal-alternative-row{margin-top:6px}
+.pf2-meal-alternative-row .pf2-meal-photo{height:56px;width:74px;aspect-ratio:auto;align-self:stretch;border:1px solid rgba(130,183,217,.13);border-radius:8px}
+.pf2-meal-photo.compact .pf2-meal-photo-label{display:none}
+.pf2-meal-photo.compact .pf2-meal-photo-credit{left:2px;right:2px;bottom:2px!important;max-width:calc(100% - 4px);width:auto;justify-content:center;margin:0;padding:3px 2px;border-radius:5px;font-size:5px;text-align:center;line-height:1.2}
+.pf2-meal-alternatives .pf2-meal-alternative-row>button{height:100%;min-height:56px;padding:8px 9px}
+.pf2-meal-alternatives .pf2-meal-alternative-row>button>span{gap:5px}
+.pf2-meal-alternatives .pf2-meal-alternative-row>button strong{font-size:9px;line-height:1.4}
+.pf2-meal-alternatives .pf2-meal-alternative-row>button small{font-size:7px}
+.pf2-meal-alternative-row .pf2-meal-photo:after{background:linear-gradient(0deg,rgba(5,12,23,.6),transparent 75%)}
+.pf2-meal-photo.illustrative .pf2-meal-photo-label{color:#ffe0a5;border-color:rgba(255,211,137,.2)}
+.pf2-meal-photo.illustrative .pf2-meal-photo-credit{color:#f5d9ad}
+@media(max-width:900px){.pf2-meal-reward-strip{grid-template-columns:1fr}.pf2-meal-reward-slots{max-width:560px;width:100%}}
+@media(max-width:650px){.pf2-habit-reward-header{grid-template-columns:37px minmax(0,1fr)}.pf2-reward-milestone{grid-column:2;justify-self:start;max-width:100%}.pf2-reward-token-row{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px}.pf2-habit-reward-header strong{font-size:18px}.pf2-planned-meal-card .pf2-meal-photo{height:188px}.pf2-meal-reward-strip{padding:12px}.pf2-meal-reward-slots b{font-size:7px}.pf2-meal-reward-slots small{font-size:6px}}
+@media(max-width:420px){.pf2-reward-track-caption{display:grid;gap:5px}.pf2-meal-alternative-row{grid-template-columns:62px minmax(0,1fr)}.pf2-meal-alternative-row .pf2-meal-photo{width:62px;height:54px}.pf2-meal-alternatives .pf2-meal-alternative-row>button{padding:7px}.pf2-meal-photo.compact .pf2-meal-photo-credit{font-size:4.5px}}
+@media(prefers-reduced-motion:reduce){.pf2-reward-progress>span,.pf2-meal-reward-slots>span,.pf2-meal-photo img{transition:none!important}}

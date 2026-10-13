@@ -1,0 +1,8 @@
+PLAYFORGE 1.2 — Quick diagnosis
+
+1. For build errors, run `npm install` in the folder containing package.json, then `npm run build`.
+2. To run UI and AI API together, use `npm run dev` (starts server.mjs, not plain Vite).
+3. Coach Nexus requires a reachable configured model. Default: Ollama at http://127.0.0.1:11434 using llama3.2:latest.
+4. If AI is offline, visit http://localhost:5173/api/health while npm run dev is active. Follow the detail returned.
+5. See AI_SETUP.md for Ollama and OpenAI-compatible providers. Do not put API keys in front-end code or commit a .env file.
+6. The chat uses a real configured language model. It does not fall back to fake heuristic responses if the provider is unavailable.

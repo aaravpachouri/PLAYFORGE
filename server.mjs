@@ -121,9 +121,15 @@ async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, tim
     ...(jsonMode ? { response_format: { type: 'json_object' }, max_tokens: 5200 } : {}),
   };
   // Gemini 3 models no longer use legacy temperature/top_p sampling parameters.
-  // Keep those parameters for other OpenAI-compatible providers.
+  // Use low reasoning effort for faster responses in chat and quest generation.
   const isGemini3 = /generativelanguage\.googleapis\.com/i.test(openAIBase) && /^gemini-3/i.test(model);
-  if (!isGemini3) requestBody.temperature = jsonMode ? 0.2 : 0.65;
+  if (isGemini3) {
+    requestBody.reasoning_effort = 'low';
+    // Keep ordinary Coach responses concise; structured plans retain their larger output allowance.
+    if (!jsonMode) requestBody.max_tokens = 1000;
+  } else {
+    requestBody.temperature = jsonMode ? 0.2 : 0.65;
+  }
   const response = await fetch(`${openAIBase}/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },

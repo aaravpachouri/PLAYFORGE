@@ -225,7 +225,7 @@ ${JSON.stringify(context)}`;
   if (!response.ok) throw new Error(typeof payload.error === 'string' ? payload.error : `AI quest generation failed (HTTP ${response.status}).`);
   if (typeof payload.reply !== 'string') throw new Error('AI returned no quest text.');
 
-  const cleaned = payload.reply.trim().replace(/^\`\`\`(?:json)?\s*/i, '').replace(/\s*\`\`\`$/, '');
+  const cleaned = payload.reply.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
   let parsed: any;
   try { parsed = JSON.parse(cleaned); }
   catch { throw new Error('AI quest response was not valid JSON.'); }

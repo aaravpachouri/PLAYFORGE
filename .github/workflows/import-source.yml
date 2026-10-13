@@ -1,0 +1,48 @@
+name: Import PLAYFORGE application source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-source.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download the supplied PLAYFORGE source archive
+        run: |
+          curl -fL --retry 3 \
+            "https://d2ol7oe51mr4n9.cloudfront.net/user_3KbtDnScA2O9o4QSX5YkGtatbM6/0f0be671-a1b1-4336-b40c-fc7914daea2d.zip" \
+            -o /tmp/playforge-source.zip
+
+      - name: Extract source files
+        run: |
+          mkdir -p /tmp/playforge-source
+          unzip -oq /tmp/playforge-source.zip -d /tmp/playforge-source
+          rsync -a \
+            --exclude=".git/" \
+            --exclude=".github/" \
+            --exclude="vercel.json" \
+            /tmp/playforge-source/ ./
+          rm -f scripts/prepare-and-build.mjs
+          rmdir scripts 2>/dev/null || true
+
+      - name: Commit application source to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Source files already match; no commit needed."
+            exit 0
+          fi
+          git commit -m "Import PLAYFORGE 2.8.0 application source"
+          git push

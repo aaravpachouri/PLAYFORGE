@@ -130,15 +130,24 @@ async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, tim
   } else {
     requestBody.temperature = jsonMode ? 0.2 : 0.65;
   }
-  const response = await fetch(`${openAIBase}/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify(requestBody),
-    signal: AbortSignal.timeout(timeoutMs),
-  });
+  const requestStartedAt = Date.now();
+  let response;
+  try {
+    response = await fetch(`${openAIBase}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    console.error(`[PLAYFORGE AI] upstream connection failed provider=${provider} model=${model} elapsedMs=${Date.now() - requestStartedAt} reason=${reason.replace(/\\s+/g, ' ').slice(0, 400)}`);
+    throw error;
+  }
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const message = payload.error?.message || `The configured AI provider returned HTTP ${response.status}.`;
+    console.error(`[PLAYFORGE AI] upstream HTTP ${response.status} provider=${provider} model=${model} elapsedMs=${Date.now() - requestStartedAt} message=${String(message).replace(/\\s+/g, ' ').slice(0, 500)}`);
     throw Object.assign(new Error(message), { status: response.status >= 500 ? 502 : response.status });
   }
   const reply = payload.choices?.[0]?.message?.content;

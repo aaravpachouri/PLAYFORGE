@@ -131,7 +131,7 @@ async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeout
     contents,
     generationConfig: {
       maxOutputTokens: jsonMode ? 5200 : 1000,
-      thinkingConfig: { thinkingLevel: 'LOW' },
+      thinkingConfig: { thinkingLevel: 'low' },
       ...(jsonMode ? { responseMimeType: 'application/json' } : {}),
     },
   };

@@ -57,6 +57,12 @@ AI_MODEL=gpt-4o-mini
 AI_API_KEY=your-secret-key-here
 ```
 
+## AI-personalised daily quests
+
+Quest Board uses the same server-side `/api/chat` model configuration as Coach Nexus to generate three distinct daily missions. It sends only the current date, the player's selected goal, experience level, preferred session length, environment and age group, plus summaries of recent activity types, minutes and a coarse energy pattern. It does not send the player's name, free-text reflections, chat history or meal log for quest generation. Generated quests are cached in the browser's existing player data for that date. If the model fails or returns invalid JSON, PLAYFORGE uses its built-in local quest set instead.
+
+With a hosted model, this limited quest context is processed by the configured provider. Review that provider's privacy terms before using hosted AI.
+
 ## Chat privacy controls
 
 - By default, the chat sends your messages and conversation history to the configured model; it does **not** include your stored profile or habit logs.

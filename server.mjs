@@ -136,9 +136,10 @@ async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeout
     },
   };
 
-  // Google recommends retrying transient 503s. If the configured model stays
-  // overloaded, try supported stable Gemini Flash models instead of failing chat.
-  const fallbackModels = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash']
+  // Retry transient 503s, then try distinct model backends. Gemini 3.7 Flash
+  // is now routed to 3.8, and 3.5 Flash is routed to 3.6, so neither is a
+  // useful independent fallback when those models are overloaded.
+  const fallbackModels = ['gemini-3.6-flash', 'gemini-3.5-flash-lite']
     .filter(candidateModel => candidateModel !== model);
   const modelsToTry = [model, model, ...fallbackModels];
   let lastOverloadMessage = '';
@@ -171,7 +172,7 @@ async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeout
 
       if (response.status === 503 && attempt < modelsToTry.length - 1) {
         lastOverloadMessage = message;
-        console.warn(`[PLAYFORGE AI] Gemini model unavailable model=${requestModel} httpStatus=503 elapsedMs=${Date.now() - requestStartedAt}; trying ${modelsToTry[attempt + 1]}`);
+        console.warn(`[PLAYFORGE AI] Gemini model unavailable model=${requestModel} httpStatus=503 elapsedMs=${Date.now() - requestStartedAt} message=${String(message).replace(/\s+/g, ' ').slice(0, 240)}; trying ${modelsToTry[attempt + 1]}`);
         continue;
       }
 

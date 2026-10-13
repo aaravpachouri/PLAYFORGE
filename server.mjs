@@ -135,40 +135,69 @@ async function askGeminiNative(messages, systemPrompt, jsonMode = false, timeout
       ...(jsonMode ? { responseMimeType: 'application/json' } : {}),
     },
   };
-  const requestStartedAt = Date.now();
-  let response;
-  try {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-    response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-      body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-  } catch (error) {
-    const reason = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-    console.error(`[PLAYFORGE AI] Gemini native connection failed model=${model} elapsedMs=${Date.now() - requestStartedAt} reason=${reason.replace(/\s+/g, ' ').slice(0, 400)}`);
-    throw error;
+
+  // Google recommends retrying transient 503s. If the configured model stays
+  // overloaded, try supported stable Gemini Flash models instead of failing chat.
+  const fallbackModels = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash']
+    .filter(candidateModel => candidateModel !== model);
+  const modelsToTry = [model, model, ...fallbackModels];
+  let lastOverloadMessage = '';
+
+  for (let attempt = 0; attempt < modelsToTry.length; attempt += 1) {
+    const requestModel = modelsToTry[attempt];
+
+    // Brief exponential-style delay before retrying the same overloaded model.
+    if (attempt === 1) await new Promise(resolve => setTimeout(resolve, 800));
+
+    const requestStartedAt = Date.now();
+    let response;
+    try {
+      const endpoint = \`https://generativelanguage.googleapis.com/v1beta/models/\${encodeURIComponent(requestModel)}:generateContent\`;
+      response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify(requestBody),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (error) {
+      const reason = error instanceof Error ? \`\${error.name}: \${error.message}\` : String(error);
+      console.error(\`[PLAYFORGE AI] Gemini native connection failed model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} reason=\${reason.replace(/\s+/g, ' ').slice(0, 400)}\`);
+      throw error;
+    }
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const message = payload.error?.message || \`Gemini native API returned HTTP \${response.status}.\`;
+
+      if (response.status === 503 && attempt < modelsToTry.length - 1) {
+        lastOverloadMessage = message;
+        console.warn(\`[PLAYFORGE AI] Gemini model unavailable model=\${requestModel} httpStatus=503 elapsedMs=\${Date.now() - requestStartedAt}; trying \${modelsToTry[attempt + 1]}\`);
+        continue;
+      }
+
+      console.error(\`[PLAYFORGE AI] Gemini native HTTP \${response.status} model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} message=\${String(message).replace(/\s+/g, ' ').slice(0, 500)}\`);
+      throw Object.assign(new Error(message), { status: response.status >= 500 ? 502 : response.status });
+    }
+
+    const candidate = payload.candidates?.[0];
+    const reply = Array.isArray(candidate?.content?.parts)
+      ? candidate.content.parts.map(part => typeof part.text === 'string' ? part.text : '').join('').trim()
+      : '';
+    if (!reply) {
+      const reason = candidate?.finishReason || payload.promptFeedback?.blockReason || 'no text candidate';
+      console.error(\`[PLAYFORGE AI] Gemini native returned no text model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} reason=\${String(reason).slice(0, 160)}\`);
+      throw Object.assign(new Error(\`Gemini returned no text (\${String(reason)}).\`), { status: 502 });
+    }
+
+    if (requestModel !== model) {
+      console.warn(\`[PLAYFORGE AI] Gemini fallback succeeded configuredModel=\${model} actualModel=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt}\`);
+    } else {
+      console.info(\`[PLAYFORGE AI] Gemini native request succeeded model=\${requestModel} elapsedMs=\${Date.now() - requestStartedAt} jsonMode=\${jsonMode}\`);
+    }
+    return reply;
   }
 
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const message = payload.error?.message || `Gemini native API returned HTTP ${response.status}.`;
-    console.error(`[PLAYFORGE AI] Gemini native HTTP ${response.status} model=${model} elapsedMs=${Date.now() - requestStartedAt} message=${String(message).replace(/\s+/g, ' ').slice(0, 500)}`);
-    throw Object.assign(new Error(message), { status: response.status >= 500 ? 502 : response.status });
-  }
-
-  const candidate = payload.candidates?.[0];
-  const reply = Array.isArray(candidate?.content?.parts)
-    ? candidate.content.parts.map(part => typeof part.text === 'string' ? part.text : '').join('').trim()
-    : '';
-  if (!reply) {
-    const reason = candidate?.finishReason || payload.promptFeedback?.blockReason || 'no text candidate';
-    console.error(`[PLAYFORGE AI] Gemini native returned no text model=${model} elapsedMs=${Date.now() - requestStartedAt} reason=${String(reason).slice(0, 160)}`);
-    throw Object.assign(new Error(`Gemini returned no text (${String(reason)}).`), { status: 502 });
-  }
-  console.info(`[PLAYFORGE AI] Gemini native request succeeded model=${model} elapsedMs=${Date.now() - requestStartedAt} jsonMode=${jsonMode}`);
-  return reply;
+  throw Object.assign(new Error(lastOverloadMessage || 'Gemini models are temporarily unavailable. Please try again shortly.'), { status: 502 });
 }
 
 async function askOpenAICompatible(messages, systemPrompt, jsonMode = false, timeoutMs = 45000) {

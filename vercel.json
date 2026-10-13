@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://playforge-je9z.onrender.com/api/$1"
+      "destination": "https://playforge-ai-west.onrender.com/api/$1"
     }
   ]
 }

@@ -130,3 +130,15 @@ playforge/
 Nutrition research runs from the backend on each generation and fetches only the official pages listed in `server.mjs`; it is not a general-purpose web search. If pages cannot be retrieved, the plan reports `reference_only`. Meal ideas are AI-generated, not individually reviewed by a registered dietitian. The backend checks common allergy words but cannot guarantee safety; never rely on an AI-generated plan for severe allergy or medical nutrition needs. User data is stored locally; saved plans do not sync across devices.
 
 This version is a functioning UI prototype plus a configurable AI API, not a hardened multi-user service. Browser-local records do not sync between devices or accounts. Charts represent the saved entries available in that browser. Before claiming outcomes, test with users and a labelled dataset and report measured results rather than assumptions.
+
+
+## Product and engineering foundation
+
+The current application is being evolved incrementally; existing realms and user journeys are preserved unless a reviewed change explicitly improves them.
+
+- [Product foundation](docs/PRODUCT_FOUNDATION.md) — vision, experience direction and preservation principles.
+- [Current architecture audit](docs/CURRENT_ARCHITECTURE_AUDIT.md) — source-level architecture, data and known constraints.
+- [Engineering workflow](docs/ENGINEERING_WORKFLOW.md) — branch, testing, agent responsibilities and release gates.
+- [Staged product roadmap](docs/STAGED_PRODUCT_ROADMAP.md) — incremental improvement plan.
+
+All implementation work is performed on isolated branches. No direct commits to `main`, merges or production deployments occur without review and explicit approval.

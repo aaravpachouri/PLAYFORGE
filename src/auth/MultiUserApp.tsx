@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { createClient, type Session } from '@supabase/supabase-js';
 import App from '../App';
 
@@ -12,9 +12,7 @@ const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
   : null;
 
 type SyncState = 'loading' | 'ready' | 'syncing' | 'error';
-type Props = { children?: ReactNode };
-
-function AuthShell({ children }: Props) {
+function AuthShell() {
   const [session, setSession] = useState<Session | null>(null);
   const [booting, setBooting] = useState(true);
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -64,6 +62,7 @@ function AuthShell({ children }: Props) {
         const oldLocal = localStorage.getItem(STORAGE_KEY);
         localStorage.removeItem(STORAGE_KEY);
         setLegacyData(oldLocal);
+        if (!oldLocal) activeUser.current = userId;
         setHydratedUser(userId);
         setSyncState('ready');
       }
@@ -212,5 +211,4 @@ const accountBar: React.CSSProperties = {position:'sticky',top:0,zIndex:1000,dis
 const signOutButton: React.CSSProperties = {border:'1px solid #55466e',borderRadius:8,padding:'6px 10px',background:'#211a30',color:'#eee7ff',cursor:'pointer'};
 const errorBar: React.CSSProperties = {padding:8,textAlign:'center',background:'#4c1d2b',color:'#fecdd3',fontSize:12};
 const dot: React.CSSProperties = {display:'inline-block',width:7,height:7,borderRadius:'50%',marginRight:6};
-const unusedChildren = null;
 export default function MultiUserApp(){ return <AuthShell/>; }

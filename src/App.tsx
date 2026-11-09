@@ -66,11 +66,8 @@ const prettyDate = (date = new Date()) => date.toLocaleDateString('en-IN', { wee
 const dayLabel = (iso: string, weekday = true) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-IN', { weekday: weekday ? 'short' : undefined, day: 'numeric' });
 const emptyLog = (date: string): DayLog => ({ date, sleepHours: null, energy: null, mood: 'Okay', waterGlasses: 0, habits: {}, activities: [], doneQuests: [], questNotes: {}, meals: [], notes: '' });
 const habitOptions = [
-  { id: 'sleep', label: 'Kept a sleep routine', desc: 'Made time for the sleep I need', icon: Moon, xp: 10 },
-  { id: 'breaks', label: 'Took movement breaks', desc: 'Broke up long periods of sitting', icon: Timer, xp: 10 },
-  { id: 'hydration', label: 'Checked in with hydration', desc: 'Had drinks regularly when I needed them', icon: Droplets, xp: 5 },
-  { id: 'focus', label: 'Made time for a priority', desc: 'Study, work, a hobby or something meaningful', icon: Target, xp: 10 },
-  { id: 'reflection', label: 'Checked in with myself', desc: 'Noticed my mood, energy or stress', icon: Heart, xp: 10 },
+  { id: 'sleep', label: 'Made space for rest', desc: 'Protected some time to wind down or recharge', icon: Moon, xp: 10 },
+  { id: 'reflection', label: 'Paused and checked in', desc: 'Noticed what felt useful or difficult today', icon: Heart, xp: 10 },
 ];
 const goalNames: Record<Goal, string> = { consistency: 'Build consistency', strength: 'Build strength', energy: 'Feel more energised', mobility: 'Move with ease' };
 const levelNames: Record<Level, string> = { new: 'Just starting', returning: 'Getting back into it', regular: 'Active most weeks' };
@@ -313,6 +310,7 @@ function App() {
   const [settingsDraft, setSettingsDraft] = useState<Profile | null>(null);
   const [pendingQuestId, setPendingQuestId] = useState<string | null>(null);
   const [questEvidenceDraft, setQuestEvidenceDraft] = useState('');
+  const [completionCelebration, setCompletionCelebration] = useState<{ title: string; category: QuestCategory; message: string; xp: number; note: string; nextTitle: string | null } | null>(null);
   const [showReset, setShowReset] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
@@ -347,7 +345,7 @@ function App() {
       const typing = !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); setCommandOpen(true); setNotificationOpen(false); }
       if (event.key === '/' && !typing && !event.ctrlKey && !event.metaKey && !event.altKey) { event.preventDefault(); setCommandOpen(true); setNotificationOpen(false); }
-      if (event.key === 'Escape') { setCommandOpen(false); setCoachOpen(false); setNotificationOpen(false); setPendingQuestId(null); }
+      if (event.key === 'Escape') { setCommandOpen(false); setCoachOpen(false); setNotificationOpen(false); setPendingQuestId(null); setCompletionCelebration(null); }
     };
     window.addEventListener('keydown', handleHotkeys);
     return () => window.removeEventListener('keydown', handleHotkeys);
@@ -355,7 +353,9 @@ function App() {
   const profile = stored.profile;
   const today = todayKey();
   const log: DayLog = { ...emptyLog(today), ...(stored.logs[today] || {}), meals: stored.logs[today]?.meals || [] };
-  const fallbackQuests = useMemo(() => profile ? getQuests(profile, log, stored.logs) as QuestMission[] : [], [profile, today, stored.logs]);
+  const fallbackQuests = useMemo(() => profile ? buildDailyLifeQuests({
+    date: today, minutes: profile.minutes, goal: profile.goal, level: profile.level,
+  }) as QuestMission[] : [], [profile, today]);
   const questHistory = useMemo(() => latestLogs(stored.logs, 7)
     .filter(day => day.date < today)
     .map(day => ({
@@ -363,13 +363,19 @@ function App() {
       activityTypes: [...new Set(day.activities.map(activity => activity.type))],
       activityMinutes: day.activities.reduce((sum, activity) => sum + activity.minutes, 0),
       energyPattern: day.energy === null ? 'not-logged' as const : day.energy <= 2 ? 'low' as const : 'not-low' as const,
-    })), [stored.logs, today]);
+      recentQuestTitles: (stored.questPlanCache?.[day.date]?.quests || [])
+        .filter(quest => day.doneQuests.includes(quest.id))
+        .map(quest => quest.title),
+    })), [stored.logs, stored.questPlanCache, today]);
   const questSignature = profile ? JSON.stringify({
+    version: 2,
     date: today,
-    profile: { goal: profile.goal, level: profile.level, minutes: profile.minutes, environment: profile.environment, ageBand: profile.ageBand },
+    profile: { goal: profile.goal, level: profile.level, minutes: profile.minutes, ageBand: profile.ageBand },
     recentHistory: questHistory,
   }) : '';
-  const cachedQuestPlan = stored.questPlanCache?.[today]?.signature === questSignature ? stored.questPlanCache[today] : null;
+  const cachedPlanCandidate = stored.questPlanCache?.[today];
+  const cachedQuestPlan = cachedPlanCandidate?.signature === questSignature && isEverydayQuestPlan(cachedPlanCandidate)
+    ? cachedPlanCandidate : null;
   const runtimeQuestPlan = aiQuestState?.signature === questSignature ? aiQuestState : null;
   const activeQuestPlan = cachedQuestPlan || runtimeQuestPlan;
   const quests: QuestMission[] = activeQuestPlan?.quests || fallbackQuests;
@@ -378,7 +384,8 @@ function App() {
 
   useEffect(() => {
     if (!profile || !questSignature) return;
-    if (stored.questPlanCache?.[today]?.signature === questSignature) return;
+    const cached = stored.questPlanCache?.[today];
+    if (cached?.signature === questSignature && isEverydayQuestPlan(cached)) return;
     if (aiQuestState?.signature === questSignature) return;
     let cancelled = false;
     void generateAIQuests(profile, today, questHistory)
@@ -502,14 +509,24 @@ function App() {
     if (!id) return;
     if (note.length < 8) { setNotice('Add a short completion note (at least 8 characters) first.'); return; }
     if (log.doneQuests.includes(id)) { setPendingQuestId(null); return; }
+    const quest = quests.find(item => item.id === id);
+    const category = quest?.category || 'Focus';
+    const nextQuest = quests.find(item => item.id !== id && !log.doneQuests.includes(item.id));
     updateToday({
       doneQuests: [...log.doneQuests, id],
       questNotes: { ...(log.questNotes || {}), [id]: note },
     });
     setPendingQuestId(null);
     setQuestEvidenceDraft('');
+    setCompletionCelebration({
+      title: quest?.title || 'Quest cleared',
+      category,
+      message: getQuestAcknowledgement(category, note),
+      xp: quest?.xp || 35,
+      note,
+      nextTitle: nextQuest?.title || null,
+    });
     if (!prefersReducedMotion) { confetti({ particleCount: 74, spread: 68, startVelocity: 28, origin: { x: 0.78, y: 0.3 }, colors: ['#8fffd0', '#57ddff', '#a88bff', '#ffd36b'], zIndex: 9999 }); }
-    setNotice('Quest debrief saved — quest completed and XP earned!');
   };
   const askCoach = async (raw: string, usePersonalContext = false) => {
     const content = raw.trim();
@@ -568,13 +585,20 @@ function App() {
   const clearCoachChat = () => { setCoachMessages([]); setCoachError(''); };
   const toggleHabit = (id: string) => {
     const checking = !log.habits[id];
-    const label = [...habitOptions, ...(stored.customHabits || [])].find(habit => habit.id === id)?.label || 'Habit';
+    const label = [...habitOptions, ...(stored.customHabits || [])].find(habit => habit.id === id)?.label || 'Routine';
     const nextHabits = { ...log.habits, [id]: checking };
     updateToday({ habits: nextHabits });
     if (checking) {
-      const requiredCount = habitOptions.length + (stored.customHabits || []).length;
-      const checkedCount = Object.values(nextHabits).filter(Boolean).length;
-      setNotice(checkedCount >= requiredCount ? 'Daily objectives cleared! +8 XP earned for this check-in.' : `${label} checked · +8 XP. Small wins count.`);
+      const routineIds = [...habitOptions.map(habit => habit.id), ...(stored.customHabits || []).map(habit => habit.id)];
+      const requiredCount = routineIds.length;
+      const checkedCount = routineIds.filter(routineId => Boolean(nextHabits[routineId])).length;
+      const acknowledgements: Record<string, string> = {
+        sleep: 'You made room to recharge. That matters, even when the day is busy.',
+        reflection: 'You paused to notice how today felt. Self-awareness is a useful skill.',
+      };
+      setNotice(checkedCount >= requiredCount && requiredCount > 0
+        ? `Your personal routines are all checked in. +8 XP for this one — nice follow-through.`
+        : `${label} checked · +8 XP. ${acknowledgements[id] || 'A small promise to yourself, kept.'}`);
       if (checkedCount >= requiredCount && requiredCount > 0 && !prefersReducedMotion) {
         confetti({ particleCount: 56, spread: 62, startVelocity: 24, origin: { x: 0.52, y: 0.42 }, colors: ['#8fffd0', '#57ddff', '#a88bff', '#ffd36b'], zIndex: 9999 });
       }

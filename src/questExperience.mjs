@@ -4,7 +4,7 @@ const questLanes = [
     type: 'learning',
     icon: 'brain',
     quests: [
-      { title: 'One thing, full focus', description: 'Choose one useful task and give it a quiet 10-minute start. Close unrelated tabs or notifications, then stop or continue by choice.', duration: 10 },
+      { title: 'One thing, full focus', description: 'Choose one useful task and give it a quiet, focused start. Close unrelated tabs or notifications, then stop or continue by choice.', duration: 10 },
       { title: 'Explain it simply', description: 'Pick one idea you are learning and explain it in three plain-language sentences, out loud or in a note.', duration: 8 },
       { title: 'Read for one insight', description: 'Read a short page or section about something that matters to you. Keep one idea worth remembering.', duration: 10 },
       { title: 'Skill practice, tiny edition', description: 'Practise one small part of a skill you want to improve. Repeat it slowly and notice one thing that got easier.', duration: 12 },

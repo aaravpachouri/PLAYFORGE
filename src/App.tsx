@@ -86,7 +86,13 @@ function readState(): StoredState | null {
     return { ...parsed, logs, experiments: Array.isArray(parsed.experiments) ? parsed.experiments : [], customHabits: Array.isArray(parsed.customHabits) ? parsed.customHabits : [] };
   } catch { return null; }
 }
-function persistState(state: StoredState) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* App remains usable in this session if storage is disabled. */ } }
+function persistState(state: StoredState) {
+  try {
+    const serialized = JSON.stringify(state);
+    localStorage.setItem(STORAGE_KEY, serialized);
+    window.dispatchEvent(new CustomEvent('playforge:state-change', { detail: serialized }));
+  } catch { /* App remains usable in this session if storage is disabled. */ }
+}
 function calculateXP(logs: Record<string, DayLog>) {
   return Object.values(logs).reduce((sum, log) => sum + calculateDailyXP(log), 0);
 }

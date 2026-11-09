@@ -18,6 +18,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
+      - run: npm install --package-lock-only --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playforge-package-lock
+          path: package-lock.json
+          if-no-files-found: error
+          retention-days: 1
+      - run: npm ci
       - run: npm test
       - run: npm run build

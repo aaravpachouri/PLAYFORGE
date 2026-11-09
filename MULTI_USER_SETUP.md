@@ -6,10 +6,10 @@ This branch adds account-gated cloud saves. The existing app state shape is reta
 
 1. Create a Supabase project on the free plan. Do not enable paid compute or paid add-ons.
 2. In **SQL Editor**, run the complete migration at `supabase/migrations/001_player_data.sql`.
-3. In **Project Settings → API**, copy the Project URL and the publishable/anon key. Never use the service-role key in the browser.
+3. In **Project Settings → API**, copy the Project URL and the publishable key. Never use the service-role key in the browser.
 4. In Vercel → PLAYFORGE project → Settings → Environment Variables, add:
    - `VITE_SUPABASE_URL` = Project URL
-   - `VITE_SUPABASE_ANON_KEY` = publishable/anon key
+   - `VITE_SUPABASE_PUBLISHABLE_KEY` = publishable/anon key
 5. Apply to Production, Preview and Development as needed, then redeploy the branch preview.
 
 ## Email authentication

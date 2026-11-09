@@ -72,7 +72,6 @@ const habitOptions = [
 const goalNames: Record<Goal, string> = { consistency: 'Build consistency', strength: 'Build strength', energy: 'Feel more energised', mobility: 'Move with ease' };
 const levelNames: Record<Level, string> = { new: 'Just starting', returning: 'Getting back into it', regular: 'Active most weeks' };
 const environmentNames: Record<Environment, string> = { home: 'At home', gym: 'At the gym', outdoor: 'Outdoors', mixed: 'A mix of places' };
-const activityTypes: ActivityType[] = ['Walking', 'Strength', 'Cycling', 'Sport', 'Dance', 'Yoga & mobility', 'Other'];
 
 function readState(): StoredState | null {
   try {
@@ -300,9 +299,6 @@ function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [notice, setNotice] = useState('');
   const [profileDraft, setProfileDraft] = useState<Profile>({ name: '', ageBand: '18-64', goal: 'consistency', level: 'new', minutes: 15, environment: 'mixed' });
-  const [selectedActivity, setSelectedActivity] = useState<ActivityType>('Walking');
-  const [activityMinutes, setActivityMinutes] = useState(15);
-  const [activityIntensity, setActivityIntensity] = useState<'easy' | 'moderate' | 'vigorous'>('moderate');
   const [experimentStyle, setExperimentStyle] = useState('Cooperative quests');
   const [experimentRating, setExperimentRating] = useState(4);
   const [experimentNote, setExperimentNote] = useState('');
@@ -425,11 +421,6 @@ function App() {
   const saveProfile = (p: Profile) => {
     setStored(prev => ({ ...prev, profile: { ...p, name: p.name.trim() || 'Player' }, onboardingDone: true }));
     setProfileDraft(p); setSettingsDraft(null); setTab('overview'); setNotice('Your personal quest system is ready.');
-  };
-  const logActivity = () => {
-    if (activityMinutes < 1 || activityMinutes > 600) { setNotice('Enter a duration between 1 and 600 minutes.'); return; }
-    updateToday({ activities: [...log.activities, { id: crypto.randomUUID?.() || `${Date.now()}`, type: selectedActivity, minutes: activityMinutes, intensity: activityIntensity }] });
-    setNotice(`${selectedActivity} session logged.`);
   };
   const logTrainingSession = (minutes: number, intensity: 'easy' | 'moderate' | 'vigorous', type: ActivityType = 'Strength') => {
     const safeMinutes = Math.max(1, Math.min(600, Math.round(minutes)));
@@ -671,7 +662,7 @@ function App() {
       {stored.demo && <div className="demo-banner"><Info size={15}/><span><strong>Demo mode</strong> — activity history is illustrative. Your edits stay on this device.</span><button onClick={() => setShowReset(true)}>Exit demo <ArrowRight size={13}/></button></div>}
       <AnimatePresence mode="wait" initial={false}><motion.div key={tab} className="tab-transition" initial={prefersReducedMotion?false:{opacity:0,y:14,filter:'blur(5px)'}} animate={{opacity:1,y:0,filter:'blur(0px)'}} exit={prefersReducedMotion?undefined:{opacity:0,y:-8,filter:'blur(4px)'}} transition={{duration:prefersReducedMotion?0:.26,ease:'easeOut'}}>
         {tab === 'overview' && <Overview profile={profile} xp={xp} level={level} xpThisLevel={xpThisLevel} streak={streak} weekMinutes={weekMinutes} weekSessions={weekSessions} activeDays={activeDays} quests={quests} questsLoading={questsLoading} log={log} weekLogs={weekLogs} onToggleQuest={toggleQuest} onGo={setTab} onCoach={() => setCoachOpen(true)} />}
-        {tab === 'quests' && <QuestBoard profile={profile} quests={quests} log={log} onToggle={toggleQuest} onGoTraining={() => setTab('training')} questSource={questSource} questLoading={questsLoading} />}
+        {tab === 'quests' && <QuestBoard quests={quests} log={log} onToggle={toggleQuest} onGoTraining={() => setTab('training')} questSource={questSource} questLoading={questsLoading} />}
         {tab === 'training' && <TrainingArena profile={profile} log={log} program={stored.trainingProgram || { startDate: todayKey(), generation: 0 }} onRegenerate={regenerateTrainingOptions} onFinish={logTrainingSession} onGoHabits={() => setTab('habits')} />}
         {tab === 'nutrition' && <NutritionStation profile={profile} meals={log.meals || []} waterGlasses={log.waterGlasses} preferences={stored.nutritionPreferences} plan={stored.nutritionPlan} isGenerating={nutritionPlanLoading} planError={nutritionPlanError} onGeneratePlan={generateNutritionPlan} onUpdatePlan={updateNutritionPlan} onLogMeal={logMeal} onRemoveMeal={removeMeal} onWaterChange={count => updateToday({ waterGlasses: Math.max(0, Math.min(20, count)) })} onAskCoach={() => setTab('coach')} />}
         {tab === 'habits' && <HabitLab log={log} customHabits={stored.customHabits || []} onAddCustomHabit={addCustomHabit} onUpdate={updateToday} onToggleHabit={toggleHabit} />}
@@ -682,7 +673,7 @@ function App() {
       <footer className="footer"><span>PLAYFORGE <b>·</b> YOUR LIFE, LEVELED UP</span><span><ShieldCheck size={13}/> Private by design <i/> Built for progress, not perfection.</span></footer>
     </main>
     <button className="floating-coach" onClick={() => { setCoachOpen(true); setNotificationOpen(false); }} aria-label="Open PLAYFORGE Coach"><span className="floating-coach-orbit"/><Bot size={20}/><span className="floating-coach-label">COACH</span></button>
-    <CommandPalette open={commandOpen} query={commandQuery} setQuery={setCommandQuery} onClose={() => setCommandOpen(false)} onGo={(next) => { setTab(next); setCommandOpen(false); }} onCoach={() => { setCoachOpen(true); setCommandOpen(false); }} onLog={() => { setTab('habits'); setCommandOpen(false); }} />
+    <CommandPalette open={commandOpen} query={commandQuery} setQuery={setCommandQuery} onClose={() => setCommandOpen(false)} onGo={(next) => { setTab(next); setCommandOpen(false); }} onCoach={() => { setCoachOpen(true); setCommandOpen(false); }} />
     <CoachDrawer open={coachOpen} messages={coachMessages} isSending={coachSending} error={coachError} aiHealth={aiHealth} includePersonalContext={coachUsePersonalContext} onIncludePersonalContext={setCoachUsePersonalContext} onRefreshAI={refreshAIStatus} onClearChat={clearCoachChat} onClose={() => setCoachOpen(false)} onAsk={askCoach} profile={profile} />
     {helpOpen && <div className="modal-backdrop playforge-help-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setHelpOpen(false); }}>
       <motion.div className="modal playforge-help-modal" role="dialog" aria-modal="true" aria-labelledby="playforge-help-title" initial={prefersReducedMotion ? false : {opacity:0,y:16,scale:.98}} animate={{opacity:1,y:0,scale:1}} exit={prefersReducedMotion ? undefined : {opacity:0,y:10,scale:.99}}>
@@ -738,7 +729,7 @@ function App() {
   </div>;
 }
 
-function CommandPalette({ open, query, setQuery, onClose, onGo, onCoach, onLog }: { open:boolean; query:string; setQuery:(q:string)=>void; onClose:()=>void; onGo:(tab:Tab)=>void; onCoach:()=>void; onLog:()=>void }) {
+function CommandPalette({ open, query, setQuery, onClose, onGo, onCoach }: { open:boolean; query:string; setQuery:(q:string)=>void; onClose:()=>void; onGo:(tab:Tab)=>void; onCoach:()=>void }) {
   const actions = [
     {name:'Home',desc:'Your day at a glance',icon:Layers,action:()=>onGo('overview'),tags:'home dashboard world overview'},
     {name:'Quests',desc:'Focus, everyday routines and discovery challenges',icon:Compass,action:()=>onGo('quests'),tags:'quests missions challenges focus discipline exploration'},
@@ -924,7 +915,7 @@ function StatCard({ label, value, unit, change, icon: Icon, accent }: { label:st
 function QuestIcon({ name }: {name:string}) { if(name==='strength') return <Dumbbell size={19}/>; if(name==='mobility') return <Waves size={19}/>; if(name==='timer') return <Timer size={19}/>; if(name==='brain') return <Brain size={19}/>; if(name==='leaf') return <Leaf size={19}/>; if(name==='spark') return <Sparkles size={19}/>; return <Footprints size={19}/>; }
 function QuestRow({ q, done, index, onToggle, disabled = false }: {q:any;done:boolean;index:number;onToggle:()=>void;disabled?:boolean}) { return <div className={`quest-row ${done?'quest-done':''}`}><div className={`quest-row-icon quest-icon-${index%4}`}><QuestIcon name={q.icon}/></div><div className="quest-main-copy"><div className="quest-tagline">{q.tag}</div><strong>{q.title}</strong><p>{q.description}</p><div className="quest-meta"><span><Clock3 size={12}/>{q.duration} min</span><span><Zap size={12}/>{q.xp} XP</span></div></div><button disabled={disabled} className={`quest-check ${done?'completed':''}`} onClick={onToggle} aria-label={done?'Mark quest incomplete':'Complete quest'}>{done?<Check size={16}/>:<ArrowRight size={16}/>}</button></div>; }
 
-function QuestBoard({ profile, quests, log, onToggle, onGoTraining, questSource, questLoading }: {profile:Profile;quests:any[];log:DayLog;onToggle:(id:string)=>void;onGoTraining:()=>void;questSource:'ai'|'local';questLoading:boolean}) {
+function QuestBoard({ quests, log, onToggle, onGoTraining, questSource, questLoading }: {quests:any[];log:DayLog;onToggle:(id:string)=>void;onGoTraining:()=>void;questSource:'ai'|'local';questLoading:boolean}) {
   const [filter,setFilter]=useState('All quests');
   const done=quests.filter(q=>log.doneQuests.includes(q.id)).length;
   const filters=['All quests','Not started','Completed'];

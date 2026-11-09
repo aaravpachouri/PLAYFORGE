@@ -18,6 +18,8 @@ function AuthShell() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -78,7 +80,8 @@ function AuthShell() {
   useEffect(() => {
     if (!supabase) { setBooting(false); return; }
     let alive = true;
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true);
       if (alive) window.setTimeout(() => { if (alive) void hydrate(nextSession); }, 0);
     });
     void supabase.auth.getSession().then(({ data, error: sessionError }) => {
@@ -153,6 +156,37 @@ function AuthShell() {
     } finally { setBusy(false); }
   };
 
+  const requestPasswordReset = async () => {
+    if (!supabase) return;
+    if (!email.trim()) { setError('Enter your email address first.'); return; }
+    setBusy(true); setError(''); setMessage('');
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: window.location.origin,
+      });
+      if (resetError) throw resetError;
+      setMessage('If an account exists for that address, a password reset link has been sent.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not send the password reset email.');
+    } finally { setBusy(false); }
+  };
+
+  const saveNewPassword = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!supabase) return;
+    if (newPassword.length < 8) { setError('Use at least 8 characters for your new password.'); return; }
+    setBusy(true); setError(''); setMessage('');
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) throw updateError;
+      setRecoveryMode(false);
+      setNewPassword('');
+      setMessage('Your password has been updated.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not update your password.');
+    } finally { setBusy(false); }
+  };
+
   const chooseLegacy = async (shouldImport: boolean) => {
     if (!supabase || !session?.user.id) return;
     setBusy(true); setError('');
@@ -195,7 +229,9 @@ function AuthShell() {
 
   if (booting) return <div style={screen}><div style={panel}><Brand/><p>Loading your secure player profile…</p></div></div>;
 
-  if (!session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>YOUR PROGRESS. YOUR ACCOUNT.</div><h1>{mode === 'signin' ? 'Welcome back, player.' : 'Create your player account.'}</h1><p>Sign in on any laptop to continue with the same quests, XP and progress.</p><form onSubmit={submitAuth} style={{ display: 'grid', gap: 12 }}><label style={label}>EMAIL<input style={field} type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label style={label}>PASSWORD<input style={field} type="password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button></form>{message&&<p style={success}>{message}</p>}{error&&<p style={danger}>{error}</p>}<button style={linkButton} onClick={()=>{setMode(mode==='signin'?'signup':'signin');setError('');setMessage('');}}>{mode==='signin'?'New to PLAYFORGE? Create an account':'Already have an account? Sign in'}</button><small style={{color:'#9294a7'}}>Your data is private to your account. Never share your password.</small></div></div>;
+  if (recoveryMode && session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>ACCOUNT RECOVERY</div><h1>Set a new password.</h1><p>Choose a new password for your PLAYFORGE player account.</p><form onSubmit={saveNewPassword} style={{display:'grid',gap:12}}><label style={label}>NEW PASSWORD<input style={field} type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy?'Saving…':'Update password'}</button></form>{error&&<p style={danger}>{error}</p>}{message&&<p style={success}>{message}</p>}</div></div>;
+
+  if (!session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>YOUR PROGRESS. YOUR ACCOUNT.</div><h1>{mode === 'signin' ? 'Welcome back, player.' : 'Create your player account.'}</h1><p>Sign in on any laptop to continue with the same quests, XP and progress.</p><form onSubmit={submitAuth} style={{ display: 'grid', gap: 12 }}><label style={label}>EMAIL<input style={field} type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label style={label}>PASSWORD<input style={field} type="password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button></form>{mode==='signin'&&<button type="button" style={linkButton} disabled={busy} onClick={()=>void requestPasswordReset()}>Forgot your password?</button>}{message&&<p style={success}>{message}</p>{error&&<p style={danger}>{error}</p>}<button style={linkButton} onClick={()=>{setMode(mode==='signin'?'signup':'signin');setError('');setMessage('');}}>{mode==='signin'?'New to PLAYFORGE? Create an account':'Already have an account? Sign in'}</button><small style={{color:'#9294a7'}}>Your data is private to your account. Never share your password.</small></div></div>;
 
   if (syncState === 'error' && !hydratedUser) return <div style={screen}><div style={panel}><Brand/><h1>Could not load cloud save</h1><p>{error}</p><button style={primary} onClick={()=>void hydrate(session)}>Retry</button><button style={linkButton} onClick={()=>void signOut()}>Sign out</button></div></div>;
 

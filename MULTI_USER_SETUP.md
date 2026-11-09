@@ -14,7 +14,12 @@ This branch adds account-gated cloud saves. The existing app state shape is reta
 
 ## Email authentication
 
-In Supabase → Authentication → URL Configuration, set the production Site URL to the PLAYFORGE domain and add the Vercel preview URL(s) to Redirect URLs. Keep email confirmation enabled. Configure SMTP only if you have a free provider and have reviewed its limits; the built-in email service has sending limits.
+In Supabase → Authentication → URL Configuration:
+- Set **Site URL** to the existing production site: `https://playforge-fawn.vercel.app`.
+- Add `https://*-aaravpachouri.vercel.app/**` to Redirect URLs for Vercel preview deployments.
+- Add `http://localhost:5173/**` for local development.
+
+The signup flow explicitly returns the confirmation link to the current app origin. Keep email confirmation enabled. Supabase's built-in email sender has low sending limits; use it for limited testing only. Do not add a paid SMTP service without approval. If you customise the confirmation template, use `{{ .RedirectTo }}` for the redirect target instead of hardcoding the Site URL.
 
 ## Data and isolation
 

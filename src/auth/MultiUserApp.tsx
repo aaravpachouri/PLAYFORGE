@@ -4,9 +4,9 @@ import App from '../App';
 
 const STORAGE_KEY = 'playforge.v1';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL?.trim() || '';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || '';
-const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim() || '';
+const supabase = SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     })
   : null;
@@ -114,16 +114,24 @@ function AuthShell() {
   useEffect(() => {
     const userId = hydratedUser;
     if (!userId || activeUser.current !== userId) return;
-    const originalSetItem = Storage.prototype.setItem;
-    Storage.prototype.setItem = function (key: string, value: string) {
-      originalSetItem.call(this, key, value);
-      if (this === window.localStorage && key === STORAGE_KEY && activeUser.current === userId) {
-        setSyncState('syncing');
-        if (saveTimer.current) clearTimeout(saveTimer.current);
-        saveTimer.current = setTimeout(() => void saveCloud(value, userId), 650);
-      }
+    const onPlayerStateChange = (event: Event) => {
+      const value = (event as CustomEvent<string>).detail;
+      if (typeof value !== 'string' || activeUser.current !== userId) return;
+      setSyncState('syncing');
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => void saveCloud(value, userId), 650);
     };
-    return () => { Storage.prototype.setItem = originalSetItem; };
+    window.addEventListener('playforge:state-change', onPlayerStateChange);
+    // The main app initialises its browser save at mount. Upload that initial
+    // state too, so a newly created account gets a durable cloud record.
+    const initialSync = window.setTimeout(() => {
+      const value = localStorage.getItem(STORAGE_KEY);
+      if (value && activeUser.current === userId) void saveCloud(value, userId);
+    }, 200);
+    return () => {
+      window.removeEventListener('playforge:state-change', onPlayerStateChange);
+      window.clearTimeout(initialSync);
+    };
   }, [hydratedUser, saveCloud]);
 
   const submitAuth = async (event: FormEvent) => {
@@ -183,7 +191,7 @@ function AuthShell() {
     await supabase.auth.signOut();
   };
 
-  if (!supabase) return <div style={screen}><div style={panel}><Brand/><h1>Cloud accounts need setup</h1><p>Add the two public Supabase project values to your Vercel environment before enabling player accounts.</p><code>VITE_SUPABASE_URL</code><code>VITE_SUPABASE_ANON_KEY</code><p>Then apply <strong>supabase/migrations/001_player_data.sql</strong> in the Supabase SQL Editor and redeploy. No service-role key belongs in the browser.</p></div></div>;
+  if (!supabase) return <div style={screen}><div style={panel}><Brand/><h1>Cloud accounts need setup</h1><p>Add the two public Supabase project values to your Vercel environment before enabling player accounts.</p><code>VITE_SUPABASE_URL</code><code>VITE_SUPABASE_PUBLISHABLE_KEY</code><p>Then apply <strong>supabase/migrations/001_player_data.sql</strong> in the Supabase SQL Editor and redeploy. No service-role key belongs in the browser.</p></div></div>;
 
   if (booting) return <div style={screen}><div style={panel}><Brand/><p>Loading your secure player profile…</p></div></div>;
 

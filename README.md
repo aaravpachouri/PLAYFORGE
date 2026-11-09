@@ -141,4 +141,6 @@ The current application is being evolved incrementally; existing realms and user
 - [Engineering workflow](docs/ENGINEERING_WORKFLOW.md) — branch, testing, agent responsibilities and release gates.
 - [Staged product roadmap](docs/STAGED_PRODUCT_ROADMAP.md) — incremental improvement plan.
 
+- [Feature inventory and verification plan](docs/FEATURE_INVENTORY_AND_VERIFICATION.md) — existing user journeys, data model, API surface and test backlog.
+
 All implementation work is performed on isolated branches. No direct commits to `main`, merges or production deployments occur without review and explicit approval.

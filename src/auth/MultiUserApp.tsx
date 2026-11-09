@@ -79,7 +79,7 @@ function AuthShell() {
     if (!supabase) { setBooting(false); return; }
     let alive = true;
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      if (alive) void hydrate(nextSession);
+      if (alive) window.setTimeout(() => { if (alive) void hydrate(nextSession); }, 0);
     });
     void supabase.auth.getSession().then(({ data, error: sessionError }) => {
       if (!alive) return;
@@ -140,7 +140,7 @@ function AuthShell() {
     setBusy(true); setError(''); setMessage('');
     try {
       const result = mode === 'signup'
-        ? await supabase.auth.signUp({ email: email.trim(), password })
+        ? await supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: window.location.origin } })
         : await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (result.error) throw result.error;
       if (mode === 'signup' && !result.data.session) {

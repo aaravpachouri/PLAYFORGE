@@ -704,13 +704,25 @@ function App() {
           <p><strong>{pendingQuest.title}</strong> · {pendingQuest.duration} min suggested. Tell PLAYFORGE what you actually did. Use a sentence starter only if it matches your experience, or write your own note.</p>
           <label className="quest-proof-label" htmlFor="quest-proof-note">YOUR COMPLETION NOTE</label>
           <div className="quest-proof-examples" aria-label="Example completion notes">{examples.map(example => <button type="button" key={example} onClick={() => setQuestEvidenceDraft(example)} className={questEvidenceDraft === example ? 'selected' : ''}>{example}</button>)}</div>
-          <textarea id="quest-proof-note" value={questEvidenceDraft} onChange={event => setQuestEvidenceDraft(event.target.value.slice(0,240))} maxLength={240} rows={3} placeholder="Example: I walked around the block for 15 minutes and stretched afterward…" />
+          <textarea id="quest-proof-note" value={questEvidenceDraft} onChange={event => setQuestEvidenceDraft(event.target.value.slice(0,240))} maxLength={240} rows={3} placeholder="Example: I focused for 10 minutes and finished one small step…" />
           <div className="quest-proof-footnote"><ShieldCheck size={14}/><span>This is a self-reported check-in, not independently verified proof. Keep it honest and low-pressure.</span></div>
           <div className="quest-proof-charcount">{questEvidenceDraft.trim().length}/240 characters · at least 8 required</div>
           <div className="modal-actions"><button className="btn-secondary" onClick={() => setPendingQuestId(null)}>Not yet</button><button className="btn-primary" onClick={confirmQuestCompletion} disabled={questEvidenceDraft.trim().length < 8}><CheckCircle2 size={15}/> Save debrief & complete</button></div>
         </motion.div>
       </div>;
     })()}
+    {completionCelebration && <div className="modal-backdrop pf2-celebration-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setCompletionCelebration(null); }}>
+      <motion.div className="modal pf2-quest-celebration" role="dialog" aria-modal="true" aria-labelledby="pf2-quest-celebration-title" initial={prefersReducedMotion ? false : {opacity:0,y:18,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={prefersReducedMotion ? {} : {opacity:0,y:10,scale:.98}}>
+        <div className="pf2-celebration-burst"><Trophy size={27}/><span><Sparkles size={13}/></span></div>
+        <div className="panel-kicker">QUEST CLEARED · {completionCelebration.category.toUpperCase()}</div>
+        <h2 id="pf2-quest-celebration-title">{completionCelebration.title}</h2>
+        <p>{completionCelebration.message}</p>
+        <div className="pf2-celebration-reward"><strong>+{completionCelebration.xp} XP</strong><span>Added to your existing player total</span></div>
+        <blockquote>“{completionCelebration.note}”</blockquote>
+        {completionCelebration.nextTitle && <div className="pf2-celebration-next"><span>NEXT UP</span><strong>{completionCelebration.nextTitle}</strong></div>}
+        <div className="modal-actions"><button className="btn-primary" onClick={() => setCompletionCelebration(null)}>Keep going <ArrowRight size={15}/></button></div>
+      </motion.div>
+    </div>}
     {notice && <div className="toast"><CheckCircle2 size={17}/>{notice}<button onClick={() => setNotice('')} aria-label="Dismiss"><X size={14}/></button></div>}
     {showReset && <div className="modal-backdrop"><div className="modal"><div className="modal-icon"><Trash2 size={21}/></div><h2>{stored.demo ? 'Exit demo mode?' : 'Reset PLAYFORGE?'}</h2><p>{stored.demo ? 'This clears the illustrative profile and sample activity so you can create your own profile.' : 'This permanently clears this app’s local profile, daily logs and experiments from this browser. Export a backup first if you need one.'}</p><div className="modal-actions"><button className="btn-secondary" onClick={() => setShowReset(false)}>Cancel</button><button className="btn-danger" onClick={resetApp}>{stored.demo ? 'Exit demo' : 'Clear local data'}</button></div></div></div>}
   </div>;
@@ -902,7 +914,7 @@ function StatCard({ label, value, unit, change, icon: Icon, accent }: { label:st
 function QuestIcon({ name }: {name:string}) { if(name==='strength') return <Dumbbell size={19}/>; if(name==='mobility') return <Waves size={19}/>; if(name==='timer') return <Timer size={19}/>; if(name==='brain') return <Brain size={19}/>; if(name==='leaf') return <Leaf size={19}/>; if(name==='spark') return <Sparkles size={19}/>; return <Footprints size={19}/>; }
 function QuestRow({ q, done, index, onToggle, disabled = false }: {q:any;done:boolean;index:number;onToggle:()=>void;disabled?:boolean}) { return <div className={`quest-row ${done?'quest-done':''}`}><div className={`quest-row-icon quest-icon-${index%4}`}><QuestIcon name={q.icon}/></div><div className="quest-main-copy"><div className="quest-tagline">{q.tag}</div><strong>{q.title}</strong><p>{q.description}</p><div className="quest-meta"><span><Clock3 size={12}/>{q.duration} min</span><span><Zap size={12}/>{q.xp} XP</span></div></div><button disabled={disabled} className={`quest-check ${done?'completed':''}`} onClick={onToggle} aria-label={done?'Mark quest incomplete':'Complete quest'}>{done?<Check size={16}/>:<ArrowRight size={16}/>}</button></div>; }
 
-function QuestBoard({ profile, quests, log, onToggle, onGoHabits, questSource, questLoading }: {profile:Profile;quests:any[];log:DayLog;onToggle:(id:string)=>void;onGoHabits:()=>void;questSource:'ai'|'local';questLoading:boolean}) {
+function QuestBoard({ profile, quests, log, onToggle, onGoTraining, questSource, questLoading }: {profile:Profile;quests:any[];log:DayLog;onToggle:(id:string)=>void;onGoTraining:()=>void;questSource:'ai'|'local';questLoading:boolean}) {
   const [filter,setFilter]=useState('All quests');
   const done=quests.filter(q=>log.doneQuests.includes(q.id)).length;
   const filters=['All quests','Not started','Completed'];
@@ -911,12 +923,12 @@ function QuestBoard({ profile, quests, log, onToggle, onGoHabits, questSource, q
   const nextIndex=quests.findIndex(q=>!log.doneQuests.includes(q.id));
 
   return <div className="page-content pf2-quest-page pf2-world-page">
-    <PageHeading kicker="CAMPAIGN MAP · DAILY MISSIONS" title={<>Choose your <span className="gradient-text">next quest.</span></>} subtitle="A flexible path for movement, recovery and small wins. Complete what you can; adapt or skip what doesn't fit today." action={<div className="quest-today-pill"><CalendarDays size={15}/>{prettyDate()}</div>}/>
+    <PageHeading kicker="CAMPAIGN MAP · DAILY MISSIONS" title={<>Choose your <span className="gradient-text">next quest.</span></>} subtitle="Three everyday challenges with different purposes: Focus, Discipline and Exploration. Physical training has its own home in Workouts." action={<div className="quest-today-pill"><CalendarDays size={15}/>{prettyDate()}</div>}/>
     <section className="pf2-quest-hero">
       <div className="pf2-quest-hero-copy">
         <div className="pf2-hero-eyebrow"><span className="pf2-live-dot"/><Compass size={14}/> DAILY EXPEDITION <span className="pf2-hero-separator"/> {questLoading ? 'AI PERSONALIZING…' : questSource === 'ai' ? 'AI PERSONALIZED' : 'LOCAL FALLBACK'}</div>
-        <h2>{done===quests.length?'Expedition cleared.':done===0?'Your next chapter starts with one move.':'Your momentum is building.'}</h2>
-        <p>Built around {goalNames[profile.goal].toLowerCase()}, your {levelNames[profile.level].toLowerCase()} starting point, preferred setting, and recent activity. Missions rotate daily; adapt or skip anything that does not fit.</p>
+        <h2>{done===quests.length?'Expedition cleared.':done===0?'Your next chapter starts with one small win.':'Your momentum is building.'}</h2>
+        <p>Personalised around your priorities and available time. Missions rotate across learning, everyday organisation and curiosity—without repeating your workout plan.</p>
         <div className="pf2-quest-hero-metrics">
           <div><span>MISSIONS CLEARED</span><strong>{done}<small> / {quests.length}</small></strong></div>
           <div><span>XP AVAILABLE</span><strong>{quests.filter(q=>!log.doneQuests.includes(q.id)).reduce((sum,q)=>sum+q.xp,0)}<small> XP</small></strong></div>
@@ -935,7 +947,7 @@ function QuestBoard({ profile, quests, log, onToggle, onGoHabits, questSource, q
     </section>
 
     <div className="pf2-campaign-topline">
-      <div><span className="panel-kicker">THE MISSION ROUTE</span><h3>Today's campaign <span>{done}/{quests.length}</span></h3><p>A goal-focused mission, a different movement mode, and a skill challenge—each with a distinct purpose.</p></div>
+      <div><span className="panel-kicker">THE MISSION ROUTE</span><h3>Today's campaign <span>{done}/{quests.length}</span></h3><p>One focus challenge, one everyday reset and one curiosity quest. Each has a different job.</p></div>
       <div className="pf2-campaign-controls"><div className="filter-tabs">{filters.map(f=><button key={f} onClick={()=>setFilter(f)} className={filter===f?'selected':''}>{f}{f==='Completed'&&<span>{done}</span>}</button>)}</div></div>
     </div>
 
@@ -961,7 +973,11 @@ function QuestBoard({ profile, quests, log, onToggle, onGoHabits, questSource, q
       })}
       {visible.length===0&&<div className="pf2-empty-missions"><Trophy size={25}/><strong>No missions in this filter.</strong><span>Try another view to see your campaign.</span></div>}
     </div>
-    <div className="soft-callout pf2-quest-safety"><div className="soft-callout-icon"><HeartPulse size={18}/></div><div><strong>{profile.ageBand==='13-17'?'Keep movement varied, enjoyable and age-appropriate.':profile.ageBand==='65+'?'Make movement fit your comfort, ability and health context.':'Build toward general activity recommendations gradually.'}</strong><p>{profile.ageBand==='13-17'?'WHO guidance for ages 5–17 describes an average of 60 minutes a day of moderate-to-vigorous activity across the week. This is population-level guidance, not a requirement to hit in one session; any safe movement counts.':profile.ageBand==='65+'?'Activities may need to be adapted to individual ability, balance, and health circumstances. A qualified professional can help if you are unsure what is suitable.':'WHO adult guidance generally recommends 150–300 minutes of moderate aerobic activity per week plus muscle-strengthening activity on 2 or more days. These are population-level guidelines, not a personal prescription.'} Quests are optional prompts. Swap, shorten or skip one when needed, and stop if you feel pain, dizziness or unusual symptoms.</p></div><button onClick={onGoHabits}>Log activity <ArrowRight size={14}/></button></div>
+    <div className="soft-callout pf2-quest-safety">
+      <div className="soft-callout-icon"><Compass size={18}/></div>
+      <div><strong>Different pages, different purpose.</strong><p>Quests are for focus, everyday organisation and curiosity. For planned exercise and movement sessions, head to Workouts. You can adapt, skip or come back to any challenge without losing earned XP.</p></div>
+      <button onClick={onGoTraining}>Open workouts <ArrowRight size={14}/></button>
+    </div>
   </div>;
 }
 
@@ -1167,7 +1183,7 @@ function TrainingArena({ profile, log, program, onRegenerate, onFinish, onGoHabi
         <div className="pf2-workout-hero-tags"><span><Clock3 size={13}/> {profile.minutes} min preference</span><span><Activity size={13}/> {profile.level==='new'?'Beginner friendly':profile.level==='returning'?'Return-at-your-pace':'Progressive options'}</span><span><ShieldCheck size={13}/> Flexible intensity</span></div>
         <div className="pf2-workout-hero-actions">
           <button className="btn-primary" onClick={() => document.getElementById('pf2-training-options')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}><Layers size={15}/> Choose today's session</button>
-          <button className="btn-glass" onClick={onGoHabits}><ClipboardCheck size={14}/> Log another activity</button>
+          <button className="btn-glass" onClick={onGoHabits}><ClipboardCheck size={14}/> Daily check-in</button>
         </div>
       </div>
       <div className="pf2-workout-hero-photo"><img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1200&q=85" alt="Athlete training in a gym" loading="eager"/><div className="pf2-workout-photo-vignette"/><div className="pf2-photo-chip"><span className="pf2-live-dot"/> 3 OPTIONS / DAY</div><div className="pf2-workout-photo-caption"><strong>IRONWOOD PEAK</strong><span>STRENGTH · CONTROL · CONSISTENCY</span></div></div>

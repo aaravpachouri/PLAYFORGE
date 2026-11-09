@@ -78,7 +78,7 @@ The app does not train a new language model. Chat uses the model provider config
 
 ## Privacy, storage and data honesty
 
-- Profile and daily logs are saved in this browser's `localStorage`; they are not a shared cloud account or multi-device database. Export a backup to move your records.
+- Player profile and progress are held in a browser working copy and, when Supabase is configured, synchronised to that authenticated player's private `public.player_data` row. The browser copy is not the account database. Row Level Security restricts each player to their own row.
 - Workout records, meal entries, hydration and habit check-ins are user-entered/self-reported. A timer or tick box is not independent proof that an activity occurred.
 - General chat sends messages and chat history to the configured model server. PLAYFORGE data is included only when the user enables **Include my PLAYFORGE data**; the summary excludes free-text reflection notes.
 - Hosted AI calls may send prompts to the selected provider and can incur costs. Keep provider keys server-side; never use `VITE_` prefixes for secrets and never commit `.env`.
@@ -129,4 +129,4 @@ playforge/
 
 Nutrition research runs from the backend on each generation and fetches only the official pages listed in `server.mjs`; it is not a general-purpose web search. If pages cannot be retrieved, the plan reports `reference_only`. Meal ideas are AI-generated, not individually reviewed by a registered dietitian. The backend checks common allergy words but cannot guarantee safety; never rely on an AI-generated plan for severe allergy or medical nutrition needs. User data is stored locally; saved plans do not sync across devices.
 
-This version is a functioning UI prototype plus a configurable AI API, not a hardened multi-user service. Browser-local records do not sync between devices or accounts. Charts represent the saved entries available in that browser. Before claiming outcomes, test with users and a labelled dataset and report measured results rather than assumptions.
+The multi-user branch adds Supabase email/password accounts and per-player cloud saves. Production use still requires a configured Supabase project, the SQL migration, Vercel environment variables, email redirect configuration, and completed two-user/two-device acceptance tests. See `MULTI_USER_SETUP.md`. Cloud writes are last-write-wins if the same account is edited simultaneously on multiple devices; do not claim conflict-free simultaneous editing. Before claiming outcomes, test with users and a labelled dataset and report measured results rather than assumptions.

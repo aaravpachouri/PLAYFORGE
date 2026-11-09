@@ -627,13 +627,13 @@ function App() {
   if (!profile || !stored.onboardingDone) return <Onboarding value={profileDraft} onChange={setProfileDraft} onSubmit={() => saveProfile(profileDraft)} onDemo={loadDemo} />;
 
   const navItems: { id: Tab; label: string; sub: string; icon: typeof Activity }[] = [
-    { id: 'overview', label: 'Game World', sub: 'Your personal universe', icon: Layers },
-    { id: 'quests', label: 'Quest Board', sub: 'Campaign missions', icon: Compass },
-    { id: 'training', label: 'Training Arena', sub: 'Guided workouts', icon: Dumbbell },
-    { id: 'nutrition', label: 'Nutrition Station', sub: 'Meals & nourishment', icon: Utensils },
-    { id: 'habits', label: 'Habit Lab', sub: 'Daily mission console', icon: ClipboardCheck },
-    { id: 'insights', label: 'Progress Observatory', sub: 'Your real-world data', icon: BarChart3 },
-    { id: 'coach', label: 'Coach Nexus', sub: 'AI fitness companion', icon: Bot },
+    { id: 'overview', label: 'Home', sub: 'Your day at a glance', icon: Layers },
+    { id: 'quests', label: 'Quests', sub: 'Focus, routines & discovery', icon: Compass },
+    { id: 'training', label: 'Workouts', sub: 'Guided movement sessions', icon: Dumbbell },
+    { id: 'nutrition', label: 'Food', sub: 'Meals & nourishment', icon: Utensils },
+    { id: 'habits', label: 'Check-in', sub: 'Mood, energy & routines', icon: ClipboardCheck },
+    { id: 'insights', label: 'Progress', sub: 'Your journey so far', icon: BarChart3 },
+    { id: 'coach', label: 'Coach', sub: 'Ask for guidance', icon: Bot },
   ];
 
   return <div className="app-shell">
@@ -665,10 +665,10 @@ function App() {
       {stored.demo && <div className="demo-banner"><Info size={15}/><span><strong>Demo mode</strong> — activity history is illustrative. Your edits stay on this device.</span><button onClick={() => setShowReset(true)}>Exit demo <ArrowRight size={13}/></button></div>}
       <AnimatePresence mode="wait" initial={false}><motion.div key={tab} className="tab-transition" initial={prefersReducedMotion?false:{opacity:0,y:14,filter:'blur(5px)'}} animate={{opacity:1,y:0,filter:'blur(0px)'}} exit={prefersReducedMotion?undefined:{opacity:0,y:-8,filter:'blur(4px)'}} transition={{duration:prefersReducedMotion?0:.26,ease:'easeOut'}}>
         {tab === 'overview' && <Overview profile={profile} xp={xp} level={level} xpThisLevel={xpThisLevel} streak={streak} weekMinutes={weekMinutes} weekSessions={weekSessions} activeDays={activeDays} quests={quests} questsLoading={questsLoading} log={log} weekLogs={weekLogs} onToggleQuest={toggleQuest} onGo={setTab} onCoach={() => setCoachOpen(true)} />}
-        {tab === 'quests' && <QuestBoard profile={profile} quests={quests} log={log} onToggle={toggleQuest} onGoHabits={() => setTab('habits')} questSource={questSource} questLoading={questsLoading} />}
+        {tab === 'quests' && <QuestBoard profile={profile} quests={quests} log={log} onToggle={toggleQuest} onGoTraining={() => setTab('training')} questSource={questSource} questLoading={questsLoading} />}
         {tab === 'training' && <TrainingArena profile={profile} log={log} program={stored.trainingProgram || { startDate: todayKey(), generation: 0 }} onRegenerate={regenerateTrainingOptions} onFinish={logTrainingSession} onGoHabits={() => setTab('habits')} />}
         {tab === 'nutrition' && <NutritionStation profile={profile} meals={log.meals || []} waterGlasses={log.waterGlasses} preferences={stored.nutritionPreferences} plan={stored.nutritionPlan} isGenerating={nutritionPlanLoading} planError={nutritionPlanError} onGeneratePlan={generateNutritionPlan} onUpdatePlan={updateNutritionPlan} onLogMeal={logMeal} onRemoveMeal={removeMeal} onWaterChange={count => updateToday({ waterGlasses: Math.max(0, Math.min(20, count)) })} onAskCoach={() => setTab('coach')} />}
-        {tab === 'habits' && <HabitLab profile={profile} log={log} customHabits={stored.customHabits || []} onAddCustomHabit={addCustomHabit} onUpdate={updateToday} onToggleHabit={toggleHabit} onAddActivity={logActivity} selectedActivity={selectedActivity} setSelectedActivity={setSelectedActivity} activityMinutes={activityMinutes} setActivityMinutes={setActivityMinutes} activityIntensity={activityIntensity} setActivityIntensity={setActivityIntensity} />}
+        {tab === 'habits' && <HabitLab log={log} customHabits={stored.customHabits || []} onAddCustomHabit={addCustomHabit} onUpdate={updateToday} onToggleHabit={toggleHabit} />}
         {tab === 'insights' && <Insights profile={profile} customHabits={stored.customHabits || []} logs={allLogs} weekLogs={weekLogs} weekMinutes={weekMinutes} weekSessions={weekSessions} activeDays={activeDays} totalQuestDone={totalQuestDone} totalHabits={totalHabits} habitTotal={habitTotal} />}
         {tab === 'coach' && <CoachNexus profile={profile} messages={coachMessages} isSending={coachSending} error={coachError} aiHealth={aiHealth} includePersonalContext={coachUsePersonalContext} onIncludePersonalContext={setCoachUsePersonalContext} onRefreshAI={refreshAIStatus} onClearChat={clearCoachChat} onAsk={askCoach} />}
         {tab === 'settings' && <Settings profile={profile} demo={stored.demo} draft={settingsDraft || profile} setDraft={setSettingsDraft} aiHealth={aiHealth} onRefreshAI={refreshAIStatus} onSave={() => saveProfile(settingsDraft || profile)} onExportJSON={exportData} onExportCSV={exportCSV} onDemo={loadDemo} onReset={() => setShowReset(true)} />}
@@ -676,7 +676,7 @@ function App() {
       <footer className="footer"><span>PLAYFORGE <b>·</b> YOUR LIFE, LEVELED UP</span><span><ShieldCheck size={13}/> Private by design <i/> Built for progress, not perfection.</span></footer>
     </main>
     <button className="floating-coach" onClick={() => { setCoachOpen(true); setNotificationOpen(false); }} aria-label="Open PLAYFORGE Coach"><span className="floating-coach-orbit"/><Bot size={20}/><span className="floating-coach-label">COACH</span></button>
-    <CommandPalette open={commandOpen} query={commandQuery} setQuery={setCommandQuery} onClose={() => setCommandOpen(false)} onGo={(next) => { setTab(next); setCommandOpen(false); }} onCoach={() => { setCoachOpen(true); setCommandOpen(false); }} onLog={() => { setTab('habits'); setCommandOpen(false); setNotice('Open Log a session in Habit Lab to add activity.'); }} />
+    <CommandPalette open={commandOpen} query={commandQuery} setQuery={setCommandQuery} onClose={() => setCommandOpen(false)} onGo={(next) => { setTab(next); setCommandOpen(false); }} onCoach={() => { setCoachOpen(true); setCommandOpen(false); }} onLog={() => { setTab('habits'); setCommandOpen(false); }} />
     <CoachDrawer open={coachOpen} messages={coachMessages} isSending={coachSending} error={coachError} aiHealth={aiHealth} includePersonalContext={coachUsePersonalContext} onIncludePersonalContext={setCoachUsePersonalContext} onRefreshAI={refreshAIStatus} onClearChat={clearCoachChat} onClose={() => setCoachOpen(false)} onAsk={askCoach} profile={profile} />
     {helpOpen && <div className="modal-backdrop playforge-help-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setHelpOpen(false); }}>
       <motion.div className="modal playforge-help-modal" role="dialog" aria-modal="true" aria-labelledby="playforge-help-title" initial={prefersReducedMotion ? false : {opacity:0,y:16,scale:.98}} animate={{opacity:1,y:0,scale:1}} exit={prefersReducedMotion ? undefined : {opacity:0,y:10,scale:.99}}>
@@ -718,16 +718,16 @@ function App() {
 
 function CommandPalette({ open, query, setQuery, onClose, onGo, onCoach, onLog }: { open:boolean; query:string; setQuery:(q:string)=>void; onClose:()=>void; onGo:(tab:Tab)=>void; onCoach:()=>void; onLog:()=>void }) {
   const actions = [
-    {name:'Home / World overview',desc:'Return to your game world',icon:Layers,action:()=>onGo('overview'),tags:'home dashboard world overview'},
-    {name:'Quest board',desc:'Choose and complete missions',icon:Compass,action:()=>onGo('quests'),tags:'quests missions challenges campaign'},
-    {name:'Training arena',desc:'Follow a guided workout and log a session',icon:Dumbbell,action:()=>onGo('training'),tags:'training workout exercise sets reps strength'},
-    {name:'Nutrition station',desc:'Explore meal ideas and log what you ate',icon:Utensils,action:()=>onGo('nutrition'),tags:'nutrition food meals recipes hydration'},
-    {name:'Habit lab',desc:'Check habits, mood, sleep and activity',icon:ClipboardCheck,action:()=>onGo('habits'),tags:'habits sleep energy mood log'},
-    {name:'Progress observatory',desc:'Explore your logged patterns',icon:BarChart3,action:()=>onGo('insights'),tags:'insights analytics progress observatory charts'},
+    {name:'Home',desc:'Your day at a glance',icon:Layers,action:()=>onGo('overview'),tags:'home dashboard world overview'},
+    {name:'Quests',desc:'Focus, everyday routines and discovery challenges',icon:Compass,action:()=>onGo('quests'),tags:'quests missions challenges focus discipline exploration'},
+    {name:'Workouts',desc:'Choose a guided movement session',icon:Dumbbell,action:()=>onGo('training'),tags:'training workout exercise sets reps strength'},
+    {name:'Food',desc:'Meal ideas and food log',icon:Utensils,action:()=>onGo('nutrition'),tags:'nutrition food meals recipes hydration'},
+    {name:'Check-in',desc:'Mood, energy, sleep and personal routines',icon:ClipboardCheck,action:()=>onGo('habits'),tags:'checkin habits sleep energy mood reflection'},
+    {name:'Progress',desc:'Explore your logged patterns',icon:BarChart3,action:()=>onGo('insights'),tags:'insights analytics progress charts'},
     {name:'Player settings',desc:'Update profile or export your data',icon:SlidersHorizontal,action:()=>onGo('settings'),tags:'settings export backup profile'},
     {name:'Coach Nexus',desc:'Open the full AI companion workspace',icon:Bot,action:()=>onGo('coach'),tags:'coach ai assistant fitness chat'},
     {name:'Ask Smart Coach',desc:'Build a plan from your logged check-ins',icon:Bot,action:onCoach,tags:'coach ai assistant plan'},
-    {name:'Log an activity',desc:'Open your daily check-in',icon:Plus,action:onLog,tags:'activity workout walking strength log'},
+    {name:'Daily check-in',desc:'Open mood, energy and routines',icon:ClipboardCheck,action:()=>onGo('habits'),tags:'checkin mood energy routines reflection'},
   ];
   const filtered=actions.filter(a=>`${a.name} ${a.desc} ${a.tags}`.toLowerCase().includes(query.toLowerCase()));
   useEffect(()=>{if(open) setQuery('');},[open,setQuery]);
@@ -857,7 +857,7 @@ function Overview({ profile, xp, level, xpThisLevel, streak, weekMinutes, weekSe
   const habitsDone = Object.values(log.habits).filter(Boolean).length;
   const realms = [
     {name:'Ironwood Peak',kicker:'TRAINING',copy:'Build strength, one set at a time',tab:'training' as Tab,tone:'ember',icon:Dumbbell},
-    {name:'Aurora Trails',kicker:'QUESTS',copy:'Move, wander, explore',tab:'quests' as Tab,tone:'cyan',icon:Footprints},
+    {name:'Aurora Trails',kicker:'QUESTS',copy:'Focus, organise and explore',tab:'quests' as Tab,tone:'cyan',icon:Compass},
     {name:'Nourishment Grove',kicker:'NUTRITION',copy:'Fuel your next adventure',tab:'nutrition' as Tab,tone:'violet',icon:Leaf},
     {name:'Mind Garden',kicker:'HABITS',copy:'Reset, reflect, recharge',tab:'habits' as Tab,tone:'gold',icon:Brain},
     {name:'The Observatory',kicker:'PROGRESS',copy:'Read your own journey data',tab:'insights' as Tab,tone:'cyan',icon:BarChart3},
@@ -965,7 +965,117 @@ function QuestBoard({ profile, quests, log, onToggle, onGoHabits, questSource, q
   </div>;
 }
 
-function HabitLab({ profile, log, customHabits, onAddCustomHabit, onUpdate, onToggleHabit, onAddActivity, selectedActivity, setSelectedActivity, activityMinutes, setActivityMinutes, activityIntensity, setActivityIntensity }: {profile:Profile;log:DayLog;customHabits:CustomHabit[];onAddCustomHabit:(name:string)=>void;onUpdate:(p:Partial<DayLog>)=>void;onToggleHabit:(id:string)=>void;onAddActivity:()=>void;selectedActivity:ActivityType;setSelectedActivity:(a:ActivityType)=>void;activityMinutes:number;setActivityMinutes:(n:number)=>void;activityIntensity:'easy'|'moderate'|'vigorous';setActivityIntensity:(s:'easy'|'moderate'|'vigorous')=>void}) { const [noteDraft,setNoteDraft]=useState(log.notes); const [customHabitDraft,setCustomHabitDraft]=useState(''); const [showCustomHabit,setShowCustomHabit]=useState(false); useEffect(()=>setNoteDraft(log.notes),[log.date,log.notes]); const totalMins=log.activities.reduce((s,a)=>s+a.minutes,0); const habitCount=Object.values(log.habits).filter(Boolean).length; return <div className="page-content pf2-habit-page pf2-world-page"><PageHeading kicker="YOUR PERSONAL LAB" title={<>Notice your patterns. <span className="gradient-text">Not your flaws.</span></>} subtitle="Log what happened, not what you wish happened. Your plan can only learn from honest, low-pressure check-ins." action={<div className="quest-today-pill"><CalendarDays size={15}/>{prettyDate()}</div>}/><section className="pf2-habit-hero"><div className="pf2-habit-hero-copy"><div className="pf2-hero-eyebrow"><span className="pf2-live-dot"/><Sparkles size={14}/> PLAYER STATUS · DAILY RESET</div><h2>{habitCount===habitOptions.length+customHabits.length?'Daily objectives cleared.':habitCount===0?'Start with one small win.':'Momentum is built one check-in at a time.'}</h2><p>Your personal mission console. Log what happened, notice your patterns, and keep the next step realistic.</p><div className="pf2-habit-status-pills"><span><Footprints size={14}/>{totalMins} min movement</span><span><HeartPulse size={14}/>{log.energy===null?'Energy not logged':`Energy ${log.energy}/5`}</span><span><Droplets size={14}/>{log.waterGlasses} glasses logged</span></div></div><div className="pf2-habit-readiness" style={{'--pf2-progress':`${Math.round(habitCount/Math.max(1,habitOptions.length+customHabits.length)*100)}%`} as CSSProperties}><div className="pf2-habit-ring"><div><strong>{Math.round(habitCount/Math.max(1,habitOptions.length+customHabits.length)*100)}<small>%</small></strong><span>CHECK-IN</span></div></div><div className="pf2-readiness-label"><span>DAILY ALIGNMENT</span><strong>{habitCount} / {habitOptions.length+customHabits.length} habits</strong><small>Progress, not perfection</small></div><div className="pf2-habit-orbit"><i/><i/><i/></div></div></section><p className="panel-intro habit-log-focus">Habit Lab is your logbook: record the movement, habits, meals, sleep, energy and mood that actually happened. Quest rewards and levels stay on Quest Board and Game World, so this space does not repeat the same XP dashboard.</p><div className="habit-layout"><div className="panel habit-checkin-panel"><div className="panel-header"><div><div className="panel-kicker">DAILY CHECK-IN</div><h3>What did you do today?</h3></div><span className="soft-icon"><ClipboardCheck size={17}/></span></div><p className="panel-intro">Check off what fits. Skip anything that doesn't apply — there's no penalty for an imperfect day.</p><div className="habit-checklist">{habitOptions.map(h=>{const Icon=h.icon;return <button key={h.id} className={`habit-check-row ${log.habits[h.id]?'selected':''}`} onClick={()=>onToggleHabit(h.id)}><span className="habit-check-icon"><Icon size={18}/></span><span className="habit-check-copy"><strong>{h.label}</strong><small>{h.desc}</small></span><span className={`habit-check-box ${log.habits[h.id]?'on':''}`}>{log.habits[h.id]&&<Check size={13}/>}</span></button>;})}</div><div className="custom-habits-section">{customHabits.map(h=><button key={h.id} className={`habit-check-row custom-habit-row ${log.habits[h.id]?'selected':''}`} onClick={()=>onToggleHabit(h.id)}><span className="habit-check-icon"><Sparkles size={18}/></span><span className="habit-check-copy"><strong>{h.label}</strong><small>{h.desc || 'Your personal habit'}</small></span><span className={`habit-check-box ${log.habits[h.id]?'on':''}`}>{log.habits[h.id]&&<Check size={13}/>}</span></button>)}{showCustomHabit?<div className="custom-habit-entry"><input value={customHabitDraft} onChange={e=>setCustomHabitDraft(e.target.value)} placeholder="e.g. Read for 10 minutes" maxLength={60}/><button className="btn-primary" onClick={()=>{onAddCustomHabit(customHabitDraft);if(customHabitDraft.trim()){setCustomHabitDraft('');setShowCustomHabit(false);}}}><Plus size={14}/> Add</button><button className="icon-button" onClick={()=>{setShowCustomHabit(false);setCustomHabitDraft('');}} aria-label="Cancel adding habit"><X size={15}/></button></div>:<button className="add-custom-habit" onClick={()=>setShowCustomHabit(true)}><Plus size={15}/> Add your own habit</button>}</div></div><div className="habit-side-column"><div className="panel mood-panel"><div className="panel-header"><div><div className="panel-kicker">HOW ARE YOU FEELING?</div><h3>Quick check-in</h3></div><span className="soft-icon"><Heart size={17}/></span></div><div className="field"><label>SLEEP LAST NIGHT (HOURS)</label><div className="number-input-row"><input type="number" min="0" max="24" step="0.5" value={log.sleepHours ?? ''} placeholder="e.g. 8" onChange={e=>onUpdate({sleepHours:e.target.value===''?null:Math.max(0,Math.min(24,Number(e.target.value)||0))})}/><span>hours</span></div></div><div className="field"><div className="field-row"><label>ENERGY TODAY</label><strong>{log.energy===null?'—':`${log.energy}/5`}</strong></div><input className="range-input" type="range" min="1" max="5" step="1" value={log.energy ?? 3} onChange={e=>onUpdate({energy:Number(e.target.value)})}/><div className="range-labels"><span>Low</span><span>High</span></div></div><div className="field"><label>MOOD (OPTIONAL)</label><div className="mood-options">{['Low','Okay','Good','Great'].map(m=><button key={m} className={log.mood===m?'selected':''} onClick={()=>onUpdate({mood:m})}>{m==='Low'?'😕':m==='Okay'?'😐':m==='Good'?'🙂':'😄'}<span>{m}</span></button>)}</div></div><div className="field"><label>WATER CHECK-IN (GLASSES)</label><div className="water-stepper"><button onClick={()=>onUpdate({waterGlasses:Math.max(0,log.waterGlasses-1)})}>−</button><span><Droplets size={15}/>{log.waterGlasses}</span><button onClick={()=>onUpdate({waterGlasses:Math.min(30,log.waterGlasses+1)})}>+</button></div><small className="field-hint">A simple log only; hydration needs vary.</small></div></div><div className="panel notes-panel"><div className="panel-header"><div><div className="panel-kicker">YOUR REFLECTION</div><h3>Anything worth noting?</h3></div><span className="soft-icon"><Brain size={17}/></span></div><textarea value={noteDraft} onChange={e=>setNoteDraft(e.target.value)} placeholder="e.g. Walked with a friend, had a busy day, felt more energetic after stretching…" rows={4}/><button className="btn-secondary full-width" onClick={()=>onUpdate({notes:noteDraft})}><Save size={15}/> Save reflection</button><small className="field-hint">Keep notes general. Avoid entering medical details or sensitive personal information.</small></div></div></div><div className="panel log-activity-panel"><div className="panel-header"><div><div className="panel-kicker">MOVEMENT COUNTS</div><h3>Log a session</h3></div><span className="soft-icon"><Activity size={17}/></span></div><div className="activity-form-grid"><div className="field"><label>ACTIVITY</label><div className="select-wrap"><select value={selectedActivity} onChange={e=>setSelectedActivity(e.target.value as ActivityType)}>{activityTypes.map(t=><option key={t}>{t}</option>)}</select><ChevronDown size={15}/></div></div><div className="field"><label>DURATION (MINUTES)</label><div className="number-input-row"><input type="number" min="1" max="600" value={activityMinutes} onChange={e=>setActivityMinutes(Math.max(1,Number(e.target.value)||1))}/><span>min</span></div></div><div className="field"><label>EFFORT (YOUR PERCEPTION)</label><div className="segmented three">{([{id:'easy',label:'Easy'},{id:'moderate',label:'Moderate'},{id:'vigorous',label:'Hard'}] as const).map(x=><button key={x.id} className={activityIntensity===x.id?'selected':''} onClick={()=>setActivityIntensity(x.id)}>{x.label}</button>)}</div></div><button className="btn-primary add-session-btn" onClick={onAddActivity}><Plus size={16}/> Add session</button></div>{log.activities.length>0&&<div className="logged-sessions"><div className="session-header"><strong>Today's activity</strong><span>{totalMins} total minutes</span></div>{log.activities.map(a=><div className="logged-session" key={a.id}><span className="session-icon"><Activity size={16}/></span><span className="session-name"><strong>{a.type}</strong><small>{a.intensity} effort · {a.minutes} min</small></span><button className="remove-session" aria-label={`Remove ${a.type} session`} onClick={()=>onUpdate({activities:log.activities.filter(x=>x.id!==a.id)})}><X size={15}/></button></div>)}</div>}</div><div className="plan-adaptation-note"><span className="note-icon"><Sparkles size={17}/></span><div><strong>How your plan adapts</strong><p>PLAYFORGE uses recent logs and your preferences to suggest a manageable next step. Sleep and energy can inform a gentler option, but they don't prove why you feel a certain way. These suggestions are educational, not a medical assessment.</p></div></div></div>; }
+function HabitLab({ log, customHabits, onAddCustomHabit, onUpdate, onToggleHabit }: {
+  log: DayLog;
+  customHabits: CustomHabit[];
+  onAddCustomHabit: (name: string) => void;
+  onUpdate: (patch: Partial<DayLog>) => void;
+  onToggleHabit: (id: string) => void;
+}) {
+  const [noteDraft, setNoteDraft] = useState(log.notes);
+  const [customHabitDraft, setCustomHabitDraft] = useState('');
+  const [showCustomHabit, setShowCustomHabit] = useState(false);
+
+  useEffect(() => setNoteDraft(log.notes), [log.date, log.notes]);
+
+  const routineCount = habitOptions.length + customHabits.length;
+  const routineIds = [...habitOptions.map(habit => habit.id), ...customHabits.map(habit => habit.id)];
+  const completedRoutines = routineIds.filter(id => Boolean(log.habits[id])).length;
+  const routineProgress = routineCount ? Math.round(completedRoutines / routineCount * 100) : 0;
+  const energyLabel = log.energy === null ? 'Not checked in' : log.energy <= 2 ? 'Taking it gently' : log.energy >= 4 ? 'Feeling energised' : 'Steady today';
+
+  return <div className="page-content pf2-habit-page pf2-world-page">
+    <PageHeading
+      kicker="YOUR DAILY CHECK-IN"
+      title={<>Make room for <span className="gradient-text">your real life.</span></>}
+      subtitle="A calm place to check in, keep personal routines and reflect. Guided workouts live in Training; everyday challenges live on Quests."
+      action={<div className="quest-today-pill"><CalendarDays size={15}/>{prettyDate()}</div>}
+    />
+
+    <section className="pf2-habit-hero">
+      <div className="pf2-habit-hero-copy">
+        <div className="pf2-hero-eyebrow"><span className="pf2-live-dot"/><Heart size={14}/> PERSONAL CHECK-IN · NO PRESSURE</div>
+        <h2>{routineCount > 0 && completedRoutines === routineCount ? 'You checked in with yourself.' : completedRoutines === 0 ? 'Start with what matters today.' : 'Small routines, your own rhythm.'}</h2>
+        <p>There is no perfect day to hit. Log what is true, keep the routines that help you, and leave the rest for another time.</p>
+        <div className="pf2-habit-status-pills">
+          <span><HeartPulse size={14}/>{energyLabel}</span>
+          <span><Moon size={14}/>{log.sleepHours === null ? 'Sleep not logged' : `${log.sleepHours} hours logged`}</span>
+          <span><ClipboardCheck size={14}/>{completedRoutines} / {routineCount} routines</span>
+        </div>
+      </div>
+      <div className="pf2-habit-readiness" style={{'--pf2-progress': `${routineProgress}%`} as CSSProperties}>
+        <div className="pf2-habit-ring"><div><strong>{routineProgress}<small>%</small></strong><span>ROUTINES</span></div></div>
+        <div className="pf2-readiness-label"><span>YOUR PERSONAL ROUTINES</span><strong>{completedRoutines} / {routineCount} checked</strong><small>Progress, not perfection</small></div>
+        <div className="pf2-habit-orbit"><i/><i/><i/></div>
+      </div>
+    </section>
+
+    <div className="habit-layout">
+      <div className="panel habit-checkin-panel">
+        <div className="panel-header">
+          <div><div className="panel-kicker">ROUTINES YOU CHOOSE</div><h3>What felt right to keep today?</h3></div>
+          <span className="soft-icon"><ClipboardCheck size={17}/></span>
+        </div>
+        <p className="panel-intro">These are personal routine reminders, not quests. Check only what genuinely happened. Each checked routine earns the existing +8 XP.</p>
+        <div className="habit-checklist">
+          {habitOptions.map(habit => {
+            const Icon = habit.icon;
+            return <button key={habit.id} className={`habit-check-row ${log.habits[habit.id] ? 'selected' : ''}`} onClick={() => onToggleHabit(habit.id)}>
+              <span className="habit-check-icon"><Icon size={18}/></span>
+              <span className="habit-check-copy"><strong>{habit.label}</strong><small>{habit.desc}</small></span>
+              <span className={`habit-check-box ${log.habits[habit.id] ? 'on' : ''}`}>{log.habits[habit.id] && <Check size={13}/>}</span>
+            </button>;
+          })}
+        </div>
+        <div className="custom-habits-section">
+          {customHabits.map(habit => <button key={habit.id} className={`habit-check-row custom-habit-row ${log.habits[habit.id] ? 'selected' : ''}`} onClick={() => onToggleHabit(habit.id)}>
+            <span className="habit-check-icon"><Sparkles size={18}/></span>
+            <span className="habit-check-copy"><strong>{habit.label}</strong><small>{habit.desc || 'A routine you chose for yourself'}</small></span>
+            <span className={`habit-check-box ${log.habits[habit.id] ? 'on' : ''}`}>{log.habits[habit.id] && <Check size={13}/>}</span>
+          </button>)}
+          {showCustomHabit ? <div className="custom-habit-entry">
+            <input value={customHabitDraft} onChange={event => setCustomHabitDraft(event.target.value)} placeholder="e.g. Prepare my bag for tomorrow" maxLength={60}/>
+            <button className="btn-primary" onClick={() => { onAddCustomHabit(customHabitDraft); if (customHabitDraft.trim()) { setCustomHabitDraft(''); setShowCustomHabit(false); } }}><Plus size={14}/> Add</button>
+            <button className="icon-button" onClick={() => { setShowCustomHabit(false); setCustomHabitDraft(''); }} aria-label="Cancel adding routine"><X size={15}/></button>
+          </div> : <button className="add-custom-habit" onClick={() => setShowCustomHabit(true)}><Plus size={15}/> Add a personal routine</button>}
+        </div>
+        {routineCount === 0 && <p className="field-hint">Add a routine that genuinely matters to you. You do not need to fill this page to make progress.</p>}
+      </div>
+
+      <div className="habit-side-column">
+        <div className="panel mood-panel">
+          <div className="panel-header"><div><div className="panel-kicker">HOW IS TODAY FEELING?</div><h3>A quick check-in</h3></div><span className="soft-icon"><Heart size={17}/></span></div>
+          <div className="field">
+            <label>SLEEP LAST NIGHT (HOURS)</label>
+            <div className="number-input-row"><input type="number" min="0" max="24" step="0.5" value={log.sleepHours ?? ''} placeholder="e.g. 8" onChange={event => onUpdate({sleepHours: event.target.value === '' ? null : Math.max(0, Math.min(24, Number(event.target.value) || 0))})}/><span>hours</span></div>
+          </div>
+          <div className="field">
+            <div className="field-row"><label>ENERGY RIGHT NOW</label><strong>{log.energy === null ? '—' : `${log.energy}/5`}</strong></div>
+            <input className="range-input" type="range" min="1" max="5" step="1" value={log.energy ?? 3} onChange={event => onUpdate({energy: Number(event.target.value)})}/>
+            <div className="range-labels"><span>Low</span><span>High</span></div>
+          </div>
+          <div className="field">
+            <label>MOOD (OPTIONAL)</label>
+            <div className="mood-options">{['Low','Okay','Good','Great'].map(mood => <button key={mood} className={log.mood === mood ? 'selected' : ''} onClick={() => onUpdate({mood})}>{mood === 'Low' ? '😕' : mood === 'Okay' ? '😐' : mood === 'Good' ? '🙂' : '😄'}<span>{mood}</span></button>)}</div>
+          </div>
+          <small className="field-hint">These are your own check-ins, not a health score or diagnosis.</small>
+        </div>
+
+        <div className="panel notes-panel">
+          <div className="panel-header"><div><div className="panel-kicker">YOUR REFLECTION</div><h3>One thing worth remembering?</h3></div><span className="soft-icon"><Brain size={17}/></span></div>
+          <textarea value={noteDraft} onChange={event => setNoteDraft(event.target.value)} placeholder="What went well? What felt difficult? What would make tomorrow a little easier?" rows={4}/>
+          <button className="btn-secondary full-width" onClick={() => onUpdate({notes: noteDraft})}><Save size={15}/> Save reflection</button>
+          <small className="field-hint">Keep notes general. Avoid entering medical details or sensitive personal information.</small>
+        </div>
+      </div>
+    </div>
+
+    <div className="pf2-checkin-feedback">
+      <span className="note-icon"><Sparkles size={17}/></span>
+      <div><strong>PLAYFORGE noticed</strong><p>{getCheckinReflection({energy: log.energy, mood: log.mood})}</p></div>
+    </div>
+  </div>;
+}
 
 function Insights({ profile, customHabits, logs, weekLogs, weekMinutes, weekSessions, activeDays, totalQuestDone, totalHabits, habitTotal }: {profile:Profile;customHabits:CustomHabit[];logs:DayLog[];weekLogs:DayLog[];weekMinutes:number;weekSessions:number;activeDays:number;totalQuestDone:number;totalHabits:number;habitTotal:number}) { const [range,setRange]=useState<'7'|'14'|'30'>('7'); const n=Number(range); const filtered=logs.filter(l=>l.date>=dateOffset(-(n-1))); const days=Array.from({length:n},(_,i)=>{const d=dateOffset(i-(n-1));return filtered.find(x=>x.date===d)||emptyLog(d)}); const minutes=days.reduce((s,d)=>s+d.activities.reduce((a,x)=>a+x.minutes,0),0); const sessions=days.reduce((s,d)=>s+d.activities.length,0); const max=Math.max(20,...days.map(d=>d.activities.reduce((s,a)=>s+a.minutes,0))); const habitCounts=[...habitOptions.map(h=>({ id:h.id, label:h.label, count:days.filter(d=>d.habits[h.id]).length })), ...customHabits.map(h=>({ id:h.id, label:h.label, count:days.filter(d=>d.habits[h.id]).length }))]; const energyEntries=days.filter(d=>d.energy!==null); const avgEnergy=energyEntries.length?energyEntries.reduce((s,d)=>s+(d.energy||0),0)/energyEntries.length:null; const sleepEntries=filtered.filter(d=>d.sleepHours!==null); const sleepAverage=sleepEntries.length?sleepEntries.reduce((s,d)=>s+(d.sleepHours||0),0)/sleepEntries.length:null; return <div className="page-content pf2-progress-page pf2-world-page"><section className="pf2-observatory-hero"><div className="pf2-observatory-copy"><div className="pf2-hero-eyebrow"><span className="pf2-live-dot"/><BarChart3 size={14}/> PROGRESS OBSERVATORY <span className="pf2-hero-separator"/> LIVE LOG DATA</div><h2>Every entry is a waypoint.<br/><em>Your journey, in context.</em></h2><p>Explore only what you have logged. Empty days stay empty—no invented workouts, sleep scores or personal-best claims.</p><div className="pf2-observatory-stats"><span><strong>{weekMinutes}</strong><small>MIN · LAST 7 DAYS</small></span><span><strong>{weekSessions}</strong><small>SESSIONS LOGGED</small></span><span><strong>{activeDays}/7</strong><small>ACTIVE DAYS</small></span></div></div><div className="pf2-observatory-chart" aria-label="Activity minutes for the last seven days based on your logs"><div className="pf2-observatory-chart-head"><span>ACTIVITY SIGNAL</span><small>{weekMinutes ? 'FROM YOUR LOGS' : 'NO ACTIVITY LOGGED YET'}</small></div><div className="pf2-observatory-bars">{weekLogs.map((day,index)=>{const minutes=day.activities.reduce((sum,item)=>sum+item.minutes,0);const max=Math.max(1,...weekLogs.map(item=>item.activities.reduce((sum,activity)=>sum+activity.minutes,0)));return <div className="pf2-observatory-bar-col" key={day.date} title={`${day.date}: ${minutes} active minutes`}><div className="pf2-observatory-bar-track"><i style={{height:`${minutes?Math.max(7,minutes/max*100):0}%`}}/></div><small>{dayLabel(day.date,false).split(' ')[0]}</small></div>;})}</div><div className="pf2-observatory-chart-foot"><span><i/> Active minutes</span><small>Daily totals · no estimates</small></div></div></section><PageHeading kicker="YOUR PLAYER INTELLIGENCE" title={<>Your progress, <span className="gradient-text">in perspective.</span></>} subtitle="Your data is a mirror, not a grade. Look for patterns and small improvements over time." action={<div className="segmented range-segment">{(['7','14','30'] as const).map(x=><button key={x} className={range===x?'selected':''} onClick={()=>setRange(x)}>{x} days</button>)}</div>}/><div className="insight-kpis"><StatCard label="ACTIVE MINUTES" value={String(minutes)} unit="min" change={`Last ${n} days`} icon={Clock3} accent="mint"/><StatCard label="SESSIONS" value={String(sessions)} unit="logged" change={`Last ${n} days`} icon={Activity} accent="purple"/><StatCard label="ACTIVE DAYS" value={String(days.filter(d=>d.activities.length||d.doneQuests.length).length)} unit={`of ${n}`} change="Activity or quest" icon={CalendarDays} accent="blue"/><StatCard label="AVERAGE SLEEP LOGGED" value={sleepAverage===null?'—':sleepAverage.toFixed(1)} unit={sleepAverage===null?'no entries':'hours'} change="Self-reported" icon={Moon} accent="gold"/></div><div className="insights-grid"><div className="panel trends-panel"><div className="panel-header"><div><div className="panel-kicker">MOVEMENT HISTORY</div><h3>Minutes by day</h3></div><span className="soft-icon"><BarChart3 size={17}/></span></div><div className={`trend-chart ${n>14?'dense':''}`}>{days.map(d=>{const mins=d.activities.reduce((s,a)=>s+a.minutes,0);return <div key={d.date} className="trend-day"><div className="trend-bar-area"><span className="trend-value">{mins||''}</span><div className={`trend-bar ${mins?'has-minutes':''} ${d.date===todayKey()?'is-today':''}`} style={{height:`${mins?Math.max(5,mins/max*100):2}%`}}/></div><span className="trend-date">{n===7?dayLabel(d.date).split(' ')[0]:new Date(`${d.date}T12:00:00`).getDate()}</span></div>})}</div><div className="chart-legend-line"><span><i/> Minutes entered in your activity log</span><span>Highest day: {Math.max(0,...days.map(d=>d.activities.reduce((s,a)=>s+a.minutes,0)))} min</span></div></div><div className="panel patterns-panel"><div className="panel-header"><div><div className="panel-kicker">PATTERNS TO NOTICE</div><h3>Your recent signals</h3></div><span className="soft-icon"><Sparkles size={17}/></span></div><div className="pattern-line"><span className="pattern-icon mint"><HeartPulse size={16}/></span><div><strong>Energy check-ins</strong><p>{avgEnergy===null?'No energy check-ins recorded for this period.':`Average self-rating: ${avgEnergy.toFixed(1)}/5 across ${energyEntries.length} logged check-ins.`}</p></div></div><div className="pattern-line"><span className="pattern-icon purple"><Moon size={16}/></span><div><strong>Sleep entries</strong><p>{sleepAverage===null?'No sleep entries recorded for this period.':`${sleepAverage.toFixed(1)} hours average among ${sleepEntries.length} days with sleep values logged.`}</p></div></div><div className="pattern-line"><span className="pattern-icon blue"><Trophy size={16}/></span><div><strong>Quest completions</strong><p>{totalQuestDone} quests recorded across all saved days.</p></div></div><div className="pattern-disclaimer"><Info size={14}/> Descriptive statistics, not proof of cause or a health score.</div></div></div><div className="panel habit-trends-panel"><div className="panel-header"><div><div className="panel-kicker">CONSISTENCY SNAPSHOT</div><h3>Which habits show up?</h3></div><span className="soft-icon"><ClipboardCheck size={17}/></span></div><div className="habit-trend-list">{habitCounts.map(h=><div className="habit-trend-row" key={h.id}><span className="habit-trend-name">{h.label}</span><div className="habit-trend-track"><span style={{width:`${h.count/n*100}%`}}/></div><span className="habit-trend-count">{h.count}/{n}</span></div>)}</div><div className="habit-trend-footer"><span>{totalHabits} habit checkmarks over {logs.length} saved days</span><button className="text-link" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})}>Back to top <ArrowUpRight size={14}/></button></div></div><div className="insight-next-step"><div className="insight-next-icon"><Target size={19}/></div><div><span className="panel-kicker">A SMALL NEXT STEP</span><h3>{activeDays>=4?'Keep your routine flexible.':weekSessions===0?'Try logging one comfortable activity.':'Choose one habit to repeat this week.'}</h3><p>{activeDays>=4?'You have several active days logged. Keep respecting rest and recovery instead of chasing a longer streak.':'Start with something achievable and compare how it feels over time. Your log is not a diagnosis and does not establish cause and effect.'}</p></div></div></div>; }
 

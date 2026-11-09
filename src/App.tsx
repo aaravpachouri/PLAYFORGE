@@ -310,6 +310,7 @@ function App() {
   const [settingsDraft, setSettingsDraft] = useState<Profile | null>(null);
   const [pendingQuestId, setPendingQuestId] = useState<string | null>(null);
   const [questEvidenceDraft, setQuestEvidenceDraft] = useState('');
+  const [questCompletionMode, setQuestCompletionMode] = useState<'planned' | 'adapted' | 'partial'>('planned');
   const [completionCelebration, setCompletionCelebration] = useState<{ title: string; category: QuestCategory; message: string; xp: number; note: string; nextTitle: string | null } | null>(null);
   const [showReset, setShowReset] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
@@ -495,6 +496,7 @@ function App() {
     if (!done) {
       // Completion opens a brief debrief first; nothing is awarded until the player submits it.
       setQuestEvidenceDraft('');
+      setQuestCompletionMode('planned');
       setPendingQuestId(id);
       return;
     }
@@ -507,21 +509,25 @@ function App() {
     const id = pendingQuestId;
     const note = questEvidenceDraft.trim();
     if (!id) return;
-    if (note.length < 8) { setNotice('Add a short completion note (at least 8 characters) first.'); return; }
     if (log.doneQuests.includes(id)) { setPendingQuestId(null); return; }
     const quest = quests.find(item => item.id === id);
     const category = quest?.category || 'Focus';
+    const completionNote = note || (questCompletionMode === 'adapted'
+      ? 'I adapted the challenge to fit my day.'
+      : questCompletionMode === 'partial'
+        ? 'I completed part of the challenge and made a start.'
+        : 'I completed the challenge as planned.');
     const nextQuest = quests.find(item => item.id !== id && !log.doneQuests.includes(item.id));
     updateToday({
       doneQuests: [...log.doneQuests, id],
-      questNotes: { ...(log.questNotes || {}), [id]: note },
+      questNotes: { ...(log.questNotes || {}), [id]: completionNote },
     });
     setPendingQuestId(null);
     setQuestEvidenceDraft('');
     setCompletionCelebration({
       title: quest?.title || 'Quest cleared',
       category,
-      message: getQuestAcknowledgement(category, note),
+      message: getQuestAcknowledgement(category, completionNote),
       xp: quest?.xp || 35,
       note,
       nextTitle: nextQuest?.title || null,
@@ -695,19 +701,23 @@ function App() {
     {pendingQuestId && (() => {
       const pendingQuest = quests.find(q => q.id === pendingQuestId);
       if (!pendingQuest) return null;
-      const missionName = pendingQuest.title.toLowerCase(); const examples = [`I tried ${missionName} at a comfortable pace.`, `I adapted ${missionName} to fit my space and energy.`, `I completed part of ${missionName} and stopped when I needed to.`];
+      const choices = [
+        { id: 'planned' as const, label: 'Completed as planned' },
+        { id: 'adapted' as const, label: 'Adapted it for today' },
+        { id: 'partial' as const, label: 'Made a start' },
+      ];
       return <div className="modal-backdrop quest-proof-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setPendingQuestId(null); }}>
-        <motion.div className="modal quest-proof-modal" role="dialog" aria-modal="true" aria-labelledby="quest-proof-title" initial={{opacity:0,y:18,scale:.97}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:10,scale:.98}}>
+        <motion.div className="modal quest-proof-modal" role="dialog" aria-modal="true" aria-labelledby="quest-proof-title" initial={prefersReducedMotion ? false : {opacity:0,y:18,scale:.97}} animate={{opacity:1,y:0,scale:1}} exit={prefersReducedMotion ? {} : {opacity:0,y:10,scale:.98}}>
           <div className="modal-icon quest-proof-icon"><ClipboardCheck size={21}/></div>
           <div className="panel-kicker">MISSION DEBRIEF · +{pendingQuest.xp} XP</div>
-          <h2 id="quest-proof-title">Before you claim this quest…</h2>
-          <p><strong>{pendingQuest.title}</strong> · {pendingQuest.duration} min suggested. Tell PLAYFORGE what you actually did. Use a sentence starter only if it matches your experience, or write your own note.</p>
-          <label className="quest-proof-label" htmlFor="quest-proof-note">YOUR COMPLETION NOTE</label>
-          <div className="quest-proof-examples" aria-label="Example completion notes">{examples.map(example => <button type="button" key={example} onClick={() => setQuestEvidenceDraft(example)} className={questEvidenceDraft === example ? 'selected' : ''}>{example}</button>)}</div>
-          <textarea id="quest-proof-note" value={questEvidenceDraft} onChange={event => setQuestEvidenceDraft(event.target.value.slice(0,240))} maxLength={240} rows={3} placeholder="Example: I focused for 10 minutes and finished one small step…" />
-          <div className="quest-proof-footnote"><ShieldCheck size={14}/><span>This is a self-reported check-in, not independently verified proof. Keep it honest and low-pressure.</span></div>
-          <div className="quest-proof-charcount">{questEvidenceDraft.trim().length}/240 characters · at least 8 required</div>
-          <div className="modal-actions"><button className="btn-secondary" onClick={() => setPendingQuestId(null)}>Not yet</button><button className="btn-primary" onClick={confirmQuestCompletion} disabled={questEvidenceDraft.trim().length < 8}><CheckCircle2 size={15}/> Save debrief & complete</button></div>
+          <h2 id="quest-proof-title">Nice work. How did it go?</h2>
+          <p><strong>{pendingQuest.title}</strong> · {pendingQuest.duration} min suggested. Choose what best describes your experience. A written note is optional.</p>
+          <div className="quest-proof-examples" aria-label="How the quest went">{choices.map(choice => <button type="button" key={choice.id} onClick={() => setQuestCompletionMode(choice.id)} className={questCompletionMode === choice.id ? 'selected' : ''}>{choice.label}</button>)}</div>
+          <label className="quest-proof-label" htmlFor="quest-proof-note">OPTIONAL NOTE</label>
+          <textarea id="quest-proof-note" value={questEvidenceDraft} onChange={event => setQuestEvidenceDraft(event.target.value.slice(0,240))} maxLength={240} rows={3} placeholder="Anything you want to remember about this win?"/>
+          <div className="quest-proof-footnote"><ShieldCheck size={14}/><span>This is your own check-in, not independently verified proof. Honest progress matters more than perfection.</span></div>
+          <div className="quest-proof-charcount">{questEvidenceDraft.trim().length}/240 characters · optional</div>
+          <div className="modal-actions"><button className="btn-secondary" onClick={() => setPendingQuestId(null)}>Not yet</button><button className="btn-primary" onClick={confirmQuestCompletion}><CheckCircle2 size={15}/> Complete quest · +{pendingQuest.xp} XP</button></div>
         </motion.div>
       </div>;
     })()}

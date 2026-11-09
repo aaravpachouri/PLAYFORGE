@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+import MultiUserApp from './auth/MultiUserApp';
 import './styles.css';
 import './nextgen.css';
 
@@ -12,6 +12,6 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <MultiUserApp />
   </StrictMode>,
 );

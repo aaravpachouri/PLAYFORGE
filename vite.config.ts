@@ -1,3 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-export default defineConfig({ plugins: [react()] });
+import { fileURLToPath } from 'node:url';
+
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: {
+        app: fileURLToPath(new URL('./index.html', import.meta.url)),
+        challenge: fileURLToPath(new URL('./challenge/index.html', import.meta.url)),
+      },
+    },
+  },
+});

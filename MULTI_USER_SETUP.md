@@ -28,6 +28,8 @@ The signup flow explicitly returns the confirmation link to the current app orig
 - No service-role key is shipped to the browser.
 - Existing browser-only progress is offered as an explicit one-time import after first sign-in; it is not silently assigned to whichever account logs in first.
 - Saves are debounced and uploaded after changes. The app retains a local working copy while signed in.
+- The public `/challenge/` page is usable without an account; guest checklist state remains on that device. Signed-in players use `public.challenge_day_completions`, a separate table with row-level policies scoped to `auth.uid()`. The page reuses the same Supabase browser session and auth credentials as the main app.
+- Challenge progress is stored as one row per user and day. Players cannot read, create or remove another player's completion rows. Guest progress is imported only after the player explicitly chooses **Merge progress**.
 - Current cloud save size is capped at 1 MiB per player.
 
 ## Acceptance checks before production

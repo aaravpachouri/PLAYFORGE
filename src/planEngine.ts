@@ -270,13 +270,13 @@ function advancedVariationFor(exercise: typeof library[number]['exercises'][numb
 
 function adjustedTargetForLevel(target: string, level: TrainingProfile['level']): string {
   if (level !== 'new') return target;
-  const timedSide = target.match(/^(\\d+)(?:\\s*[–-]\\s*(\\d+))?\\s*sec(?:onds?)?\\s+each side$/i);
+  const timedSide = target.match(/^(\d+)(?:\s*[–-]\s*(\d+))?\s*sec(?:onds?)?\s+each side$/i);
   if (timedSide) {
     const low = Math.max(8, Math.round(Number(timedSide[1]) * 0.75));
     const high = Math.max(low, Math.round(Number(timedSide[2] || timedSide[1]) * 0.8));
     return timedSide[2] ? `${low}–${high} sec each side` : `${low} sec each side`;
   }
-  const perSide = target.match(/^(\\d+)\\s+each side$/i);
+  const perSide = target.match(/^(\d+)\s+each side$/i);
   if (perSide) return `${Math.max(3, Math.round(Number(perSide[1]) * 0.75))} each side`;
   const reps = target.match(REP_TARGET);
   if (reps) {

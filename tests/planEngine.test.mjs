@@ -21,6 +21,9 @@ test('beginner profiles get shorter targets and a lower set ceiling', () => {
   assert.ok(main.every(exercise => exercise.sets <= 2));
   assert.ok(sessions.flatMap(day => day.sessions).every(session => session.intensity !== 'vigorous'));
   assert.ok(main.some(exercise => /[4-8]/.test(exercise.target)));
+  const perSide = main.filter(exercise => /each side$/i.test(exercise.target));
+  assert.ok(perSide.length > 0);
+  assert.ok(perSide.every(exercise => Number.parseInt(exercise.target, 10) < 6));
 });
 
 test('regular profiles get harder movement options and more working sets', () => {

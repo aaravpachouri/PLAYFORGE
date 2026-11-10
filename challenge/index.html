@@ -681,6 +681,177 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
   .sample-xp-pop { animation: none; }
 }
 
+
+/* Shared account access and private, per-player challenge progress. */
+.top-actions { display:flex; align-items:center; gap:10px; }
+.account-button {
+  min-height:42px;
+  border-color:rgba(116,217,232,.32);
+  background:rgba(17,31,51,.72);
+  color:#c9fff1;
+}
+.account-button:hover { border-color:rgba(113,239,242,.72); }
+.account-button:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+.challenge-sync-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:12px;
+  min-height:20px;
+}
+.sync-indicator {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  color:#9db1c7;
+  font-size:9px;
+  line-height:1.5;
+}
+.sync-indicator:before {
+  content:"";
+  flex:0 0 7px;
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#8ba0b7;
+}
+.sync-indicator[data-state="saved"]:before { background:#7df0bf; box-shadow:0 0 10px #7df0bf88; }
+.sync-indicator[data-state="saving"]:before { background:#ffd47c; box-shadow:0 0 10px #ffd47c88; }
+.sync-indicator[data-state="error"]:before { background:#ff929f; box-shadow:0 0 10px #ff929f88; }
+.sync-indicator[data-state="loading"]:before { background:#73d8f2; box-shadow:0 0 10px #73d8f288; }
+.challenge-sync-row button,
+.device-import button {
+  flex:0 0 auto;
+  padding:7px 10px;
+  border:1px solid rgba(113,239,242,.24);
+  border-radius:9px;
+  background:rgba(19,42,58,.85);
+  color:#b9fff0;
+  font-size:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+.device-import {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:13px;
+  padding:12px 13px;
+  border:1px solid rgba(165,143,255,.23);
+  border-radius:12px;
+  background:rgba(111,88,173,.08);
+}
+.device-import > div { display:grid; gap:4px; min-width:0; }
+.device-import strong { color:#e8e2ff; font-size:10px; }
+.device-import span { color:#a9b5c8; font-size:9px; line-height:1.5; }
+.account-modal[hidden] { display:none; }
+.account-modal {
+  position:fixed;
+  z-index:3000;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:20px;
+}
+.account-backdrop {
+  position:absolute;
+  inset:0;
+  width:100%;height:100%;
+  border:0;
+  background:rgba(2,6,14,.82);
+  backdrop-filter:blur(13px);
+}
+.account-dialog {
+  position:relative;
+  z-index:1;
+  width:min(100%,460px);
+  max-height:min(88vh,720px);
+  overflow:auto;
+  padding:25px;
+  border:1px solid rgba(117,205,231,.28);
+  border-radius:22px;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(119,94,205,.17),transparent 48%),
+    linear-gradient(155deg,#142137,#0b1424 72%);
+  box-shadow:0 30px 100px rgba(0,0,0,.62),0 0 65px rgba(89,212,224,.09);
+}
+.account-dialog-head { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
+.account-dialog-head .eyebrow { font-size:8px; letter-spacing:.16em; }
+.account-dialog h2 {
+  margin:8px 0 0;
+  max-width:330px;
+  color:#f2f7ff;
+  font-size:25px;
+  line-height:1.12;
+  letter-spacing:-.045em;
+}
+.account-close {
+  width:32px;height:32px;
+  border:1px solid rgba(161,186,217,.2);
+  border-radius:10px;
+  background:rgba(255,255,255,.04);
+  color:#e6efff;
+  font-size:20px;
+  cursor:pointer;
+}
+.account-intro { margin:17px 0; color:#afc0d3; font-size:12px; line-height:1.7; }
+.account-form { display:grid; gap:8px; }
+.account-form label {
+  margin-top:5px;
+  color:#91a8c1;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.16em;
+}
+.account-form input {
+  width:100%;
+  min-height:44px;
+  padding:0 13px;
+  border:1px solid rgba(130,172,212,.25);
+  border-radius:11px;
+  outline:none;
+  background:rgba(4,12,25,.72);
+  color:#f5f8ff;
+  font:inherit;
+  font-size:13px;
+}
+.account-form input:focus { border-color:#77e9e2; box-shadow:0 0 0 3px rgba(92,229,220,.09); }
+.account-submit { width:100%; margin-top:9px; }
+.account-form-actions { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; margin-top:11px; }
+.account-form-actions button {
+  border:0;
+  padding:5px 0;
+  background:transparent;
+  color:#a9d9ec;
+  font-size:10px;
+  cursor:pointer;
+}
+.account-feedback { min-height:18px; margin:8px 0 0; color:#9bf0ca; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+.account-feedback[data-error="true"] { color:#ffabb5; }
+.account-privacy { margin:13px 0 0; color:#748ba4; font-size:9px; line-height:1.55; }
+.signed-in-email {
+  padding:13px 14px;
+  border:1px solid rgba(117,229,205,.22);
+  border-radius:11px;
+  background:rgba(70,211,178,.055);
+  color:#e2fff4;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+.account-cloud-state { display:flex; align-items:center; gap:9px; margin:14px 0; color:#9fb4c7; font-size:10px; }
+@media(max-width:650px) {
+  .top-actions { gap:7px; }
+  .top-actions .account-button { min-height:37px; padding:0 10px; font-size:9px; }
+  .top-actions .top-cta { min-height:37px; padding:0 11px; font-size:9px; }
+  .device-import { align-items:flex-start; flex-direction:column; }
+  .account-dialog { padding:21px 18px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .account-backdrop { backdrop-filter:none; }
+}
+
 </style>
 </head>
 <body>
@@ -689,7 +860,10 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
   <nav class="main-nav" aria-label="Main navigation">
     <a href="/">Home</a><a class="active" href="#challenge" aria-current="page">Challenge</a><a href="#how-it-works">How it works</a>
   </nav>
-  <a class="btn top-cta" href="/">Open app <span aria-hidden="true">↗</span></a>
+  <div class="top-actions">
+    <button class="btn account-button" id="accountButton" type="button" aria-controls="accountModal">Sign in to sync</button>
+    <a class="btn top-cta" href="/">Open app <span aria-hidden="true">↗</span></a>
+  </div>
 </header>
 <main class="wrap">
 <section class="hero hero-world">
@@ -719,7 +893,12 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
   </div>
 </section>
 <section id="challenge"><div class="section-head"><div><div class="eyebrow" style="margin-bottom:9px">THE SEVEN-DAY RUN</div><h2>Your next <span>7 small wins.</span></h2></div><p>Seven simple actions. No pressure.<br>Miss a day? Pick up whenever you’re ready.</p></div>
-<div class="progress-panel" aria-live="polite"><div class="progress-row"><strong>Your challenge progress</strong><span id="progressText">0 of 7 complete</span></div><div class="track" role="progressbar" aria-label="Challenge progress" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0" id="progressTrack"><i id="progressFill"></i></div></div>
+<div class="progress-panel" aria-live="polite">
+  <div class="progress-row"><strong>Your challenge progress</strong><span id="progressText">0 of 7 complete</span></div>
+  <div class="track" role="progressbar" aria-label="Challenge progress" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0" id="progressTrack"><i id="progressFill"></i></div>
+  <div class="challenge-sync-row"><span class="sync-indicator" id="syncStatus" data-state="guest" role="status" aria-live="polite">Guest run · saved on this device</span><button id="retrySync" type="button" hidden>Retry sync</button></div>
+  <div class="device-import" id="deviceImport" hidden><div><strong>Progress found on this device</strong><span id="deviceImportText">Merge your saved days into your account.</span></div><button id="importDeviceProgress" class="btn secondary" type="button">Merge progress</button></div>
+</div>
 <div class="days" id="days">
 <article class="day"><div class="day-num"><span>DAY</span><strong>01</strong></div><div class="day-copy"><small>Choose your focus<span class="mission-glyph" aria-hidden="true">◎</span></small><h3>Pick one thing that matters.</h3><p>Choose a routine or personal goal you want to make easier. Write down the smallest version you could realistically do today.</p><p class="hint">Try: read two pages, tidy one corner, or take a short walk.</p></div><input class="check" type="checkbox" aria-label="Mark day 1 complete" data-day="0"></article>
 <article class="day"><div class="day-num"><span>DAY</span><strong>02</strong></div><div class="day-copy"><small>Make it repeatable<span class="mission-glyph" aria-hidden="true">◷</span></small><h3>Give your goal a tiny time slot.</h3><p>Attach your action to something already in your day: after breakfast, before a study session, or when you get home.</p><p class="hint">Keep it small enough to repeat.</p></div><input class="check" type="checkbox" aria-label="Mark day 2 complete" data-day="1"></article>
@@ -729,65 +908,41 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
 <article class="day"><div class="day-num"><span>DAY</span><strong>06</strong></div><div class="day-copy"><small>Notice what helps<span class="mission-glyph" aria-hidden="true">▥</span></small><h3>Spot one thing that made it easier.</h3><p>Think about your energy, timing, environment, or the way you broke the task down. Keep the one change that helped most.</p><p class="hint">Adapt the plan to real life.</p></div><input class="check" type="checkbox" aria-label="Mark day 6 complete" data-day="5"></article>
 <article class="day"><div class="day-num"><span>DAY</span><strong>07</strong></div><div class="day-copy"><small>Reflect and choose<span class="mission-glyph" aria-hidden="true">⚑</span></small><h3>Keep one thing for next week.</h3><p>What felt useful? What felt unrealistic? Choose one small action to carry forward, and let the rest go.</p><p class="hint">Progress is information, not a test.</p></div><input class="check" type="checkbox" aria-label="Mark day 7 complete" data-day="6"></article>
 </div>
-<p class="note" id="privacy">Your checklist is saved only in this browser on this device. It is not connected to your PLAYFORGE account and this page does not collect your email. Use the PLAYFORGE app to build and track your own quests and workouts. Adjust every activity to your needs; this challenge is general motivation, not a medical or personalised training plan.</p></section>
+<p class="note" id="privacy">Try the challenge as a guest and your checklist stays on this device. Sign in with your PLAYFORGE account to sync completed days across your devices. Each player's challenge progress is private to their account; your email and activity are never shown to other players. Adjust every activity to your needs; this challenge is general motivation, not a medical or personalised training plan.</p></section>
 <section class="bottom" id="how-it-works"><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">WANT A PLAYER PROFILE?</div><h3>Bring your routine into PLAYFORGE.</h3><p>Build daily quests, track workouts and meals, and see your progress over time. Create an account to keep your app progress with you across devices.</p><a class="btn primary" href="/">Open PLAYFORGE ↗</a></div><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">DO IT WITH A FRIEND</div><h3>Make the challenge easier to start.</h3><p>Share the same seven-day plan with someone you know. You can compare notes without competing or sharing personal data.</p><button class="btn secondary" id="copyInvite" type="button">Copy invite text</button><p id="shareStatus" role="status" style="margin-top:10px;color:#82ffd1;min-height:16px"></p></div></section>
 </main>
 <footer class="wrap footer"><span>© PLAYFORGE · Level up your real life.</span><span><a href="/">Open app</a> · <a href="https://playforge-fawn.vercel.app">Home</a></span></footer>
-<script>
-(() => {
-  const key = 'playforge-seven-day-challenge-v1';
-  const checks = [...document.querySelectorAll('[data-day]')];
-  const fill = document.getElementById('progressFill');
-  const progressText = document.getElementById('progressText');
-  const track = document.getElementById('progressTrack');
-  const status = document.getElementById('shareStatus');
-  const heroDayCount = document.getElementById('heroDayCount');
-  const heroProgress = document.getElementById('heroProgress');
-  const heroProgressFill = document.getElementById('heroProgressFill');
-  const heroProgressLabel = document.getElementById('heroProgressLabel');
-  let saved = [];
-  try {
-    const parsed = JSON.parse(localStorage.getItem(key) || '[]');
-    if (Array.isArray(parsed)) saved = parsed.filter(n => Number.isInteger(n) && n >= 0 && n < 7);
-  } catch { saved = []; }
-  checks.forEach(input => input.checked = saved.includes(Number(input.dataset.day)));
-  const update = () => {
-    const completed = checks.filter(input => input.checked).length;
-    const percent = completed / 7 * 100;
-    fill.style.width = percent + '%';
-    progressText.textContent = completed + ' of 7 complete';
-    track.setAttribute('aria-valuenow', String(completed));
-    heroDayCount.textContent = completed + ' / 7';
-    heroProgressFill.style.width = percent + '%';
-    heroProgress.setAttribute('aria-valuenow', String(completed));
-    heroProgressLabel.textContent = completed + (completed === 1 ? ' day cleared' : ' days cleared');
-    checks.forEach(input => input.closest('.day').classList.toggle('done', input.checked));
-    try {
-      localStorage.setItem(key, JSON.stringify(checks.filter(input => input.checked).map(input => Number(input.dataset.day))));
-    } catch { /* Keep the checklist usable for this session. */ }
-  };
-  checks.forEach(input => input.addEventListener('change', update));
-  update();
-  const invite = "I'm trying the free PLAYFORGE 7-Day Level Up: seven days of small, realistic actions to build a routine that fits real life. Join me: https://playforge-fawn.vercel.app/challenge/";
-  const share = async () => {
-    const data = { title: 'The 7-Day Level Up — PLAYFORGE', text: invite, url: 'https://playforge-fawn.vercel.app/challenge/' };
-    try {
-      if (navigator.share) await navigator.share(data);
-      else if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(invite);
-        status.textContent = 'Invite copied. Paste it into your message.';
-      } else status.textContent = invite;
-    } catch (error) {
-      if (error && error.name !== 'AbortError') status.textContent = 'Could not open sharing. Copy the page address instead.';
-    }
-  };
-  document.getElementById('shareTop').addEventListener('click', share);
-  document.getElementById('copyInvite').addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(invite);
-      status.textContent = 'Invite copied. Paste it into your message.';
-    } catch { status.textContent = invite; }
-  });
-})();
-</script>
+<script type="module" src="/src/challenge.ts"></script>
+
+<div class="account-modal" id="accountModal" hidden>
+  <button class="account-backdrop" id="accountBackdrop" type="button" aria-label="Close account dialog"></button>
+  <section class="account-dialog" role="dialog" aria-modal="true" aria-labelledby="accountDialogTitle">
+    <div class="account-dialog-head">
+      <div><div class="eyebrow">PLAYFORGE · PLAYER ID</div><h2 id="accountDialogTitle">Your progress, wherever you go.</h2></div>
+      <button class="account-close" id="closeAccountModal" type="button" aria-label="Close">×</button>
+    </div>
+    <div id="authFormPanel">
+      <p class="account-intro">Use the same email and password as the PLAYFORGE app. Your seven-day checklist will sync to your own account.</p>
+      <form id="challengeAuthForm" class="account-form">
+        <label for="challengeEmail">EMAIL</label>
+        <input id="challengeEmail" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        <label for="challengePassword">PASSWORD</label>
+        <input id="challengePassword" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters">
+        <button class="btn primary account-submit" id="challengeAuthSubmit" type="submit">Sign in</button>
+      </form>
+      <p class="account-feedback" id="accountFeedback" role="status" aria-live="polite"></p>
+      <div class="account-form-actions">
+        <button id="toggleAuthMode" type="button">New to PLAYFORGE? Create an account</button>
+        <button id="forgotPassword" type="button">Forgot password?</button>
+      </div>
+      <p class="account-privacy">Your checklist is private to your account. Other players cannot view or edit it.</p>
+    </div>
+    <div id="signedInPanel" hidden>
+      <p class="account-intro">Your challenge progress is linked to this PLAYFORGE account:</p>
+      <div class="signed-in-email" id="signedInEmail"></div>
+      <div class="account-cloud-state"><span class="sync-indicator" data-state="saved">●</span><span>Challenge progress syncs to your private account.</span></div>
+      <button class="btn secondary account-submit" id="challengeSignOut" type="button">Sign out</button>
+    </div>
+  </section>
+</div>
 </body></html>

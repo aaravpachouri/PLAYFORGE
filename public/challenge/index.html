@@ -583,6 +583,104 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
   overflow-wrap: anywhere;
 }
 
+
+/* Sample in-app feedback preview: real rewards appear after a logged action in PLAYFORGE. */
+.scene-image {
+  transform: none;
+  image-rendering: auto;
+  filter: saturate(1.06) contrast(1.025);
+}
+.sample-xp-pop {
+  position: absolute;
+  z-index: 3;
+  top: 88px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 210, 111, .56);
+  border-radius: 13px;
+  background: linear-gradient(120deg, rgba(58, 42, 21, .93), rgba(19, 26, 45, .94));
+  box-shadow: 0 0 28px rgba(255, 194, 81, .18), inset 0 1px 0 rgba(255,255,255,.08);
+  animation: sample-xp-rise 3.8s ease-in-out infinite;
+}
+.sample-xp-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(255, 215, 123, .34);
+  border-radius: 9px;
+  background: rgba(255, 208, 111, .12);
+  color: #ffdb8d;
+  font-size: 17px;
+  text-shadow: 0 0 12px rgba(255, 206, 105, .7);
+}
+.sample-xp-pop > span:last-child { display: grid; gap: 3px; }
+.sample-xp-pop strong {
+  color: #ffdf91;
+  font-size: 19px;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.sample-xp-pop small {
+  color: #d2c5a6;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+.sample-motivation-card {
+  position: absolute;
+  z-index: 3;
+  right: 18px;
+  bottom: 116px;
+  display: grid;
+  width: 215px;
+  gap: 7px;
+  padding: 13px 14px;
+  border: 1px solid rgba(174, 145, 255, .46);
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(172, 132, 255, .22), transparent 62%),
+    linear-gradient(140deg, rgba(22, 25, 54, .94), rgba(12, 20, 38, .96));
+  box-shadow: 0 12px 32px rgba(0,0,0,.3), 0 0 24px rgba(158, 126, 255, .12);
+  transform: rotate(-2deg);
+}
+.sample-motivation-card > span {
+  color: #c7b6ff;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+.sample-motivation-card strong {
+  color: #f6f2ff;
+  font-size: 14px;
+  line-height: 1.3;
+  letter-spacing: -.025em;
+}
+.sample-motivation-card small {
+  color: #aab7cf;
+  font-size: 9px;
+  line-height: 1.4;
+}
+@keyframes sample-xp-rise {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+@media (max-width: 650px) {
+  .sample-xp-pop { top: 68px; right: 12px; padding: 8px 10px; gap: 7px; }
+  .sample-xp-icon { width: 25px; height: 25px; font-size: 14px; }
+  .sample-xp-pop strong { font-size: 16px; }
+  .sample-xp-pop small { font-size: 6px; }
+  .sample-motivation-card { right: 12px; bottom: 105px; width: 178px; padding: 10px 11px; gap: 5px; }
+  .sample-motivation-card strong { font-size: 12px; }
+  .sample-motivation-card small { font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sample-xp-pop { animation: none; }
+}
+
 </style>
 </head>
 <body>
@@ -610,6 +708,8 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
     <div class="scene-vignette" aria-hidden="true"></div>
     <div class="player-tag"><span class="player-tag-dot"></span><span>YOUR PLAYER COMPANION</span><strong>ROOK <b>·</b> LVL 01</strong></div>
     <div class="companion-note"><span class="companion-spark">✦</span><span>One small win<br>at a time.</span></div>
+    <div class="sample-xp-pop" aria-hidden="true"><span class="sample-xp-icon">✦</span><span><strong>+30 XP</strong><small>30 MIN SESSION LOGGED</small></span></div>
+    <div class="sample-motivation-card" aria-hidden="true"><span>MOMENTUM CARD · EXAMPLE</span><strong>Consistency beats intensity.</strong><small>Showing up today is a win.</small></div>
     <div class="hero-hud" aria-live="polite">
       <div class="hud-heading"><span>YOUR CHALLENGE</span><strong id="heroDayCount">0 / 7</strong></div>
       <div class="hud-track" id="heroProgress" role="progressbar" aria-label="Days completed" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"><i id="heroProgressFill"></i></div>

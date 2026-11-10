@@ -1115,3 +1115,23 @@ input[type="checkbox"]{accent-color:#75f3cc}
 .pf2-planned-meal-footer .btn-primary:disabled{opacity:.48;cursor:not-allowed;filter:saturate(.55)}
 @media(max-width:720px){.pf2-weekly-movement-recap{padding:15px}.pf2-weekly-movement-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-weekly-movement-heading{align-items:flex-start;flex-direction:column}.pf2-recap-date{align-self:flex-start}}
 @media(max-width:420px){.pf2-weekly-movement-chart{gap:4px;padding:9px 6px}.pf2-movement-day>small{font-size:7px}.pf2-slot-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.pf2-meal-quick-add button{flex:1 1 100%}}
+
+
+/* Workout session usability: guided start, clear step language and mobile actions. */
+.pf2-live-workout{scroll-margin-top:18px}
+.pf2-active-session{scroll-margin-top:18px;outline:none}
+.pf2-session-actions .btn-primary{min-height:42px;font-size:10px}
+.pf2-session-complete-note{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;min-width:150px;min-height:42px;padding:10px 12px;border:1px solid rgba(104,231,190,.2);border-radius:11px;background:rgba(54,148,121,.12);color:#9cf2d3;font-size:10px;font-weight:800}
+.pf2-session-complete-note svg{flex:none}
+.pf2-timer-guidance{display:inline-flex;align-items:center;gap:7px;min-height:40px;margin-right:auto;color:#8ca8bb;font-size:9px;line-height:1.5}
+.pf2-timer-guidance svg{flex:none;color:#8ce6d0}
+.pf2-player-control-row{justify-content:space-between}
+@media(max-width:560px){
+  .pf2-session-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pf2-session-actions button{width:100%;min-width:0;min-height:42px}
+  .pf2-session-actions .btn-primary,.pf2-session-complete-note{grid-column:1/-1}
+  .pf2-player-control-row{display:grid;grid-template-columns:1fr}
+  .pf2-player-control-row button{width:100%}
+  .pf2-session-finalize{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.pf2-live-workout{scroll-behavior:auto}}

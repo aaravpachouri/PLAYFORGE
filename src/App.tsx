@@ -291,6 +291,16 @@ function calculateDailyXP(log: DayLog) {
     + mealSlots * 12;
 }
 
+
+const MOTIVATION_FLASHCARDS = [
+  { topic: 'CONSISTENCY', front: 'What matters more than a perfect day?', back: 'A small action you can repeat on an ordinary day.' },
+  { topic: 'RECOVERY', front: 'Does taking a rest day erase progress?', back: 'No. Recovery is part of a sustainable routine, not a step backwards.' },
+  { topic: 'SELF-TRUST', front: 'How do you build trust in yourself?', back: 'Keep one realistic promise to yourself, then make it repeatable.' },
+  { topic: 'MOMENTUM', front: 'What if today did not go to plan?', back: 'One difficult day does not erase the work you have already done. Begin again gently.' },
+  { topic: 'FOCUS', front: 'What is the smallest useful next step?', back: 'Choose one action you can start now. You can decide what comes after.' },
+  { topic: 'REFLECTION', front: 'What made showing up easier today?', back: 'Notice the timing, environment or support that helped, and keep what worked.' },
+] as const;
+
 function App() {
   const [stored, setStored] = useState<StoredState>(() => { const existing = readState(); return existing ? { ...existing, trainingProgram: existing.trainingProgram || { startDate: todayKey(), generation: 0 } } : { logs: {}, experiments: [], customHabits: [], demo: false, onboardingDone: false, trainingProgram: { startDate: todayKey(), generation: 0 } }; });
   const [nutritionPlanLoading, setNutritionPlanLoading] = useState(false);
@@ -307,7 +317,9 @@ function App() {
   const [pendingQuestId, setPendingQuestId] = useState<string | null>(null);
   const [questEvidenceDraft, setQuestEvidenceDraft] = useState('');
   const [questCompletionMode, setQuestCompletionMode] = useState<'planned' | 'adapted' | 'partial'>('planned');
-  const [completionCelebration, setCompletionCelebration] = useState<{ title: string; category: QuestCategory; message: string; xp: number; note: string; nextTitle: string | null } | null>(null);
+  const [completionCelebration, setCompletionCelebration] = useState<{ title: string; category: string; message: string; xp: number; note: string; nextTitle: string | null } | null>(null);
+  const [motivationCardIndex, setMotivationCardIndex] = useState(-1);
+  const [motivationCardFlipped, setMotivationCardFlipped] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
@@ -418,14 +430,36 @@ function App() {
     const current: DayLog = { ...emptyLog(today), ...(prev.logs[today] || {}), meals: prev.logs[today]?.meals || [] };
     return { ...prev, logs: { ...prev.logs, [today]: { ...current, ...patch, date: today } } };
   });
+  const showReward = (reward: { title: string; category: string; message: string; xp: number; note?: string; nextTitle?: string | null }) => {
+    if (!Number.isFinite(reward.xp) || reward.xp <= 0) return;
+    setMotivationCardIndex(current => (current + 1) % MOTIVATION_FLASHCARDS.length);
+    setMotivationCardFlipped(false);
+    setNotice('');
+    setCompletionCelebration({
+      title: reward.title,
+      category: reward.category,
+      message: reward.message,
+      xp: Math.round(reward.xp),
+      note: reward.note || '',
+      nextTitle: reward.nextTitle || null,
+    });
+  };
   const saveProfile = (p: Profile) => {
     setStored(prev => ({ ...prev, profile: { ...p, name: p.name.trim() || 'Player' }, onboardingDone: true }));
     setProfileDraft(p); setSettingsDraft(null); setTab('overview'); setNotice('Your personal quest system is ready.');
   };
   const logTrainingSession = (minutes: number, intensity: 'easy' | 'moderate' | 'vigorous', type: ActivityType = 'Strength') => {
     const safeMinutes = Math.max(1, Math.min(600, Math.round(minutes)));
+    const activityXP = Math.min(30, safeMinutes);
     updateToday({ activities: [...log.activities, { id: crypto.randomUUID?.() || `${Date.now()}`, type, minutes: safeMinutes, intensity }] });
-    setNotice(`${type} session logged for ${safeMinutes} minutes. This is your self-reported session record.`);
+    showReward({
+      title: `${type} session logged`,
+      category: 'TRAINING ARENA',
+      message: `Your ${safeMinutes}-minute session has been saved as a self-reported activity. XP reflects the recorded session, not how hard you pushed.`,
+      xp: activityXP,
+      note: 'A session you can recover from is a session you can return to.',
+    });
+    if (!prefersReducedMotion) confetti({ particleCount: 48, spread: 62, startVelocity: 25, origin: { x: 0.76, y: 0.34 }, colors: ['#8fffd0', '#57ddff', '#a88bff', '#ffd36b'], zIndex: 9999 });
   };
   const regenerateTrainingOptions = () => {
     const today = todayKey();
@@ -472,8 +506,14 @@ function App() {
     const entry: MealEntry = { ...meal, id: crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`, loggedAt: new Date().toISOString() };
     updateToday({ meals: [...existingMeals, entry] });
     if (earnsSlotXP) {
+      showReward({
+        title: 'Nourishment logged',
+        category: 'NOURISHMENT',
+        message: `${meal.name} is in your ${meal.slot.toLowerCase()} log. Your first entry in this meal slot today earns the XP bonus.`,
+        xp: 12,
+        note: 'A food log is information, not a score. Keep it useful and pressure-free.',
+      });
       if (!prefersReducedMotion) confetti({ particleCount: 34, spread: 54, startVelocity: 22, origin: { x: 0.76, y: 0.44 }, colors: ['#8fffd0', '#57ddff', '#a88bff', '#ffd36b'], zIndex: 9999 });
-      setNotice(`${meal.name} logged · +12 Meal XP for your first ${meal.slot.toLowerCase()} entry today!`);
     } else {
       setNotice(`${meal.name} added to today's food log. Your ${meal.slot.toLowerCase()} XP bonus is already claimed for today.`);
     }
@@ -515,9 +555,9 @@ function App() {
     });
     setPendingQuestId(null);
     setQuestEvidenceDraft('');
-    setCompletionCelebration({
+    showReward({
       title: quest?.title || 'Quest cleared',
-      category,
+      category: `QUEST CLEARED · ${category.toUpperCase()}`,
       message: getQuestAcknowledgement(category, completionNote),
       xp: quest?.xp || 35,
       note,
@@ -593,9 +633,15 @@ function App() {
         sleep: 'You made room to recharge. That matters, even when the day is busy.',
         reflection: 'You paused to notice how today felt. Self-awareness is a useful skill.',
       };
-      setNotice(checkedCount >= requiredCount && requiredCount > 0
-        ? `Your personal routines are all checked in. +8 XP for this one — nice follow-through.`
-        : `${label} checked · +8 XP. ${acknowledgements[id] || 'A small promise to yourself, kept.'}`);
+      showReward({
+        title: `${label} checked in`,
+        category: 'HABIT LAB',
+        message: checkedCount >= requiredCount && requiredCount > 0
+          ? 'Your personal routines are all checked in. A few small systems can make the day easier to navigate.'
+          : acknowledgements[id] || 'A small promise to yourself, kept.',
+        xp: 8,
+        note: 'Consistency starts with something small enough to do again.',
+      });
       if (checkedCount >= requiredCount && requiredCount > 0 && !prefersReducedMotion) {
         confetti({ particleCount: 56, spread: 62, startVelocity: 24, origin: { x: 0.52, y: 0.42 }, colors: ['#8fffd0', '#57ddff', '#a88bff', '#ffd36b'], zIndex: 9999 });
       }
@@ -715,11 +761,26 @@ function App() {
     {completionCelebration && <div className="modal-backdrop pf2-celebration-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setCompletionCelebration(null); }}>
       <motion.div className="modal pf2-quest-celebration" role="dialog" aria-modal="true" aria-labelledby="pf2-quest-celebration-title" initial={prefersReducedMotion ? false : {opacity:0,y:18,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={prefersReducedMotion ? {} : {opacity:0,y:10,scale:.98}}>
         <div className="pf2-celebration-burst"><Trophy size={27}/><span><Sparkles size={13}/></span></div>
-        <div className="panel-kicker">QUEST CLEARED · {completionCelebration.category.toUpperCase()}</div>
+        <div className="panel-kicker">XP REWARD · {completionCelebration.category.toUpperCase()}</div>
         <h2 id="pf2-quest-celebration-title">{completionCelebration.title}</h2>
         <p>{completionCelebration.message}</p>
-        <div className="pf2-celebration-reward"><strong>+{completionCelebration.xp} XP</strong><span>Added to your existing player total</span></div>
-        <blockquote>“{completionCelebration.note}”</blockquote>
+        <div className="pf2-celebration-reward"><strong>+{completionCelebration.xp} XP</strong><span>Added to your player total · real reward, no duplicate bonus</span></div>
+        {completionCelebration.note && <blockquote className="pf2-reward-reflection"><span>YOUR REFLECTION</span>“{completionCelebration.note}”</blockquote>}
+        {(() => {
+          const card = MOTIVATION_FLASHCARDS[Math.max(0, motivationCardIndex)];
+          return <section className={`pf2-motivation-flashcard ${motivationCardFlipped ? 'is-flipped' : ''}`} aria-label="Motivation flashcard">
+            <div className="pf2-motivation-flashcard-head"><span><Sparkles size={13}/> MOMENTUM FLASHCARD</span><strong>{Math.max(0, motivationCardIndex) + 1}/{MOTIVATION_FLASHCARDS.length}</strong></div>
+            <button className="pf2-motivation-flashcard-face" type="button" onClick={() => setMotivationCardFlipped(value => !value)} aria-label={motivationCardFlipped ? 'Show flashcard prompt' : 'Reveal flashcard reminder'}>
+              <span>{motivationCardFlipped ? 'THE TAKEAWAY' : `PROMPT · ${card.topic}`}</span>
+              <strong>{motivationCardFlipped ? card.back : card.front}</strong>
+              <small>{motivationCardFlipped ? 'Tap to return to the prompt' : 'Tap to reveal your reminder'}</small>
+            </button>
+            <div className="pf2-motivation-flashcard-actions">
+              <button type="button" onClick={() => setMotivationCardFlipped(value => !value)}>{motivationCardFlipped ? 'Show prompt' : 'Reveal insight'}</button>
+              <button type="button" onClick={() => { setMotivationCardIndex(index => (index + 1) % MOTIVATION_FLASHCARDS.length); setMotivationCardFlipped(false); }}>Next card <ArrowRight size={13}/></button>
+            </div>
+          </section>;
+        })()}
         {completionCelebration.nextTitle && <div className="pf2-celebration-next"><span>NEXT UP</span><strong>{completionCelebration.nextTitle}</strong></div>}
         <div className="modal-actions"><button className="btn-primary" onClick={() => setCompletionCelebration(null)}>Keep going <ArrowRight size={15}/></button></div>
       </motion.div>

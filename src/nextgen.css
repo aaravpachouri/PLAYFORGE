@@ -1135,3 +1135,22 @@ input[type="checkbox"]{accent-color:#75f3cc}
   .pf2-session-finalize{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){.pf2-live-workout{scroll-behavior:auto}}
+
+
+/* In-session form coach: always visible, scannable and responsive. */
+.pf2-form-coach{display:grid;gap:12px;margin:17px 0 4px;padding:15px;border:1px solid rgba(113,222,204,.18);border-radius:14px;background:linear-gradient(145deg,rgba(15,45,52,.42),rgba(16,23,42,.72))}
+.pf2-form-coach-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding-bottom:9px;border-bottom:1px solid rgba(132,188,203,.12)}
+.pf2-form-coach-heading>span:last-child{color:#8bdcc9;font-size:8px;font-weight:800;letter-spacing:.08em}
+.pf2-form-coach-setup,.pf2-form-coach-movement,.pf2-form-coach-breath,.pf2-form-coach-grid>div{min-width:0}
+.pf2-form-coach strong{display:block;margin-bottom:5px;color:#dff9f3;font-size:10px;font-weight:850}
+.pf2-form-coach p{margin:0;color:#9eb5c8;font-size:9px;line-height:1.65}
+.pf2-form-coach-movement ol,.pf2-form-coach-grid ul{display:grid;gap:6px;margin:6px 0 0;padding-left:18px;color:#a8bdce;font-size:9px;line-height:1.6}
+.pf2-form-coach-movement li::marker{color:#78dec5;font-weight:800}
+.pf2-form-coach-breath{padding:10px 11px;border:1px solid rgba(121,195,207,.12);border-radius:10px;background:rgba(7,18,31,.32)}
+.pf2-form-coach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pf2-form-coach-grid>div{padding:10px 11px;border:1px solid rgba(121,157,195,.11);border-radius:10px;background:rgba(7,18,31,.28)}
+.pf2-form-coach-grid p+p{margin-top:7px}
+.pf2-form-coach-grid b{color:#c7e8e5}
+.pf2-form-coach-safety{display:flex;align-items:flex-start;gap:7px;padding-top:8px;border-top:1px solid rgba(132,188,203,.1);color:#8da9ba;font-size:8px;line-height:1.55}
+.pf2-form-coach-safety svg{flex:none;color:#83d8bd;margin-top:1px}
+@media(max-width:560px){.pf2-form-coach{padding:12px}.pf2-form-coach-grid{grid-template-columns:1fr}.pf2-form-coach-heading{align-items:flex-start}}

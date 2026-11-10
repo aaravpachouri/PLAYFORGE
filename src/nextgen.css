@@ -902,3 +902,183 @@ input[type="checkbox"]{accent-color:#75f3cc}
 @media(max-width:650px){.pf2-habit-reward-header{grid-template-columns:37px minmax(0,1fr)}.pf2-reward-milestone{grid-column:2;justify-self:start;max-width:100%}.pf2-reward-token-row{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px}.pf2-habit-reward-header strong{font-size:18px}.pf2-planned-meal-card .pf2-meal-photo{height:188px}.pf2-meal-reward-strip{padding:12px}.pf2-meal-reward-slots b{font-size:7px}.pf2-meal-reward-slots small{font-size:6px}}
 @media(max-width:420px){.pf2-reward-track-caption{display:grid;gap:5px}.pf2-meal-alternative-row{grid-template-columns:62px minmax(0,1fr)}.pf2-meal-alternative-row .pf2-meal-photo{width:62px;height:54px}.pf2-meal-alternatives .pf2-meal-alternative-row>button{padding:7px}.pf2-meal-photo.compact .pf2-meal-photo-credit{font-size:4.5px}}
 @media(prefers-reduced-motion:reduce){.pf2-reward-progress>span,.pf2-meal-reward-slots>span,.pf2-meal-photo img{transition:none!important}}
+
+
+/* Everyday quest experience: rewards and check-ins */
+.pf2-celebration-backdrop {
+  z-index: 1200;
+  padding: 22px;
+  background: rgba(5, 5, 13, .82);
+  backdrop-filter: blur(14px);
+}
+.pf2-quest-celebration {
+  width: min(100%, 520px);
+  max-height: min(88vh, 760px);
+  overflow-y: auto;
+  border: 1px solid rgba(173, 151, 255, .35);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(128, 91, 226, .22), transparent 48%),
+    linear-gradient(155deg, #1b172b 0%, #11101b 68%, #10121d 100%);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, .62), 0 0 70px rgba(125, 91, 222, .12);
+  text-align: center;
+  gap: 15px;
+}
+.pf2-celebration-burst {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  margin: 2px auto 3px;
+  display: grid;
+  place-items: center;
+  border-radius: 23px;
+  color: #ffe3a4;
+  background: linear-gradient(145deg, rgba(255, 207, 111, .2), rgba(155, 115, 255, .18));
+  border: 1px solid rgba(255, 214, 142, .36);
+  box-shadow: 0 0 40px rgba(255, 198, 104, .14), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.pf2-celebration-burst > span {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #e5d9ff;
+  background: #6045a8;
+  border: 1px solid rgba(255,255,255,.2);
+}
+.pf2-quest-celebration h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(25px, 5vw, 34px);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+.pf2-quest-celebration > p {
+  max-width: 410px;
+  margin: 0 auto;
+  color: #c9c3d8;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.pf2-celebration-reward {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 210, 119, .23);
+  background: linear-gradient(120deg, rgba(255, 202, 107, .11), rgba(153, 119, 255, .09));
+}
+.pf2-celebration-reward strong {
+  color: #ffd783;
+  font-size: 30px;
+  letter-spacing: -.035em;
+  font-weight: 900;
+}
+.pf2-celebration-reward span {
+  color: #b9b2ca;
+  font-size: 11px;
+}
+.pf2-quest-celebration blockquote {
+  margin: 0;
+  padding: 13px 15px;
+  border-left: 2px solid rgba(176, 152, 255, .7);
+  border-radius: 0 12px 12px 0;
+  background: rgba(255,255,255,.035);
+  color: #dcd5eb;
+  font-size: 13px;
+  line-height: 1.55;
+  text-align: left;
+}
+.pf2-celebration-next {
+  display: grid;
+  gap: 5px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 13px;
+  background: rgba(255,255,255,.025);
+  text-align: left;
+}
+.pf2-celebration-next span {
+  color: #9c91b5;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+.pf2-celebration-next strong {
+  color: #f2edff;
+  font-size: 13px;
+}
+.pf2-quest-celebration .modal-actions {
+  justify-content: center;
+  margin-top: 2px;
+}
+.pf2-quest-celebration .modal-actions .btn-primary {
+  min-width: 180px;
+  justify-content: center;
+}
+.pf2-checkin-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-top: 18px;
+  padding: 17px 19px;
+  border-radius: 16px;
+  border: 1px solid rgba(169, 142, 255, .2);
+  background: linear-gradient(110deg, rgba(125, 91, 222, .105), rgba(74, 185, 173, .055));
+}
+.pf2-checkin-feedback .note-icon {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #c9b7ff;
+  background: rgba(157, 128, 255, .14);
+}
+.pf2-checkin-feedback strong {
+  display: block;
+  margin: 1px 0 4px;
+  color: #e9e2ff;
+  font-size: 13px;
+}
+.pf2-checkin-feedback p {
+  margin: 0;
+  color: #bdb6cd;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.pf2-habit-page .habit-layout {
+  align-items: start;
+}
+.pf2-habit-page .habit-side-column {
+  gap: 16px;
+}
+.pf2-habit-page .habit-checklist:empty {
+  display: none;
+}
+.pf2-habit-page .custom-habits-section {
+  margin-top: 10px;
+}
+.pf2-habit-page .habit-checkin-panel .panel-intro {
+  max-width: 560px;
+}
+.pf2-habit-page .pf2-habit-hero {
+  margin-bottom: 23px;
+}
+@media (max-width: 640px) {
+  .pf2-celebration-backdrop { padding: 12px; }
+  .pf2-quest-celebration { padding: 22px 18px; border-radius: 20px; }
+  .pf2-checkin-feedback { padding: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf2-celebration-burst,
+  .pf2-checkin-feedback {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -139,7 +139,11 @@ async function loadAccount(nextSession: Session | null): Promise<void> {
     return;
   }
 
+  // Never display the previous guest or player's checklist while this account loads.
+  // Only this account's unsynced local cache may be used as a temporary fallback.
+  activeDays = readStoredDays(accountCacheKey(activeUserId));
   loadingAccount = true;
+  renderProgress();
   checks.forEach(input => { input.disabled = true; });
   setSyncStatus('Loading your private challenge progress…', 'loading');
   try {
@@ -369,11 +373,13 @@ forgotPassword.addEventListener('click', () => void requestPasswordReset());
 signOutButton.addEventListener('click', () => void signOut());
 importDeviceButton.addEventListener('click', () => void importDeviceProgress());
 retrySync.addEventListener('click', () => {
-  if (activeUserId) {
+  if (activeUserId && pendingChanges.size > 0) {
     pendingChanges.forEach((value, dayIndex) => pendingChanges.set(dayIndex, { ...value, version: ++writeVersion }));
     queueAccountWrite(activeUserId);
-  } else {
+  } else if (activeSession) {
     void loadAccount(activeSession);
+  } else {
+    setSyncStatus('Sign in again to retry account sync.', 'error');
   }
 });
 

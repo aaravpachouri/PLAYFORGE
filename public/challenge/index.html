@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080e18">
 <meta name="description" content="A free, flexible 7-day reset for your routines. Pick one small action each day, track your progress, and keep what works.">
-<link rel="canonical" href="https://playforge-fawn.vercel.app/challenge/"><link rel="icon" type="image/svg+xml" href="/playforge.svg">
+<link rel="preload" as="image" href="/challenge/player-scene.webp"><link rel="canonical" href="https://playforge-fawn.vercel.app/challenge/"><link rel="icon" type="image/svg+xml" href="/playforge.svg">
 <meta property="og:type" content="website"><meta property="og:title" content="The 7-Day Level Up — PLAYFORGE"><meta property="og:description" content="Seven days. One small action at a time. Build a routine that fits real life."><meta property="og:url" content="https://playforge-fawn.vercel.app/challenge/"><meta property="og:image" content="https://playforge-fawn.vercel.app/challenge/og-card.svg">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="The 7-Day Level Up — PLAYFORGE"><meta name="twitter:description" content="Seven days. One small action at a time. Build a routine that fits real life."><meta name="twitter:image" content="https://playforge-fawn.vercel.app/challenge/og-card.svg">
 <title>The 7-Day Level Up — PLAYFORGE</title>
@@ -282,39 +282,205 @@
   }
 }
 
+
+/* PLAYFORGE challenge world */
+:root{--world-bg:#070b15;--world-line:rgba(124,176,213,.2);--world-cyan:#71eff2;--world-mint:#83ffd3;--world-violet:#ad8aff}
+body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176,.18),transparent 30%),radial-gradient(ellipse at 6% 44%,rgba(28,155,157,.12),transparent 28%),radial-gradient(ellipse at 50% 100%,rgba(96,68,155,.1),transparent 35%),var(--world-bg)}
+.wrap{width:min(1280px,calc(100% - 56px))}
+.top{position:relative;height:82px;gap:24px;border-bottom-color:rgba(141,176,215,.14)}
+.main-nav{display:flex;align-items:center;justify-content:center;gap:clamp(20px,3.4vw,50px);margin:0 auto}
+.main-nav a{position:relative;padding:12px 0;color:#9fafc7;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.025em;transition:color .18s}
+.main-nav a:hover,.main-nav a.active{color:#f2f7ff}
+.main-nav a.active:after{content:"";position:absolute;right:0;bottom:3px;left:0;height:2px;border-radius:4px;background:linear-gradient(90deg,var(--world-cyan),var(--world-violet));box-shadow:0 0 14px rgba(113,239,242,.5)}
+.top-cta{flex:0 0 auto;min-height:42px;padding:0 17px;border:1px solid rgba(116,199,232,.32);border-radius:999px;background:rgba(17,31,51,.78);color:#e9f5ff;font-size:11px}
+.top-cta:hover{border-color:rgba(113,239,242,.72)}
+.hero{grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);align-items:center;gap:clamp(30px,4vw,58px);padding:62px 0 70px}
+.hero-copy{position:relative;z-index:2}
+.hero-copy .eyebrow{display:inline-flex;padding:8px 12px;border:1px solid rgba(112,246,214,.19);border-radius:999px;background:rgba(70,229,207,.065);letter-spacing:.17em}
+.hero-copy h1{max-width:610px;margin:21px 0 18px;font-size:clamp(48px,5.45vw,76px);line-height:.99;letter-spacing:-.068em}
+.hero-copy h1 span{background:linear-gradient(100deg,#83ffd5,#65dcf0 48%,#aa8bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-copy .lead{max-width:560px;color:#b5c4d6;font-size:15px;line-height:1.85}
+.actions{gap:12px;margin-top:27px}
+.actions .btn{min-height:49px;padding:0 18px;border-radius:13px;font-size:11px}
+.primary{background:linear-gradient(105deg,#9bffdc,#63e4df);box-shadow:0 12px 34px rgba(91,231,207,.2),inset 0 1px 0 rgba(255,255,255,.45)}
+.primary:hover{box-shadow:0 16px 40px rgba(91,231,207,.28)}
+.secondary{border-color:rgba(144,183,213,.24);background:rgba(16,26,43,.72)}
+.hero-proof{display:flex;flex-wrap:wrap;gap:18px;margin-top:24px;color:#8196af;font-size:10px;font-weight:700;letter-spacing:.055em}
+.hero-proof span{display:inline-flex;align-items:center;gap:8px}
+.hero-proof i{width:6px;height:6px;border-radius:50%;background:var(--world-mint);box-shadow:0 0 12px rgba(131,255,211,.65)}
+.hero-stage{position:relative;isolation:isolate;min-height:430px;aspect-ratio:1.43/1;overflow:hidden;border:1px solid rgba(116,217,232,.29);border-radius:27px;background:#13233a;box-shadow:0 28px 80px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.09)}
+.hero-stage:before{content:"";position:absolute;z-index:1;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,rgba(5,10,22,.32),transparent 28%,transparent 48%,rgba(5,10,22,.56)),linear-gradient(90deg,rgba(7,14,27,.22),transparent 45%)}
+.scene-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:48% center;transform:scale(1.015)}
+.scene-vignette{position:absolute;z-index:1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 56% 43%,transparent 35%,rgba(3,8,19,.25) 100%)}
+.player-tag{position:absolute;z-index:2;top:18px;left:18px;display:grid;grid-template-columns:8px auto;align-items:center;column-gap:8px;padding:10px 13px;border:1px solid rgba(150,221,239,.22);border-radius:12px;background:rgba(7,17,32,.62);color:#b9d7e9;backdrop-filter:blur(12px)}
+.player-tag>span:nth-child(2){font-size:8px;font-weight:800;letter-spacing:.15em}
+.player-tag strong{grid-column:2;margin-top:4px;color:#fff;font-size:11px;letter-spacing:.11em}
+.player-tag strong b{color:var(--world-cyan)}
+.player-tag-dot{width:7px;height:7px;grid-row:1/3;border-radius:50%;background:var(--world-mint);box-shadow:0 0 13px var(--world-mint)}
+.companion-note{position:absolute;z-index:2;top:20px;right:20px;display:flex;align-items:center;gap:9px;padding:10px 13px;border:1px solid rgba(194,176,255,.27);border-radius:13px;background:rgba(17,19,43,.62);color:#e7e2ff;font-size:10px;line-height:1.45;backdrop-filter:blur(12px)}
+.companion-spark{color:#c4a4ff;font-size:20px;text-shadow:0 0 15px rgba(175,138,255,.7)}
+.hero-hud{position:absolute;z-index:3;right:18px;bottom:18px;width:min(270px,66%);padding:16px 17px 14px;border:1px solid rgba(108,230,242,.44);border-radius:17px;background:linear-gradient(140deg,rgba(7,18,34,.91),rgba(10,24,43,.82));box-shadow:0 0 34px rgba(48,218,233,.15),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(16px)}
+.hud-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#a7c8dd;font-size:8px;font-weight:900;letter-spacing:.16em}
+.hud-heading strong{padding:6px 9px;border:1px solid rgba(119,223,231,.24);border-radius:999px;color:#fff;font-size:10px;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.hud-track{height:7px;margin-top:14px;overflow:hidden;border:1px solid rgba(137,177,213,.18);border-radius:99px;background:rgba(113,145,175,.2)}
+.hud-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#82ffd4,#4ed9f1,#a98bff);box-shadow:0 0 16px rgba(103,239,225,.65);transition:width .3s}
+.hud-foot{display:flex;align-items:center;gap:8px;margin-top:12px;color:#c7d7e8;font-size:9px}
+.hud-foot strong{color:#f3f8ff;font-size:10px;font-variant-numeric:tabular-nums}
+.hud-orb{color:#a995ff;font-size:17px;text-shadow:0 0 12px rgba(169,149,255,.65)}
+.hud-side-note{margin-left:auto;color:#77dfd8;font-size:7px;font-weight:900;letter-spacing:.12em}
+.scene-caption{position:absolute;z-index:2;bottom:22px;left:20px;color:rgba(238,248,255,.75);font-size:8px;font-weight:800;letter-spacing:.15em;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.scene-caption span{color:var(--world-cyan);padding:0 4px}
+#challenge{scroll-margin-top:28px;padding-top:4px}
+#challenge .section-head{align-items:end;gap:24px;margin:0 0 20px}
+#challenge .section-head h2{font-size:clamp(26px,3.1vw,36px);line-height:1.1;letter-spacing:-.05em}
+#challenge .section-head h2 span{background:linear-gradient(90deg,#83ffd5,#6bdcf1 55%,#b191ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#challenge .section-head>p{max-width:295px;color:#9fb2c8;font-size:11px;line-height:1.75}
+.progress-panel{position:relative;overflow:hidden;margin-bottom:17px;padding:18px 22px 19px;border:1px solid rgba(113,207,225,.2);border-radius:17px;background:radial-gradient(ellipse at 100% 0%,rgba(96,139,224,.12),transparent 43%),linear-gradient(120deg,rgba(17,31,52,.94),rgba(11,20,37,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.progress-row strong{color:#eaf4ff;font-size:12px}
+.progress-row span{color:var(--world-mint);font-size:11px;font-variant-numeric:tabular-nums}
+.track{height:7px;margin-top:12px;background:rgba(134,164,192,.18)}
+.track i{box-shadow:0 0 15px rgba(106,242,217,.52)}
+.days{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:16px}
+.day{--mission-accent:#71e8ec;position:relative;isolation:isolate;overflow:hidden;grid-template-columns:58px minmax(0,1fr) 30px;align-items:start;gap:15px;min-height:218px;padding:20px;border:1px solid color-mix(in srgb,var(--mission-accent) 28%,rgba(118,161,201,.13));border-radius:19px;background:radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--mission-accent) 12%,transparent),transparent 50%),linear-gradient(145deg,rgba(19,31,52,.97),rgba(9,17,32,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 14px 34px rgba(0,0,0,.15);transition:transform .2s,border-color .2s,box-shadow .2s}
+.day:before{content:"";position:absolute;z-index:-1;top:-80px;right:-90px;width:190px;height:190px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,color-mix(in srgb,var(--mission-accent) 15%,transparent),transparent 69%);opacity:.85}
+.day:after{content:"";position:absolute;right:20px;bottom:0;left:20px;height:1px;background:linear-gradient(90deg,transparent,var(--mission-accent),transparent);opacity:.35}
+.day:nth-child(2){--mission-accent:#7caeff}.day:nth-child(3){--mission-accent:#9c8aff}.day:nth-child(4){--mission-accent:#72dfba}.day:nth-child(5){--mission-accent:#f28dc7}.day:nth-child(6){--mission-accent:#f2bd73}.day:nth-child(7){--mission-accent:#b49aff}
+.day:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--mission-accent) 58%,rgba(118,161,201,.13));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 20px 40px rgba(0,0,0,.24),0 0 28px color-mix(in srgb,var(--mission-accent) 10%,transparent)}
+.day-num{width:58px;height:64px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;border:1px solid color-mix(in srgb,var(--mission-accent) 36%,transparent);border-radius:15px;background:color-mix(in srgb,var(--mission-accent) 9%,rgba(7,16,30,.9));color:var(--mission-accent);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.day-num span{color:currentColor;font-size:8px;font-weight:900;letter-spacing:.19em;line-height:1}
+.day-num strong{color:#f4f8ff;font-size:18px;font-weight:900;line-height:1;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.day-copy{min-width:0;padding-top:3px}
+.day-copy small{display:flex;align-items:center;justify-content:space-between;gap:7px;margin:0 0 8px;color:var(--mission-accent);font-size:8px;font-weight:900;letter-spacing:.16em;line-height:1.3;text-transform:uppercase}
+.mission-glyph{display:inline-grid;flex:0 0 27px;width:27px;height:27px;place-items:center;border:1px solid color-mix(in srgb,var(--mission-accent) 26%,transparent);border-radius:9px;background:color-mix(in srgb,var(--mission-accent) 9%,transparent);color:var(--mission-accent);font-size:17px;letter-spacing:0;box-shadow:0 0 16px color-mix(in srgb,var(--mission-accent) 10%,transparent)}
+.day-copy h3{margin:0 0 8px;color:#f2f7ff;font-size:16px;line-height:1.28;letter-spacing:-.035em}
+.day-copy p{max-width:50ch;color:#aebed2;font-size:11px;line-height:1.7}
+.day-copy .hint{display:inline-block;max-width:100%;margin-top:10px;padding:6px 9px;border:1px solid color-mix(in srgb,var(--mission-accent) 21%,transparent);border-radius:9px;background:color-mix(in srgb,var(--mission-accent) 6%,transparent);color:#b0f1de;font-size:9px;line-height:1.5}
+.check{width:26px;height:26px;margin:0;border:1px solid rgba(163,190,216,.46);border-radius:8px;background:rgba(5,13,26,.84);cursor:pointer;box-shadow:inset 0 1px 2px rgba(0,0,0,.25);transition:transform .17s,border-color .17s,background .17s,box-shadow .17s}
+.check:hover{transform:scale(1.08);border-color:var(--mission-accent)}
+.check:focus-visible{outline:3px solid color-mix(in srgb,var(--mission-accent) 38%,transparent);outline-offset:3px}
+.check:checked{border-color:var(--world-mint);background:linear-gradient(145deg,#a5ffdc,#5ddfbd);box-shadow:0 0 20px rgba(94,238,193,.24)}
+.check:checked:after{font-size:16px}
+.day.done{border-color:rgba(130,255,209,.5);background:radial-gradient(ellipse at 100% 0%,rgba(130,255,209,.14),transparent 50%),linear-gradient(145deg,rgba(19,54,51,.93),rgba(9,24,34,.98))}
+.day.done .day-num{border-color:rgba(130,255,209,.48);background:rgba(94,229,185,.13);color:var(--world-mint)}
+.day.done .day-copy small{color:var(--world-mint)}
+.days>.day:last-child:nth-child(3n+1){grid-column:2}
+.note{margin-top:18px;padding:15px 17px;border-color:rgba(255,212,124,.17);border-radius:14px;background:linear-gradient(110deg,rgba(255,212,124,.055),rgba(255,212,124,.02));color:#c5c4bb;font-size:10px}
+.bottom{gap:16px;margin:26px 0 60px}
+.bottom-card{position:relative;overflow:hidden;padding:25px;border-color:rgba(127,174,212,.17);border-radius:20px;background:linear-gradient(145deg,rgba(17,30,50,.92),rgba(10,18,33,.94))}
+.bottom-card h3{font-size:18px;letter-spacing:-.035em}
+.bottom-card p{color:#aabbd0;font-size:12px;line-height:1.75}
+.footer{color:#758ca7}.footer a{color:#b7c9db}
+@media(max-width:1100px){.hero{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:26px}.days{grid-template-columns:repeat(2,minmax(0,1fr))}.days>.day:last-child:nth-child(3n+1){grid-column:auto}.days>.day:last-child:nth-child(odd){grid-column:1/-1;width:min(100%,calc(50% - 8px));justify-self:center}}
+@media(max-width:900px){.wrap{width:min(100% - 40px,760px)}.hero{grid-template-columns:1fr;gap:28px;padding:44px 0 54px}.hero-copy{max-width:690px}.hero-stage{width:100%;max-width:760px;min-height:390px;justify-self:center}.hero-copy h1{max-width:none}#challenge .section-head{align-items:flex-start}#challenge .section-head>p{max-width:260px}}
+@media(max-width:650px){.wrap{width:min(100% - 28px,560px)}.top{height:70px;gap:12px}.main-nav{gap:17px}.main-nav a{font-size:10px}.main-nav a:first-child{display:none}.top-cta{min-height:37px;padding:0 12px;font-size:10px}.hero{padding:35px 0 43px;gap:24px}.hero-copy h1{margin:17px 0 15px;font-size:clamp(46px,11vw,64px)}.hero-copy .lead{font-size:13px;line-height:1.75}.hero-proof{margin-top:18px}.hero-stage{min-height:325px;aspect-ratio:1.18/1;border-radius:21px}.player-tag{top:12px;left:12px;padding:8px 10px}.player-tag>span:nth-child(2){font-size:7px}.player-tag strong{font-size:9px}.companion-note{top:12px;right:12px;padding:8px 10px;font-size:8px}.companion-spark{font-size:16px}.hero-hud{right:12px;bottom:12px;width:min(235px,72%);padding:12px}.hud-heading{font-size:7px}.hud-foot{margin-top:9px}.hud-side-note{font-size:6px}.scene-caption{bottom:16px;left:13px;max-width:42%;font-size:6px;line-height:1.5}#challenge .section-head{display:block}#challenge .section-head h2{font-size:29px}#challenge .section-head>p{max-width:none;margin-top:9px}.progress-panel{padding:16px}.days{grid-template-columns:1fr;gap:12px}.days>.day:last-child:nth-child(odd){grid-column:auto;width:auto;justify-self:stretch}.day{min-height:0;padding:17px}.day-copy h3{font-size:16px}.bottom{grid-template-columns:1fr;margin-bottom:42px}.bottom-card{padding:20px}}
+@media(max-width:390px){.top{gap:8px}.brand{gap:8px;font-size:12px}.mark{width:32px;height:32px}.main-nav{gap:12px}.main-nav a{font-size:9px}.top-cta{padding:0 9px}.actions .btn{min-height:44px;padding:0 13px;font-size:10px}.hero-stage{min-height:290px}.hero-hud{width:74%}.day{grid-template-columns:50px minmax(0,1fr) 27px;gap:11px;padding:14px}.day-num{width:50px;height:58px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.day,.check,.hud-track i{transition:none!important}.day:hover,.check:hover{transform:none}}
+
 </style>
 </head>
 <body>
-<header class="wrap top"><a class="brand" href="/" aria-label="PLAYFORGE home"><span class="mark">P</span><span>PLAYFORGE</span></a><span class="top-note">A small challenge. A real-life level up.</span><a class="btn secondary" href="/" style="min-height:36px;padding:0 12px">Open app ↗</a></header>
+<header class="wrap top">
+  <a class="brand" href="/" aria-label="PLAYFORGE home"><span class="mark">P</span><span>PLAYFORGE</span></a>
+  <nav class="main-nav" aria-label="Main navigation">
+    <a href="/">Home</a><a class="active" href="#challenge" aria-current="page">Challenge</a><a href="#how-it-works">How it works</a>
+  </nav>
+  <a class="btn top-cta" href="/">Open app <span aria-hidden="true">↗</span></a>
+</header>
 <main class="wrap">
-<section class="hero"><div><div class="eyebrow"><span class="pulse"></span> FREE · 7 DAYS · YOUR PACE</div><h1>Seven days.<br><span>One level up.</span></h1><p class="lead">A simple reset for your routines. Pick one small action each day, keep track of what you complete, and discover what actually fits your life. No perfect streaks. No pressure to do everything.</p><div class="actions"><a class="btn primary" href="#challenge">Start the 7-day challenge ↓</a><button class="btn secondary" id="shareTop" type="button">Share challenge ↗</button></div></div>
-<div class="hero-art" aria-label="PLAYFORGE level progress illustration"><div class="art-label">YOUR ROUTINE, YOUR RULES</div><div class="orbit"></div><div class="orbit two"></div><div class="float">DAILY QUEST <b>+1</b></div><div class="level"><div><strong>LEVEL UP</strong><small>SMALL WINS ADD UP</small><div class="xp"><i></i></div></div><span style="font-size:11px;color:#b5d8d8">DAY 01 / 07</span></div></div></section>
-<section id="challenge"><div class="section-head"><div><div class="eyebrow" style="margin-bottom:9px">THE SEVEN-DAY RUN</div><h2>Make a little progress each day.</h2></div><p>Complete the action, then tick the day.<br>Miss one? Pick up whenever you're ready.</p></div>
+<section class="hero hero-world">
+  <div class="hero-copy">
+    <div class="eyebrow"><span class="pulse"></span> FREE · 7 DAYS · YOUR PACE</div>
+    <h1>Seven days.<br><span>One level up.</span></h1>
+    <p class="lead">Build a routine that fits real life. Pick one small action each day, notice what helps, and keep the changes that work. No perfect streaks. No pressure to do everything.</p>
+    <div class="actions">
+      <a class="btn primary" href="#challenge"><span aria-hidden="true">▶</span> Start the 7-day run <span aria-hidden="true">→</span></a>
+      <button class="btn secondary" id="shareTop" type="button"><span aria-hidden="true">↗</span> Share your run</button>
+    </div>
+    <div class="hero-proof"><span><i></i> 7 simple actions</span><span><i></i> Your pace, always</span></div>
+  </div>
+  <div class="hero-stage">
+    <img class="scene-image" src="/challenge/player-scene.webp" alt="A PLAYFORGE player companion and floating robot overlooking a glowing city at sunset" fetchpriority="high">
+    <div class="scene-vignette" aria-hidden="true"></div>
+    <div class="player-tag"><span class="player-tag-dot"></span><span>YOUR PLAYER COMPANION</span><strong>ROOK <b>·</b> LVL 01</strong></div>
+    <div class="companion-note"><span class="companion-spark">✦</span><span>One small win<br>at a time.</span></div>
+    <div class="hero-hud" aria-live="polite">
+      <div class="hud-heading"><span>YOUR CHALLENGE</span><strong id="heroDayCount">0 / 7</strong></div>
+      <div class="hud-track" id="heroProgress" role="progressbar" aria-label="Days completed" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"><i id="heroProgressFill"></i></div>
+      <div class="hud-foot"><span class="hud-orb" aria-hidden="true">✦</span><strong id="heroProgressLabel">0 days cleared</strong><span class="hud-side-note">KEEP GOING</span></div>
+    </div>
+    <div class="scene-caption">THE 7-DAY LEVEL UP <span>·</span> START WHERE YOU ARE</div>
+  </div>
+</section>
+<section id="challenge"><div class="section-head"><div><div class="eyebrow" style="margin-bottom:9px">THE SEVEN-DAY RUN</div><h2>Your next <span>7 small wins.</span></h2></div><p>Seven simple actions. No pressure.<br>Miss a day? Pick up whenever you’re ready.</p></div>
 <div class="progress-panel" aria-live="polite"><div class="progress-row"><strong>Your challenge progress</strong><span id="progressText">0 of 7 complete</span></div><div class="track" role="progressbar" aria-label="Challenge progress" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0" id="progressTrack"><i id="progressFill"></i></div></div>
 <div class="days" id="days">
-<article class="day"><div class="day-num"><span>DAY</span><strong>01</strong></div><div class="day-copy"><small>Choose your focus</small><h3>Pick one thing that matters.</h3><p>Choose a routine or personal goal you want to make easier. Write down the smallest version you could realistically do today.</p><p class="hint">Try: read two pages, tidy one corner, or take a short walk.</p></div><input class="check" type="checkbox" aria-label="Mark day 1 complete" data-day="0"></article>
-<article class="day"><div class="day-num"><span>DAY</span><strong>02</strong></div><div class="day-copy"><small>Make it repeatable</small><h3>Give your goal a tiny time slot.</h3><p>Attach your action to something already in your day: after breakfast, before a study session, or when you get home.</p><p class="hint">Keep it small enough to repeat.</p></div><input class="check" type="checkbox" aria-label="Mark day 2 complete" data-day="1"></article>
-<article class="day"><div class="day-num"><span>DAY</span><strong>03</strong></div><div class="day-copy"><small>Move in a way that fits</small><h3>Make room for movement.</h3><p>Try a comfortable walk, stretch, sport, or workout that suits your ability and energy. Rest is also a valid choice.</p><p class="hint">Stop if something feels painful or wrong.</p></div><input class="check" type="checkbox" aria-label="Mark day 3 complete" data-day="2"></article>
-<article class="day"><div class="day-num"><span>DAY</span><strong>04</strong></div><div class="day-copy"><small>Reset your environment</small><h3>Make the next good choice easier.</h3><p>Prepare one thing that supports your routine: keep your book visible, set out comfortable clothes, or clear your workspace.</p><p class="hint">A helpful setup beats relying on motivation.</p></div><input class="check" type="checkbox" aria-label="Mark day 4 complete" data-day="3"></article>
-<article class="day"><div class="day-num"><span>DAY</span><strong>05</strong></div><div class="day-copy"><small>Repeat, don't escalate</small><h3>Do your small action again.</h3><p>Repeat the version that felt manageable. You do not need to add more time, more reps, or more tasks to make progress count.</p><p class="hint">Consistency can start very small.</p></div><input class="check" type="checkbox" aria-label="Mark day 5 complete" data-day="4"></article>
-<article class="day"><div class="day-num"><span>DAY</span><strong>06</strong></div><div class="day-copy"><small>Notice what helps</small><h3>Spot one thing that made it easier.</h3><p>Think about your energy, timing, environment, or the way you broke the task down. Keep the one change that helped most.</p><p class="hint">Adapt the plan to real life.</p></div><input class="check" type="checkbox" aria-label="Mark day 6 complete" data-day="5"></article>
-<article class="day"><div class="day-num"><span>DAY</span><strong>07</strong></div><div class="day-copy"><small>Reflect and choose</small><h3>Keep one thing for next week.</h3><p>What felt useful? What felt unrealistic? Choose one small action to carry forward, and let the rest go.</p><p class="hint">Progress is information, not a test.</p></div><input class="check" type="checkbox" aria-label="Mark day 7 complete" data-day="6"></article>
+<article class="day"><div class="day-num"><span>DAY</span><strong>01</strong></div><div class="day-copy"><small>Choose your focus<span class="mission-glyph" aria-hidden="true">◎</span></small><h3>Pick one thing that matters.</h3><p>Choose a routine or personal goal you want to make easier. Write down the smallest version you could realistically do today.</p><p class="hint">Try: read two pages, tidy one corner, or take a short walk.</p></div><input class="check" type="checkbox" aria-label="Mark day 1 complete" data-day="0"></article>
+<article class="day"><div class="day-num"><span>DAY</span><strong>02</strong></div><div class="day-copy"><small>Make it repeatable<span class="mission-glyph" aria-hidden="true">◷</span></small><h3>Give your goal a tiny time slot.</h3><p>Attach your action to something already in your day: after breakfast, before a study session, or when you get home.</p><p class="hint">Keep it small enough to repeat.</p></div><input class="check" type="checkbox" aria-label="Mark day 2 complete" data-day="1"></article>
+<article class="day"><div class="day-num"><span>DAY</span><strong>03</strong></div><div class="day-copy"><small>Move in a way that fits<span class="mission-glyph" aria-hidden="true">↗</span></small><h3>Make room for movement.</h3><p>Try a comfortable walk, stretch, sport, or workout that suits your ability and energy. Rest is also a valid choice.</p><p class="hint">Stop if something feels painful or wrong.</p></div><input class="check" type="checkbox" aria-label="Mark day 3 complete" data-day="2"></article>
+<article class="day"><div class="day-num"><span>DAY</span><strong>04</strong></div><div class="day-copy"><small>Reset your environment<span class="mission-glyph" aria-hidden="true">✦</span></small><h3>Make the next good choice easier.</h3><p>Prepare one thing that supports your routine: keep your book visible, set out comfortable clothes, or clear your workspace.</p><p class="hint">A helpful setup beats relying on motivation.</p></div><input class="check" type="checkbox" aria-label="Mark day 4 complete" data-day="3"></article>
+<article class="day"><div class="day-num"><span>DAY</span><strong>05</strong></div><div class="day-copy"><small>Repeat, don't escalate<span class="mission-glyph" aria-hidden="true">⟳</span></small><h3>Do your small action again.</h3><p>Repeat the version that felt manageable. You do not need to add more time, more reps, or more tasks to make progress count.</p><p class="hint">Consistency can start very small.</p></div><input class="check" type="checkbox" aria-label="Mark day 5 complete" data-day="4"></article>
+<article class="day"><div class="day-num"><span>DAY</span><strong>06</strong></div><div class="day-copy"><small>Notice what helps<span class="mission-glyph" aria-hidden="true">▥</span></small><h3>Spot one thing that made it easier.</h3><p>Think about your energy, timing, environment, or the way you broke the task down. Keep the one change that helped most.</p><p class="hint">Adapt the plan to real life.</p></div><input class="check" type="checkbox" aria-label="Mark day 6 complete" data-day="5"></article>
+<article class="day"><div class="day-num"><span>DAY</span><strong>07</strong></div><div class="day-copy"><small>Reflect and choose<span class="mission-glyph" aria-hidden="true">⚑</span></small><h3>Keep one thing for next week.</h3><p>What felt useful? What felt unrealistic? Choose one small action to carry forward, and let the rest go.</p><p class="hint">Progress is information, not a test.</p></div><input class="check" type="checkbox" aria-label="Mark day 7 complete" data-day="6"></article>
 </div>
-<p class="note">Your checklist is saved only in this browser on this device. It is not connected to your PLAYFORGE account and this page does not collect your email. Use the PLAYFORGE app to build and track your own quests and workouts. Adjust every activity to your needs; this challenge is general motivation, not a medical or personalised training plan.</p></section>
-<section class="bottom"><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">WANT A PLAYER PROFILE?</div><h3>Bring your routine into PLAYFORGE.</h3><p>Build daily quests, track workouts and meals, and see your progress over time. Create an account to keep your app progress with you across devices.</p><a class="btn primary" href="/">Open PLAYFORGE ↗</a></div><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">DO IT WITH A FRIEND</div><h3>Make the challenge easier to start.</h3><p>Share the same seven-day plan with someone you know. You can compare notes without competing or sharing personal data.</p><button class="btn secondary" id="copyInvite" type="button">Copy invite text</button><p id="shareStatus" role="status" style="margin-top:10px;color:#82ffd1;min-height:16px"></p></div></section>
+<p class="note" id="privacy">Your checklist is saved only in this browser on this device. It is not connected to your PLAYFORGE account and this page does not collect your email. Use the PLAYFORGE app to build and track your own quests and workouts. Adjust every activity to your needs; this challenge is general motivation, not a medical or personalised training plan.</p></section>
+<section class="bottom" id="how-it-works"><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">WANT A PLAYER PROFILE?</div><h3>Bring your routine into PLAYFORGE.</h3><p>Build daily quests, track workouts and meals, and see your progress over time. Create an account to keep your app progress with you across devices.</p><a class="btn primary" href="/">Open PLAYFORGE ↗</a></div><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">DO IT WITH A FRIEND</div><h3>Make the challenge easier to start.</h3><p>Share the same seven-day plan with someone you know. You can compare notes without competing or sharing personal data.</p><button class="btn secondary" id="copyInvite" type="button">Copy invite text</button><p id="shareStatus" role="status" style="margin-top:10px;color:#82ffd1;min-height:16px"></p></div></section>
 </main>
 <footer class="wrap footer"><span>© PLAYFORGE · Level up your real life.</span><span><a href="/">Open app</a> · <a href="https://playforge-fawn.vercel.app">Home</a></span></footer>
 <script>
 (() => {
-const key='playforge-seven-day-challenge-v1',checks=[...document.querySelectorAll('[data-day]')],fill=document.getElementById('progressFill'),progressText=document.getElementById('progressText'),track=document.getElementById('progressTrack'),status=document.getElementById('shareStatus');let saved=[];
-try{const parsed=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(parsed))saved=parsed.filter(n=>Number.isInteger(n)&&n>=0&&n<7)}catch{saved=[]}
-checks.forEach(input=>input.checked=saved.includes(Number(input.dataset.day)));
-const update=()=>{const completed=checks.filter(input=>input.checked).length;fill.style.width=(completed/7*100)+'%';progressText.textContent=completed+' of 7 complete';track.setAttribute('aria-valuenow',String(completed));checks.forEach(input=>input.closest('.day').classList.toggle('done',input.checked));try{localStorage.setItem(key,JSON.stringify(checks.filter(input=>input.checked).map(input=>Number(input.dataset.day))))}catch{}};
-checks.forEach(input=>input.addEventListener('change',update));update();
-const invite="I'm trying the free PLAYFORGE 7-Day Level Up: seven days of small, realistic actions to build a routine that fits real life. Join me: https://playforge-fawn.vercel.app/challenge/";
-const share=async()=>{const data={title:'The 7-Day Level Up — PLAYFORGE',text:invite,url:'https://playforge-fawn.vercel.app/challenge/'};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(invite);status.textContent='Invite copied. Paste it into your message.'}else{status.textContent=invite}}catch(error){if(error&&error.name!=='AbortError')status.textContent='Could not open sharing. Copy the page address instead.'}};
-document.getElementById('shareTop').addEventListener('click',share);
-document.getElementById('copyInvite').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(invite);status.textContent='Invite copied. Paste it into your message.'}catch{status.textContent=invite}});
+  const key = 'playforge-seven-day-challenge-v1';
+  const checks = [...document.querySelectorAll('[data-day]')];
+  const fill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  const track = document.getElementById('progressTrack');
+  const status = document.getElementById('shareStatus');
+  const heroDayCount = document.getElementById('heroDayCount');
+  const heroProgress = document.getElementById('heroProgress');
+  const heroProgressFill = document.getElementById('heroProgressFill');
+  const heroProgressLabel = document.getElementById('heroProgressLabel');
+  let saved = [];
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (Array.isArray(parsed)) saved = parsed.filter(n => Number.isInteger(n) && n >= 0 && n < 7);
+  } catch { saved = []; }
+  checks.forEach(input => input.checked = saved.includes(Number(input.dataset.day)));
+  const update = () => {
+    const completed = checks.filter(input => input.checked).length;
+    const percent = completed / 7 * 100;
+    fill.style.width = percent + '%';
+    progressText.textContent = completed + ' of 7 complete';
+    track.setAttribute('aria-valuenow', String(completed));
+    heroDayCount.textContent = completed + ' / 7';
+    heroProgressFill.style.width = percent + '%';
+    heroProgress.setAttribute('aria-valuenow', String(completed));
+    heroProgressLabel.textContent = completed + (completed === 1 ? ' day cleared' : ' days cleared');
+    checks.forEach(input => input.closest('.day').classList.toggle('done', input.checked));
+    try {
+      localStorage.setItem(key, JSON.stringify(checks.filter(input => input.checked).map(input => Number(input.dataset.day))));
+    } catch { /* Keep the checklist usable for this session. */ }
+  };
+  checks.forEach(input => input.addEventListener('change', update));
+  update();
+  const invite = "I'm trying the free PLAYFORGE 7-Day Level Up: seven days of small, realistic actions to build a routine that fits real life. Join me: https://playforge-fawn.vercel.app/challenge/";
+  const share = async () => {
+    const data = { title: 'The 7-Day Level Up — PLAYFORGE', text: invite, url: 'https://playforge-fawn.vercel.app/challenge/' };
+    try {
+      if (navigator.share) await navigator.share(data);
+      else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(invite);
+        status.textContent = 'Invite copied. Paste it into your message.';
+      } else status.textContent = invite;
+    } catch (error) {
+      if (error && error.name !== 'AbortError') status.textContent = 'Could not open sharing. Copy the page address instead.';
+    }
+  };
+  document.getElementById('shareTop').addEventListener('click', share);
+  document.getElementById('copyInvite').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(invite);
+      status.textContent = 'Invite copied. Paste it into your message.';
+    } catch { status.textContent = invite; }
+  });
 })();
 </script>
 </body></html>

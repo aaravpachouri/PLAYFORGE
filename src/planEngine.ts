@@ -258,6 +258,16 @@ const ADVANCED_VARIATIONS: Record<string, { name: string; target: string; direct
   'Wall plank': { name: 'Forearm plank', target: '15–20 sec', direction: 'Use the floor only if you can keep a steady body line and breathe normally; otherwise return to the wall.' },
 };
 
+function advancedVariationFor(exercise: typeof library[number]['exercises'][number], profile: TrainingProfile) {
+  if (profile.environment === 'gym' && exercise.name === 'Chair or bodyweight squats') {
+    return { name: 'Goblet squats', target: '8–10 reps', direction: 'Hold a light dumbbell close to your chest only if you know how to use it safely. A controlled bodyweight squat is always an option.' };
+  }
+  if (profile.environment === 'gym' && exercise.name === 'Backpack or cable rows') {
+    return { name: 'Seated cable rows', target: '8–12 reps', direction: 'Choose a light cable setting, keep your torso steady and pull without leaning back or jerking.' };
+  }
+  return ADVANCED_VARIATIONS[exercise.name];
+}
+
 function adjustedTargetForLevel(target: string, level: TrainingProfile['level']): string {
   if (level !== 'new') return target;
   const reps = target.match(REP_TARGET);
@@ -389,14 +399,16 @@ function buildSession(template: typeof library[number], date: string, generation
   const setCap = profile.ageBand === '13-17' ? 3 : profile.ageBand === '65+' ? 2 : 4;
   const exercises = template.exercises.map((exercise, index) => {
     const isMain = exercise.category === 'main';
-    const variation = profile.level === 'regular' && isMain ? ADVANCED_VARIATIONS[exercise.name] : undefined;
+    const variation = profile.level === 'regular' && isMain ? advancedVariationFor(exercise, profile) : undefined;
     const adapted = variation && profile.ageBand !== '65+'
       ? { ...exercise, ...variation }
       : exercise;
+    const repeatableTarget = REP_TARGET.test(adapted.target) || SECOND_TARGET.test(adapted.target);
+    const progressable = isMain && (exercise.sets > 1 || repeatableTarget);
     let sets = exercise.sets;
-    if (isMain && sets > 0) {
+    if (progressable) {
       if (profile.level === 'new') {
-        sets = Math.max(1, sets - (sets > 1 ? 1 : 0));
+        sets = Math.min(2, Math.max(1, sets - (sets > 1 ? 1 : 0)));
       } else if (profile.level === 'regular') {
         sets = Math.min(setCap, sets + 1);
       }

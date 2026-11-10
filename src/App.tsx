@@ -1283,9 +1283,15 @@ function NutritionStation({ profile, meals, waterGlasses, preferences, plan, isG
   useEffect(() => { if (plan && !plan.days.some(day => day.date === selectedDate)) setSelectedDate(plan.days[0]?.date || todayKey()); }, [plan, selectedDate]);
   const selectedDay = plan?.days.find(day => day.date === selectedDate) || plan?.days[0];
   const selectedDayIsToday = selectedDay?.date === todayKey();
-  const recentMealSuggestions = Array.from(new Map(
-    [...meals].reverse().map(entry => [entry.name.trim().toLocaleLowerCase(), entry]),
-  ).values()).slice(0, 3);
+  const recentMealSuggestions = (() => {
+    const seen = new Set<string>();
+    return [...meals].reverse().filter(entry => {
+      const key = entry.name.trim().toLocaleLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 3);
+  })();
   const planEndDate = plan?.days[plan.days.length - 1]?.date;
   const planExpired = Boolean(planEndDate && planEndDate < todayKey());
   const slotMeals = meals.filter(meal => meal.slot === slot);

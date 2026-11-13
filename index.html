@@ -23,6 +23,36 @@
 
     <title>PLAYFORGE | Gamified Fitness, Habits & Daily Challenges</title>
 
+    <style>
+      .dailylaunch-badge {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 10000;
+        display: block;
+        width: 150px;
+        line-height: 0;
+        opacity: 0.94;
+        transition: opacity 160ms ease, transform 160ms ease;
+      }
+      .dailylaunch-badge:hover {
+        opacity: 1;
+        transform: translateY(-2px);
+      }
+      .dailylaunch-badge img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      @media (max-width: 600px) {
+        .dailylaunch-badge {
+          right: 12px;
+          bottom: 12px;
+          width: 126px;
+        }
+      }
+    </style>
+
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="PLAYFORGE" />
     <meta property="og:url" content="https://playforge-fawn.vercel.app/" />
@@ -71,6 +101,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <a
+      class="dailylaunch-badge"
+      href="https://dailylaunch.io/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Featured on DailyLaunch"
+    >
+      <img src="https://dailylaunch.io/badge/dark.svg?v=a6cc2b9b" alt="Featured on DailyLaunch" width="200" height="54" />
+    </a>
     <noscript>
       <main>
         <h1>PLAYFORGE — Gamified Fitness, Habits and Daily Challenges</h1>

@@ -30,7 +30,8 @@ const challengeFooter = $('challengeFooter');
 const challengeAccountBar = $('challengeAccountBar');
 const challengeUserEmail = $('challengeUserEmail');
 const challengeSignOut = $('challengeSignOut') as HTMLButtonElement;
-const challengeStatus = $('challengeStatus');
+const challengeStatus = $('challengeStatusMessage');
+const challengeStatusContainer = $('challengeStatus');
 const challengeRetry = $('challengeRetry') as HTMLButtonElement;
 const legacyImport = $('legacyImport');
 const legacyAccountEmail = $('legacyAccountEmail');
@@ -51,6 +52,7 @@ let authMode: AuthMode = 'signin';
 let recoveryMode = false;
 let activeUserId: string | null = null;
 let challengeReady = false;
+let loadingUserId: string | null = null;
 let loadVersion = 0;
 
 function setAuthFeedback(message: string, isError = false) {
@@ -61,8 +63,8 @@ function setAuthFeedback(message: string, isError = false) {
 
 function setChallengeStatus(message: string, isError = false) {
   challengeStatus.textContent = message;
-  challengeStatus.hidden = !message;
-  challengeStatus.classList.toggle('is-error', isError);
+  challengeStatusContainer.hidden = !message;
+  challengeStatusContainer.classList.toggle('is-error', isError);
   challengeRetry.hidden = !isError;
 }
 
@@ -96,6 +98,8 @@ function showSignedOut() {
   loadVersion += 1;
   activeUserId = null;
   challengeReady = false;
+  loadingUserId = null;
+  setChallengeStatus('');
   authLoading.hidden = true;
   authGate.hidden = false;
   challengeContent.hidden = true;
@@ -146,7 +150,10 @@ function applyDays(days: number[]) {
 
 async function loadChallengeForUser(userId: string, version: number) {
   if (!supabase) return;
-  setChallengeStatus('Loading your saved challenge days…');
+  authLoading.hidden = false;
+  challengeContent.hidden = true;
+  challengeFooter.hidden = true;
+  setChallengeStatus('');
 
   const { data, error } = await supabase
     .from('challenge_day_completions')
@@ -155,6 +162,8 @@ async function loadChallengeForUser(userId: string, version: number) {
 
   if (version !== loadVersion || activeUserId !== userId) return;
   if (error) {
+    authLoading.hidden = true;
+    challengeAccountBar.hidden = false;
     dayInputs.forEach((input) => { input.disabled = true; });
     setChallengeStatus('We could not load your saved challenge progress. Check your connection and retry.', true);
     return;
@@ -167,11 +176,10 @@ async function loadChallengeForUser(userId: string, version: number) {
   challengeContent.hidden = false;
   challengeFooter.hidden = false;
   challengeAccountBar.hidden = false;
-  challengeUserEmail.textContent = $('challengeUserEmail').textContent || '';
   setChallengeStatus('');
 
   if (legacyDays.length) {
-    legacyAccountEmail.textContent = $('challengeUserEmail').textContent || 'this account';
+    legacyAccountEmail.textContent = challengeUserEmail.textContent || 'this account';
     legacyImport.hidden = false;
   } else {
     legacyImport.hidden = true;
@@ -201,10 +209,11 @@ async function handleSession(session: Session | null) {
     return;
   }
 
-  if (activeUserId === userId && challengeReady) return;
+  if (activeUserId === userId && (challengeReady || loadingUserId === userId)) return;
 
   activeUserId = userId;
   challengeReady = false;
+  loadingUserId = userId;
   const version = ++loadVersion;
   authLoading.hidden = false;
   authGate.hidden = true;
@@ -212,6 +221,7 @@ async function handleSession(session: Session | null) {
   challengeFooter.hidden = true;
   challengeAccountBar.hidden = true;
   await loadChallengeForUser(userId, version);
+  if (version === loadVersion) loadingUserId = null;
 }
 
 async function submitAuth(event: SubmitEvent) {
@@ -394,7 +404,11 @@ authModeToggle.addEventListener('click', () => {
 authForgotPassword.addEventListener('click', () => void requestPasswordReset());
 challengeSignOut.addEventListener('click', () => void signOut());
 challengeRetry.addEventListener('click', () => {
-  if (activeUserId) void loadChallengeForUser(activeUserId, ++loadVersion);
+  if (activeUserId) {
+    challengeReady = false;
+    loadingUserId = activeUserId;
+    void loadChallengeForUser(activeUserId, ++loadVersion).finally(() => { loadingUserId = null; });
+  }
 });
 legacyImportButton.addEventListener('click', () => void importLegacyProgress());
 legacyDiscardButton.addEventListener('click', discardLegacyProgress);

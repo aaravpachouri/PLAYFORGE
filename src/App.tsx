@@ -922,7 +922,84 @@ function CoachNexus({ profile, messages, isSending, error, aiHealth, includePers
 
 function BrandLockup() { return <div className="brand onboarding-brand"><div className="brand-mark"><Gamepad2 size={22} strokeWidth={2.4}/><span/></div><div><div className="brand-name">PLAYFORGE<span>®</span></div><div className="brand-caption">YOUR LIFE. LEVELED UP.</div></div></div>; }
 function Onboarding({ value, onChange, onSubmit, onDemo }: { value: Profile; onChange: (p: Profile) => void; onSubmit: () => void; onDemo: () => void }) {
-  return <div className="onboarding-shell"><div className="onboarding-bg-orb orb-one"/><div className="onboarding-bg-orb orb-two"/><header className="onboarding-header"><BrandLockup/><div className="onboarding-label"><span className="live-dot"/> YOUR PERSONAL QUEST SYSTEM</div></header><div className="onboarding-grid"><section className="onboarding-story"><div className="eyebrow"><Sparkles size={14}/> SMALL STEPS. BIG WORLDS.</div><h1>Your life is the<br/><span>game.</span></h1><p>Turn everyday movement and tiny habits into progress. Build a plan around your real life, discover your patterns, and unlock your next level.</p><div className="feature-pills"><span><Target size={14}/> Adaptive quests</span><span><HeartPulse size={14}/> Habit intelligence</span><span><Trophy size={14}/> Real progress</span></div><div className="orbit-card"><div className="orbit-sun"><Zap size={25} fill="currentColor"/></div><div className="orbit-ring ring-a"/><div className="orbit-ring ring-b"/><div className="orbit-card-copy"><span>YOUR NEXT MISSION</span><strong>Progress, not perfection.</strong><small>Every move counts. Your pace, your game.</small></div><div className="orbit-tiny t1"><Footprints size={15}/></div><div className="orbit-tiny t2"><Heart size={14}/></div><div className="orbit-tiny t3"><Trophy size={15}/></div></div><div className="onboarding-footnote"><ShieldCheck size={14}/> Your data stays in this browser. No account needed.</div></section><section className="setup-card"><div className="setup-heading"><div><span className="step-label">START YOUR JOURNEY · 01/01</span><h2>Build your player profile</h2><p>A few quick choices help shape your first quests.</p></div><div className="setup-icon"><UserRound size={20}/></div></div><div className="form-stack"><div className="field"><label>WHAT SHOULD WE CALL YOU?</label><input value={value.name} onChange={e => onChange({...value, name:e.target.value})} placeholder="Your first name" maxLength={24}/></div><div className="field"><label>AGE GROUP</label><div className="segmented three">{(['13-17','18-64','65+'] as AgeBand[]).map(x=><button key={x} className={value.ageBand===x?'selected':''} onClick={()=>onChange({...value,ageBand:x})}>{x==='13-17'?'13–17':x==='18-64'?'18–64':'65+'}</button>)}</div><small className="field-hint">Used for age-relevant context, not clinical advice.</small></div><div className="field"><label>YOUR MAIN QUEST</label><div className="choice-grid">{([{id:'consistency',label:'Build consistency',icon:Flame},{id:'strength',label:'Build strength',icon:Dumbbell},{id:'energy',label:'More energy',icon:Sun},{id:'mobility',label:'Move with ease',icon:Waves}] as {id:Goal;label:string;icon:typeof Activity}[]).map(x=><button key={x.id} className={`choice-tile ${value.goal===x.id?'selected':''}`} onClick={()=>onChange({...value,goal:x.id})}><x.icon size={17}/><span>{x.label}</span>{value.goal===x.id&&<Check size={14} className="choice-check"/>}</button>)}</div></div><div className="field"><label>WHERE WILL YOU MOVE?</label><div className="select-wrap"><select value={value.environment} onChange={e=>onChange({...value,environment:e.target.value as Environment})}><option value="mixed">A mix — home, gym & outdoors</option><option value="home">Mostly at home</option><option value="gym">Mostly at a gym</option><option value="outdoor">Mostly outdoors</option></select><ChevronDown size={16}/></div></div><div className="field"><label>YOUR STARTING POINT</label><div className="stacked-options">{([{id:'new',label:'Just starting',desc:'Keep it simple and build up gently.'},{id:'returning',label:'Getting back into it',desc:'I have experience, but need a rhythm.'},{id:'regular',label:'Active most weeks',desc:'Help me stay consistent and progress.'}] as {id:Level;label:string;desc:string}[]).map(x=><button key={x.id} className={`level-option ${value.level===x.id?'selected':''}`} onClick={()=>onChange({...value,level:x.id})}><span className="radio-dot"/><span><strong>{x.label}</strong><small>{x.desc}</small></span></button>)}</div></div><div className="field"><div className="field-row"><label>TIME FOR A QUEST</label><strong>{value.minutes} minutes</strong></div><input className="range-input" type="range" min={5} max={60} step={5} value={value.minutes} onChange={e=>onChange({...value,minutes:Number(e.target.value)})}/><div className="range-labels"><span>5 min · Easy start</span><span>60 min · Longer session</span></div></div><button className="btn-primary full-width" onClick={onSubmit}>Create my world <ArrowRight size={17}/></button><button className="demo-link" onClick={onDemo}>Explore with sample data <ArrowRight size={13}/></button><div className="privacy-note"><LockKeyhole size={13}/> No sign-up. Your entries stay on this device.</div></div></section></div><div className="onboarding-bottom"><span>© PLAYFORGE · PERSONAL WELLNESS EXPERIMENT</span><span>A wellness prototype. Choose movement that fits your comfort and needs.</span></div></div>;
+  const goalLabel = goalNames[value.goal];
+  const levelLabel = levelNames[value.level];
+  const environmentLabel = environmentNames[value.environment];
+  return <div className="onboarding-shell onboarding-refresh">
+    <div className="onboarding-bg-orb orb-one"/>
+    <div className="onboarding-bg-orb orb-two"/>
+    <header className="onboarding-header">
+      <BrandLockup/>
+      <div className="onboarding-label"><span className="live-dot"/> YOUR PERSONAL QUEST SYSTEM</div>
+    </header>
+    <main className="onboarding-refresh-layout">
+      <section className="onboarding-intro">
+        <div className="onboarding-intro-kicker"><Sparkles size={14}/> A WORLD THAT ADAPTS TO YOU</div>
+        <h1>Make progress<br/>feel like <span>play.</span></h1>
+        <p className="onboarding-intro-copy">A few details help PLAYFORGE shape quests, movement ideas and daily habits around your actual life — not somebody else’s routine.</p>
+        <div className="onboarding-benefit-list">
+          <div><span className="onboarding-benefit-icon"><Compass size={17}/></span><span><strong>A clearer next step</strong><small>Get a starting point that fits your goal and experience.</small></span></div>
+          <div><span className="onboarding-benefit-icon purple"><Sparkles size={17}/></span><span><strong>Quests that fit your day</strong><small>Suggestions shaped around the time and setting you choose.</small></span></div>
+          <div><span className="onboarding-benefit-icon gold"><TrendingUp size={17}/></span><span><strong>Progress you can understand</strong><small>Notice your patterns without streak pressure or perfection.</small></span></div>
+        </div>
+        <div className="onboarding-preview-card">
+          <div className="onboarding-preview-top"><span><i/> YOUR PLAYER BLUEPRINT</span><small>LIVE PREVIEW</small></div>
+          <div className="onboarding-preview-name"><span className="onboarding-avatar"><UserRound size={19}/></span><div><strong>{value.name.trim() || 'Your player'}</strong><small>Your next chapter starts here</small></div></div>
+          <div className="onboarding-preview-stats">
+            <div><small>MAIN QUEST</small><strong>{goalLabel}</strong></div>
+            <div><small>YOUR PACE</small><strong>{levelLabel}</strong></div>
+            <div><small>TIME BUDGET</small><strong>{value.minutes} min / day</strong></div>
+          </div>
+          <div className="onboarding-preview-foot"><ShieldCheck size={13}/> Your choices guide your recommendations. You stay in control.</div>
+        </div>
+        <div className="onboarding-footnote"><LockKeyhole size={13}/> No sign-up required to get started. Your entries stay on this device.</div>
+      </section>
+      <section className="setup-card onboarding-form-card">
+        <div className="setup-heading onboarding-form-heading">
+          <div><span className="step-label">YOUR STARTING POINT · 01 / 01</span><h2>Let’s build your player profile</h2><p>There are no wrong answers. You can change these any time.</p></div>
+          <div className="setup-icon"><UserRound size={20}/></div>
+        </div>
+        <div className="onboarding-form-intro"><span className="onboarding-form-intro-icon"><Wand2 size={15}/></span><span><strong>Make it yours</strong><small>Each choice helps tune the experience you’ll see next.</small></span></div>
+        <div className="form-stack onboarding-form-stack">
+          <div className="field onboarding-field">
+            <label>01 · WHAT SHOULD WE CALL YOU?</label>
+            <input value={value.name} onChange={e => onChange({...value, name:e.target.value})} placeholder="Your first name" maxLength={24}/>
+            <small className="field-hint">Just a name for your player profile.</small>
+          </div>
+          <div className="field onboarding-field">
+            <label>02 · YOUR AGE GROUP</label>
+            <div className="segmented three">{(['13-17','18-64','65+'] as AgeBand[]).map(x=><button key={x} className={value.ageBand===x?'selected':''} onClick={()=>onChange({...value,ageBand:x})}>{x==='13-17'?'13–17':x==='18-64'?'18–64':'65+'}</button>)}</div>
+            <small className="field-hint">Helps keep suggestions age-aware and relevant.</small>
+          </div>
+          <div className="field onboarding-field">
+            <label>03 · WHAT WOULD YOU LIKE TO WORK TOWARDS?</label>
+            <div className="choice-grid">{([{id:'consistency',label:'Build consistency',icon:Flame,desc:'Find a rhythm that lasts'},{id:'strength',label:'Build strength',icon:Dumbbell,desc:'Feel stronger over time'},{id:'energy',label:'More energy',icon:Sun,desc:'Support your everyday energy'},{id:'mobility',label:'Move with ease',icon:Waves,desc:'Make movement feel easier'}] as {id:Goal;label:string;icon:typeof Activity;desc:string}[]).map(x=><button key={x.id} className={`choice-tile onboarding-choice-tile ${value.goal===x.id?'selected':''}`} onClick={()=>onChange({...value,goal:x.id})}><x.icon size={18}/><span><strong>{x.label}</strong><small>{x.desc}</small></span>{value.goal===x.id&&<Check size={14} className="choice-check"/>}</button>)}</div>
+          </div>
+          <div className="field onboarding-field">
+            <label>04 · WHERE DO YOU PREFER TO MOVE?</label>
+            <div className="select-wrap"><select value={value.environment} onChange={e=>onChange({...value,environment:e.target.value as Environment})}><option value="mixed">A mix — home, gym & outdoors</option><option value="home">Mostly at home</option><option value="gym">Mostly at a gym</option><option value="outdoor">Mostly outdoors</option></select><ChevronDown size={16}/></div>
+            <small className="field-hint">We’ll keep your setting in mind when shaping ideas.</small>
+          </div>
+          <div className="field onboarding-field">
+            <label>05 · WHERE ARE YOU STARTING FROM?</label>
+            <div className="stacked-options">{([{id:'new',label:'Just starting',desc:'Keep it simple and build up gently.'},{id:'returning',label:'Getting back into it',desc:'I have experience, but need a rhythm.'},{id:'regular',label:'Active most weeks',desc:'Help me stay consistent and progress.'}] as {id:Level;label:string;desc:string}[]).map(x=><button key={x.id} className={`level-option ${value.level===x.id?'selected':''}`} onClick={()=>onChange({...value,level:x.id})}><span className="radio-dot"/><span><strong>{x.label}</strong><small>{x.desc}</small></span><ChevronRight size={15} className="onboarding-level-arrow"/></button>)}</div>
+          </div>
+          <div className="field onboarding-field onboarding-time-field">
+            <div className="field-row"><label>06 · HOW MUCH TIME FEELS REALISTIC?</label><strong>{value.minutes} minutes</strong></div>
+            <input className="range-input" type="range" min={5} max={60} step={5} value={value.minutes} onChange={e=>onChange({...value,minutes:Number(e.target.value)})}/>
+            <div className="range-labels"><span>5 min · Quick start</span><span>60 min · More room</span></div>
+            <small className="field-hint">A realistic time budget helps keep your first suggestions manageable.</small>
+          </div>
+          <div className="onboarding-submit-area">
+            <button className="btn-primary full-width onboarding-submit" onClick={onSubmit}>Build my personal quest world <ArrowRight size={17}/></button>
+            <p>Your profile is a starting point, not a permanent setting.</p>
+            <button className="demo-link" onClick={onDemo}>Take a look around with sample data <ArrowRight size={13}/></button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div className="onboarding-bottom"><span>© PLAYFORGE · YOUR JOURNEY, YOUR PACE</span><span>Personalised suggestions, with you in control.</span></div>
+  </div>;
 }
 
 function PageHeading({ kicker, title, subtitle, action }: { kicker: string; title: ReactNode; subtitle: string; action?: ReactNode }) {

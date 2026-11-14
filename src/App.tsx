@@ -707,7 +707,7 @@ function App() {
       </header>
       {stored.demo && <div className="demo-banner"><Info size={15}/><span><strong>Demo mode</strong> — activity history is illustrative. Your edits stay on this device.</span><button onClick={() => setShowReset(true)}>Exit demo <ArrowRight size={13}/></button></div>}
       <AnimatePresence mode="wait" initial={false}><motion.div key={tab} className="tab-transition" initial={prefersReducedMotion?false:{opacity:0,y:14,filter:'blur(5px)'}} animate={{opacity:1,y:0,filter:'blur(0px)'}} exit={prefersReducedMotion?undefined:{opacity:0,y:-8,filter:'blur(4px)'}} transition={{duration:prefersReducedMotion?0:.26,ease:'easeOut'}}>
-        {tab === 'overview' && <Overview profile={profile} xp={xp} level={level} xpThisLevel={xpThisLevel} streak={streak} weekMinutes={weekMinutes} weekSessions={weekSessions} activeDays={activeDays} quests={quests} questsLoading={questsLoading} log={log} weekLogs={weekLogs} onToggleQuest={toggleQuest} onGo={setTab} onCoach={() => setCoachOpen(true)} />}
+        {tab === 'overview' && <Overview profile={profile} hasStarted={Object.values(stored.logs).some(day => day.activities.length > 0 || day.doneQuests.length > 0 || Object.values(day.habits).some(Boolean))} xp={xp} level={level} xpThisLevel={xpThisLevel} streak={streak} weekMinutes={weekMinutes} weekSessions={weekSessions} activeDays={activeDays} quests={quests} questsLoading={questsLoading} log={log} weekLogs={weekLogs} onToggleQuest={toggleQuest} onGo={setTab} onCoach={() => setCoachOpen(true)} />}
         {tab === 'quests' && <QuestBoard quests={quests} log={log} onToggle={toggleQuest} onGoTraining={() => setTab('training')} questSource={questSource} questLoading={questsLoading} />}
         {tab === 'training' && <TrainingArena profile={profile} log={log} weekLogs={weekLogs} program={stored.trainingProgram || { startDate: todayKey(), generation: 0 }} onRegenerate={regenerateTrainingOptions} onFinish={logTrainingSession} onGoHabits={() => setTab('habits')} />}
         {tab === 'nutrition' && <NutritionStation profile={profile} meals={log.meals || []} waterGlasses={log.waterGlasses} preferences={stored.nutritionPreferences} plan={stored.nutritionPlan} isGenerating={nutritionPlanLoading} planError={nutritionPlanError} onGeneratePlan={generateNutritionPlan} onUpdatePlan={updateNutritionPlan} onLogMeal={logMeal} onRemoveMeal={removeMeal} onWaterChange={count => updateToday({ waterGlasses: Math.max(0, Math.min(20, count)) })} onAskCoach={() => setTab('coach')} />}
@@ -922,7 +922,7 @@ function PageHeading({ kicker, title, subtitle, action }: { kicker: string; titl
     </div>
   </>;
 }
-function Overview({ profile, xp, level, xpThisLevel, streak, weekMinutes, weekSessions, activeDays, quests, questsLoading, log, weekLogs, onToggleQuest, onGo, onCoach }: { profile: Profile; xp: number; level: number; xpThisLevel: number; streak: number; weekMinutes: number; weekSessions: number; activeDays: number; quests: any[]; questsLoading: boolean; log: DayLog; weekLogs: DayLog[]; onToggleQuest: (id:string)=>void; onGo:(tab:Tab)=>void; onCoach:()=>void }) {
+function Overview({ profile, hasStarted, xp, level, xpThisLevel, streak, weekMinutes, weekSessions, activeDays, quests, questsLoading, log, weekLogs, onToggleQuest, onGo, onCoach }: { profile: Profile; hasStarted: boolean; xp: number; level: number; xpThisLevel: number; streak: number; weekMinutes: number; weekSessions: number; activeDays: number; quests: any[]; questsLoading: boolean; log: DayLog; weekLogs: DayLog[]; onToggleQuest: (id:string)=>void; onGo:(tab:Tab)=>void; onCoach:()=>void }) {
   const done = quests.filter(q=>log.doneQuests.includes(q.id)).length;
   const maxBar = Math.max(25,...weekLogs.map(d=>d.activities.reduce((s,a)=>s+a.minutes,0)));
   const [showXpInfo,setShowXpInfo]=useState(false);
@@ -938,6 +938,20 @@ function Overview({ profile, xp, level, xpThisLevel, streak, weekMinutes, weekSe
     {name:'Coach Nexus',kicker:'AI COACH',copy:'Plans, meals and recovery in one place',tab:'coach' as Tab,tone:'violet',icon:Bot},
   ];
   const selectedRealm=realms.find(r=>r.name===activeRealm) || realms[1];
+  if (!hasStarted) return <div className="page-content playforge-home">
+    <div className="home-topline"><div className="home-welcome"><div className="eyebrow home-eyebrow"><span className="live-pulse"/> YOUR WORLD IS READY <span className="eyebrow-divider"/> FIRST SESSION</div><h1>Welcome, <span className="gradient-text">{profile.name}.</span></h1><p>No need to explore everything yet. Start with one small quest and discover PLAYFORGE as you go.</p></div></div>
+    <section className="panel" style={{maxWidth:760,margin:'18px auto 0',padding:'clamp(24px,5vw,44px)',borderRadius:24,background:'linear-gradient(135deg,rgba(139,92,246,.16),rgba(18,17,31,.96) 58%)',border:'1px solid rgba(167,139,250,.3)',boxShadow:'0 24px 70px rgba(0,0,0,.2)'}}>
+      <div className="panel-kicker" style={{color:'#b9a5ff'}}>YOUR FIRST MISSION · 01</div>
+      <div style={{display:'flex',alignItems:'center',gap:14,margin:'18px 0'}}><span style={{width:52,height:52,display:'grid',placeItems:'center',borderRadius:16,background:'rgba(167,139,250,.16)',color:'#c4b5fd'}}><Compass size={25}/></span><div><h2 style={{fontSize:'clamp(24px,4vw,34px)',margin:0}}>Start with one quest.</h2><p style={{margin:'7px 0 0',color:'#b9b4ca'}}>Pick a short, achievable challenge for today. You can change or skip it at any time.</p></div></div>
+      <button className="btn-primary" style={{width:'100%',justifyContent:'center',padding:16,fontSize:15}} onClick={()=>onGo('quests')}><Play size={16} fill="currentColor"/> Start my first quest <ArrowRight size={16}/></button>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:12,marginTop:24}}>
+        <div style={{padding:14,borderRadius:14,background:'rgba(255,255,255,.035)'}}><strong style={{display:'block',fontSize:13,color:'#eee9ff'}}>1. Choose</strong><small style={{color:'#aaa4bd'}}>Find one mission that feels manageable.</small></div>
+        <div style={{padding:14,borderRadius:14,background:'rgba(255,255,255,.035)'}}><strong style={{display:'block',fontSize:13,color:'#eee9ff'}}>2. Complete</strong><small style={{color:'#aaa4bd'}}>Do it at your own pace and record your progress.</small></div>
+        <div style={{padding:14,borderRadius:14,background:'rgba(255,255,255,.035)'}}><strong style={{display:'block',fontSize:13,color:'#eee9ff'}}>3. Explore</strong><small style={{color:'#aaa4bd'}}>Your full player hub opens after your first action.</small></div>
+      </div>
+      <p style={{fontSize:11,color:'#918ba4',margin:'20px 0 0',textAlign:'center'}}>One small step is enough to begin. No streak pressure and no perfect routine required.</p>
+    </section>
+  </div>;
   const smallWins=[
     {title:'First spark',text:'Log your first activity',ok:weekSessions>0,icon:Zap},
     {title:'Quest runner',text:'Clear 3 quests',ok:quests.filter(q=>log.doneQuests.includes(q.id)).length>=3,icon:Compass},

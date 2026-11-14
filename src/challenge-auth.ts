@@ -357,7 +357,9 @@ async function saveDay(input: HTMLInputElement) {
       setChallengeStatus(error instanceof Error ? error.message : 'Could not save that challenge day. Please try again.', true);
     }
   } finally {
-    input.disabled = false;
+    // A save started under the previous account must not re-enable controls
+    // after the session has changed or the user has signed out.
+    input.disabled = activeUserId !== userId;
   }
 }
 

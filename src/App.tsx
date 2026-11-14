@@ -445,7 +445,20 @@ function App() {
     });
   };
   const saveProfile = (p: Profile) => {
-    setStored(prev => ({ ...prev, profile: { ...p, name: p.name.trim() || 'Player' }, onboardingDone: true }));
+    setStored(prev => {
+      const currentToday: DayLog = { ...emptyLog(today), ...(prev.logs[today] || {}), meals: prev.logs[today]?.meals || [] };
+      return {
+        ...prev,
+        profile: { ...p, name: p.name.trim() || 'Player' },
+        onboardingDone: true,
+        // Completing player setup is the app's sign-in moment. Mark the check-in
+        // reflection as complete once for this day; never overwrite an existing choice.
+        logs: {
+          ...prev.logs,
+          [today]: { ...currentToday, habits: { ...currentToday.habits, reflection: true } },
+        },
+      };
+    });
     setProfileDraft(p); setSettingsDraft(null); setTab('overview'); setNotice('Your personal quest system is ready.');
   };
   const logTrainingSession = (minutes: number, intensity: 'easy' | 'moderate' | 'vigorous', type: ActivityType = 'Strength') => {

@@ -30,7 +30,30 @@ The signup flow explicitly returns the confirmation link to the current app orig
 - Saves are debounced and uploaded after changes. The app retains a local working copy while signed in.
 - Current cloud save size is capped at 1 MiB per player.
 
+## Challenge UI shared account
+
+The standalone page at `/challenge/` uses the same Supabase project URL, publishable key, and default browser Auth storage as PLAYFORGE. Because both experiences are served from the same origin, a user who is already signed in to PLAYFORGE is recognised by the Challenge UI without another login. Signing in or creating an account in the Challenge also creates the same Auth session used by the main app. Email confirmation remains a one-time requirement for a newly created account; it is not repeated per experience.
+
+Challenge completion records are stored only in `public.challenge_day_completions`, keyed by the same Auth `user_id`. PLAYFORGE progress remains in `public.player_data`. Separate tables and per-user RLS policies keep the experiences' data independent.
+
+Run `supabase/migrations/002_challenge_day_completions.sql` in the same Supabase project if the challenge completion table or its RLS policies are not already present. Never expose a service-role key in the Challenge page.
+
+The Challenge page uses the same `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` Vercel environment variables as the main app. Preview deployments should use the same Supabase project and have the appropriate preview redirect URLs configured.
+
+Existing anonymous Challenge checkboxes are offered as a one-time import after sign-in. They are not silently assigned to an account. Signing out from the Challenge signs out the shared browser session from PLAYFORGE too.
+
 ## Acceptance checks before production
+
+1. Sign in to PLAYFORGE, open `/challenge/` in the same browser, and verify the Challenge opens without another sign-in.
+2. Complete one Challenge day; verify it appears in `challenge_day_completions` for that Auth user and does not modify `player_data`.
+3. Sign out from the Challenge; verify PLAYFORGE now shows its signed-out state.
+4. Create a new account from the Challenge, complete email confirmation once, then open PLAYFORGE and verify the same account is signed in.
+5. Create a second test user and verify they cannot read, insert or delete the first user's Challenge days.
+6. Open the same account on a second browser/device and verify Challenge progress persists.
+7. Test password reset, email confirmation, mobile layout, and legacy checklist import/discard.
+8. Run `npm test` and `npm run build`.
+
+Do not merge this branch or replace the production deployment until all acceptance checks pass.
 
 1. Create Player A, import or create progress, complete a quest and verify the row updates.
 2. Sign in as Player A on a second browser/device; verify the same progress appears.

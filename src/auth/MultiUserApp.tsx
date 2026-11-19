@@ -15,7 +15,11 @@ type SyncState = 'loading' | 'ready' | 'syncing' | 'error';
 function AuthShell() {
   const [session, setSession] = useState<Session | null>(null);
   const [booting, setBooting] = useState(true);
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup'>(() => (window.location.hash === '#signup' ? 'signup' : 'signin'));
+  const [showIntro, setShowIntro] = useState(() => {
+    const q = new URLSearchParams(window.location.search);
+    return !(q.has('signin') || q.has('auth') || window.location.hash === '#signin' || window.location.hash === '#signup');
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -230,6 +234,22 @@ function AuthShell() {
   if (booting) return <div style={screen}><div style={panel}><Brand/><p>Loading your secure player profile…</p></div></div>;
 
   if (recoveryMode && session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>ACCOUNT RECOVERY</div><h1>Set a new password.</h1><p>Choose a new password for your PLAYFORGE player account.</p><form onSubmit={saveNewPassword} style={{display:'grid',gap:12}}><label style={label}>NEW PASSWORD<input style={field} type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy?'Saving…':'Update password'}</button></form>{error&&<p style={danger}>{error}</p>}{message&&<p style={success}>{message}</p>}</div></div>;
+
+  if (!session && !recoveryMode && showIntro) {
+    const go = (m: 'signin' | 'signup') => { setMode(m); setError(''); setMessage(''); setShowIntro(false); };
+    const card: React.CSSProperties = { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: 18 };
+    return <div style={{ ...screen, alignItems: 'flex-start', overflowY: 'auto' }}><main style={{ width: 'min(760px, 100%)', margin: '0 auto', padding: '28px 0 120px', display: 'grid', gap: 22 }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}><Brand/><button type="button" style={linkButton} onClick={() => go('signin')}>Sign in</button></header>
+      <section><div style={eyebrow}>FREE · GAME-INSPIRED SELF-IMPROVEMENT</div><h1 style={{ fontSize: 'clamp(30px, 6vw, 48px)', lineHeight: 1.1, margin: '8px 0 12px' }}>Turn your goals into quests.</h1><p style={{ fontSize: 18, lineHeight: 1.5 }}>PLAYFORGE helps you build habits, track workouts and daily activity, complete challenges and see your progress, so showing up feels like a game you want to keep playing.</p><div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 16 }}><button type="button" style={primary} onClick={() => go('signup')}>Create your first quest</button><button type="button" style={{ ...primary, background: 'transparent', border: '1px solid rgba(255,255,255,0.3)' }} onClick={() => go('signin')}>I already have an account</button></div></section>
+      <section style={card}><div style={eyebrow}>EXAMPLE QUEST (ILLUSTRATIVE)</div><h2 style={{ margin: '6px 0' }}>Read for 10 minutes</h2><p style={{ margin: 0 }}>Pick a goal, break it into a small quest, finish it today and log it. Small wins add up over days.</p></section>
+      <section style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+        <div style={card}><strong>Quests and XP</strong><p>Complete missions and earn XP from what you log.</p></div>
+        <div style={card}><strong>Habits and workouts</strong><p>Check in daily, log movement and follow training sessions.</p></div>
+        <div style={card}><strong>Progress</strong><p>See your own saved activity over time.</p></div>
+      </section>
+      <section><button type="button" style={primary} onClick={() => go('signup')}>Create your first quest</button><p style={{ color: '#9294a7', fontSize: 14 }}>PLAYFORGE is a self-reported wellness prototype, not a medical device.</p></section>
+    </main></div>;
+  }
 
   if (!session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>YOUR PROGRESS. YOUR ACCOUNT.</div><h1>{mode === 'signin' ? 'Welcome back, player.' : 'Create your player account.'}</h1><p>Sign in on any laptop to continue with the same quests, XP and progress.</p><form onSubmit={submitAuth} style={{ display: 'grid', gap: 12 }}><label style={label}>EMAIL<input style={field} type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label style={label}>PASSWORD<input style={field} type="password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button></form>{mode==='signin'&&<button type="button" style={linkButton} disabled={busy} onClick={()=>void requestPasswordReset()}>Forgot your password?</button>}{message&&<p style={success}>{message}</p>}{error&&<p style={danger}>{error}</p>}<button style={linkButton} onClick={()=>{setMode(mode==='signin'?'signup':'signin');setError('');setMessage('');}}>{mode==='signin'?'New to PLAYFORGE? Create an account':'Already have an account? Sign in'}</button><small style={{color:'#9294a7'}}>Your data is private to your account. Never share your password.</small></div></div>;
 

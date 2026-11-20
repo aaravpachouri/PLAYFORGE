@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { createClient, type Session } from '@supabase/supabase-js';
 import App from '../App';
+import { Flame, Swords, TrendingUp } from 'lucide-react';
 
 const STORAGE_KEY = 'playforge.v1';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL?.trim() || '';
@@ -12,6 +13,94 @@ const supabase = SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY
   : null;
 
 type SyncState = 'loading' | 'ready' | 'syncing' | 'error';
+
+function pfStars(count: number, seed: number): string {
+  let s = seed;
+  const rand = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  const shadows: string[] = [];
+  for (let i = 0; i < count; i++) {
+    shadows.push(`${(rand() * 100).toFixed(2)}vw ${(rand() * 100).toFixed(2)}vh 0 0px rgba(255,255,255,${(0.3 + rand() * 0.55).toFixed(2)})`);
+  }
+  return shadows.join(',');
+}
+const INTRO_STARS_A = pfStars(110, 123457);
+const INTRO_STARS_B = pfStars(60, 987653);
+const INTRO_CSS = `
+body{position:relative}
+.dailylaunch-badge{position:absolute;right:24px;bottom:24px}
+.pf-intro{position:relative;min-height:100vh;background:#07060d;color:#f7f5ff;font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
+.pf-sky{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 50% -10%,#2a1b52 0%,#150f2b 42%,#07060d 78%)}
+.pf-orb{position:absolute;border-radius:50%;filter:blur(70px)}
+.pf-orb-a{width:52vw;height:52vw;min-width:420px;min-height:420px;left:-12%;top:-16%;background:radial-gradient(circle at 35% 35%,rgba(139,92,246,.5),rgba(76,29,149,0) 70%);animation:pf-drift-a 22s ease-in-out infinite alternate}
+.pf-orb-b{width:44vw;height:44vw;min-width:360px;min-height:360px;right:-10%;bottom:-14%;background:radial-gradient(circle at 60% 40%,rgba(56,189,248,.32),rgba(14,116,144,0) 70%);animation:pf-drift-b 27s ease-in-out infinite alternate}
+.pf-stars{position:absolute;top:0;left:0;width:2px;height:2px;border-radius:50%;background:transparent}
+.pf-stars-a{box-shadow:${INTRO_STARS_A};animation:pf-twinkle 4.5s ease-in-out infinite}
+.pf-stars-b{box-shadow:${INTRO_STARS_B};width:1px;height:1px;animation:pf-twinkle 6.5s ease-in-out infinite 1.2s}
+.pf-grain{position:absolute;inset:0;opacity:.06;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.pf-vignette{position:absolute;inset:0;background:radial-gradient(120% 100% at 50% 40%,transparent 55%,rgba(3,2,8,.75) 100%)}
+.pf-wrap{position:relative;z-index:1;width:min(1120px,100%);margin:0 auto;padding:0 24px;box-sizing:border-box}
+.pf-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:26px}
+.pf-brand{white-space:nowrap}
+.pf-hero{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:72px 0 64px;min-height:min(78vh,820px)}
+.pf-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:10px;letter-spacing:.22em;color:#c4b5fd;font-weight:800;padding:8px 14px;border:1px solid rgba(196,181,253,.25);border-radius:999px;background:rgba(139,92,246,.08)}
+.pf-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;box-shadow:0 0 10px 2px rgba(167,139,250,.8);animation:pf-pulse-glow 3.2s ease-in-out infinite}
+.pf-title{font-size:clamp(40px,7vw,74px);line-height:1.02;letter-spacing:-.02em;font-weight:900;margin:20px 0 18px;background:linear-gradient(115deg,#fff 25%,#d9ccff 55%,#8b5cf6 95%);-webkit-background-clip:text;background-clip:text;color:transparent;text-wrap:balance}
+.pf-sub{font-size:17px;line-height:1.6;color:#b9b4cc;max-width:46ch;margin:0}
+.pf-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+.pf-primary{padding:16px 26px;border:0;border-radius:14px;background:linear-gradient(110deg,#8b5cf6,#6d48d8,#8b5cf6);background-size:220% 220%;color:#fff;font-weight:800;font-size:15px;letter-spacing:.02em;cursor:pointer;box-shadow:0 12px 44px rgba(139,92,246,.45),inset 0 1px 0 rgba(255,255,255,.25);animation:pf-sheen 7s ease-in-out infinite;transition:transform .18s ease,box-shadow .18s ease}
+.pf-primary:hover{transform:translateY(-2px);box-shadow:0 18px 54px rgba(139,92,246,.6),inset 0 1px 0 rgba(255,255,255,.25)}
+.pf-ghost{white-space:nowrap;padding:12px 20px;border:1px solid rgba(196,181,253,.3);border-radius:12px;background:rgba(19,16,32,.5);backdrop-filter:blur(8px);color:#d8ceff;font-weight:700;font-size:14px;cursor:pointer;transition:border-color .18s ease,background .18s ease}
+.pf-ghost:hover{border-color:rgba(196,181,253,.6);background:rgba(139,92,246,.14)}
+.pf-ghost-lg{padding:16px 22px;font-size:15px}
+.pf-stage{position:relative;display:grid;place-items:center;min-height:340px}
+.pf-card-glow{position:absolute;width:78%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.38),rgba(139,92,246,0) 65%);filter:blur(30px);animation:pf-pulse-glow 5s ease-in-out infinite}
+.pf-card-float{animation:pf-float 8s ease-in-out infinite}
+.pf-quest{position:relative;width:min(380px,100%);padding:24px;border-radius:22px;background:linear-gradient(160deg,rgba(32,26,54,.85),rgba(16,13,28,.9));border:1px solid rgba(167,139,250,.3);box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.12),0 0 60px rgba(139,92,246,.18);backdrop-filter:blur(16px);transform:rotate(-2.5deg);box-sizing:border-box}
+.pf-quest-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pf-quest-tag{font-size:9px;letter-spacing:.18em;font-weight:800;color:#a78bfa;padding:5px 10px;border-radius:999px;border:1px solid rgba(167,139,250,.35);background:rgba(139,92,246,.12)}
+.pf-quest-xp{font-size:11px;font-weight:900;color:#fbbf24;text-shadow:0 0 14px rgba(251,191,36,.6)}
+.pf-quest-title{font-size:24px;margin:14px 0 8px;letter-spacing:-.01em}
+.pf-quest-sub{font-size:13.5px;line-height:1.55;color:#a8a3bd;margin:0 0 18px}
+.pf-bar{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;position:relative}
+.pf-bar-fill{height:100%;width:64%;border-radius:999px;background:linear-gradient(90deg,#6d48d8,#a78bfa,#e9d5ff);position:relative;overflow:hidden}
+.pf-bar-shimmer{position:absolute;top:0;bottom:0;width:34%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:pf-shimmer 3.4s ease-in-out infinite}
+.pf-bar-meta{display:flex;justify-content:space-between;margin-top:10px;font-size:9.5px;letter-spacing:.14em;font-weight:800;color:#8f8aa5}
+.pf-features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:8px 0 0}
+.pf-feature{padding:22px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.pf-feature:hover{transform:translateY(-4px);border-color:rgba(167,139,250,.4);background:rgba(139,92,246,.09)}
+.pf-feature strong{display:block;font-size:15px;margin:14px 0 6px}
+.pf-feature p{margin:0;font-size:13.5px;line-height:1.5;color:#a8a3bd}
+.pf-icon{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:12px;color:#e9d5ff;background:linear-gradient(140deg,rgba(139,92,246,.5),rgba(109,72,216,.25));border:1px solid rgba(167,139,250,.4);box-shadow:0 6px 20px rgba(139,92,246,.3)}
+.pf-final{display:grid;justify-items:center;gap:14px;padding:56px 0 150px;text-align:center}
+.pf-fine{color:#8f8aa5;font-size:13px;margin:0}
+.pf-e1{animation:pf-rise .7s .05s cubic-bezier(.2,.7,.3,1) both}
+.pf-e2{animation:pf-rise .7s .15s cubic-bezier(.2,.7,.3,1) both}
+.pf-e3{animation:pf-rise .8s .25s cubic-bezier(.2,.7,.3,1) both}
+.pf-e4{animation:pf-rise .8s .4s cubic-bezier(.2,.7,.3,1) both}
+.pf-e5{animation:pf-rise .8s .52s cubic-bezier(.2,.7,.3,1) both}
+.pf-e6{animation:pf-rise .8s .64s cubic-bezier(.2,.7,.3,1) both}
+@keyframes pf-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pf-twinkle{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes pf-drift-a{0%{transform:translate3d(-6%,-4%,0) scale(1)}100%{transform:translate3d(5%,6%,0) scale(1.12)}}
+@keyframes pf-drift-b{0%{transform:translate3d(4%,5%,0) scale(1.05)}100%{transform:translate3d(-5%,-6%,0) scale(1)}}
+@keyframes pf-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pf-sheen{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes pf-shimmer{from{transform:translateX(-120%)}to{transform:translateX(320%)}}
+@keyframes pf-pulse-glow{0%,100%{opacity:.55}50%{opacity:.9}}
+@media (max-width:880px){
+.pf-brand{font-size:11px!important;letter-spacing:.14em!important}
+.pf-eyebrow{font-size:9px;letter-spacing:.15em;padding:7px 12px}
+.pf-top{padding-top:20px}
+.pf-hero{grid-template-columns:1fr;gap:44px;padding:56px 0 48px;min-height:0}
+.pf-stage{min-height:0}
+.pf-features{grid-template-columns:1fr}
+.pf-title{font-size:clamp(38px,11vw,54px)}
+}
+@media (prefers-reduced-motion:reduce){
+.pf-intro *,.pf-intro *::before,.pf-intro *::after{animation:none!important;transition:none!important}
+}
+`;
+
 function AuthShell() {
   const [session, setSession] = useState<Session | null>(null);
   const [booting, setBooting] = useState(true);
@@ -237,18 +326,55 @@ function AuthShell() {
 
   if (!session && !recoveryMode && showIntro) {
     const go = (m: 'signin' | 'signup') => { setMode(m); setError(''); setMessage(''); setShowIntro(false); };
-    const card: React.CSSProperties = { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: 18 };
-    return <div style={{ ...screen, alignItems: 'flex-start', overflowY: 'auto' }}><main style={{ width: 'min(760px, 100%)', margin: '0 auto', padding: '28px 0 120px', display: 'grid', gap: 22 }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}><Brand/><button type="button" style={linkButton} onClick={() => go('signin')}>Sign in</button></header>
-      <section><div style={eyebrow}>FREE · GAME-INSPIRED SELF-IMPROVEMENT</div><h1 style={{ fontSize: 'clamp(30px, 6vw, 48px)', lineHeight: 1.1, margin: '8px 0 12px' }}>Turn your goals into quests.</h1><p style={{ fontSize: 18, lineHeight: 1.5 }}>PLAYFORGE helps you build habits, track workouts and daily activity, complete challenges and see your progress, so showing up feels like a game you want to keep playing.</p><div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 16 }}><button type="button" style={primary} onClick={() => go('signup')}>Create your first quest</button><button type="button" style={{ ...primary, background: 'transparent', border: '1px solid rgba(255,255,255,0.3)' }} onClick={() => go('signin')}>I already have an account</button></div></section>
-      <section style={card}><div style={eyebrow}>EXAMPLE QUEST (ILLUSTRATIVE)</div><h2 style={{ margin: '6px 0' }}>Read for 10 minutes</h2><p style={{ margin: 0 }}>Pick a goal, break it into a small quest, finish it today and log it. Small wins add up over days.</p></section>
-      <section style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-        <div style={card}><strong>Quests and XP</strong><p>Complete missions and earn XP from what you log.</p></div>
-        <div style={card}><strong>Habits and workouts</strong><p>Check in daily, log movement and follow training sessions.</p></div>
-        <div style={card}><strong>Progress</strong><p>See your own saved activity over time.</p></div>
-      </section>
-      <section><button type="button" style={primary} onClick={() => go('signup')}>Create your first quest</button><p style={{ color: '#9294a7', fontSize: 14 }}>PLAYFORGE is a self-reported wellness prototype, not a medical device.</p></section>
-    </main></div>;
+    return <div className="pf-intro">
+      <style>{INTRO_CSS}</style>
+      <div className="pf-sky" aria-hidden="true">
+        <div className="pf-orb pf-orb-a" />
+        <div className="pf-orb pf-orb-b" />
+        <div className="pf-stars pf-stars-a" />
+        <div className="pf-stars pf-stars-b" />
+        <div className="pf-grain" />
+        <div className="pf-vignette" />
+      </div>
+      <main className="pf-wrap">
+        <header className="pf-top pf-e1">
+          <div className="pf-brand" style={{ fontSize: 13, fontWeight: 900, letterSpacing: '.24em', color: '#b9a5ff' }}>PLAYFORGE <span style={{ color: '#77758e' }}>/ PLAYER ID</span></div>
+          <button type="button" className="pf-ghost" onClick={() => go('signin')}>Sign in</button>
+        </header>
+        <section className="pf-hero">
+          <div className="pf-copy">
+            <div className="pf-eyebrow pf-e2"><span className="pf-eyebrow-dot" />FREE · GAME-INSPIRED SELF-IMPROVEMENT</div>
+            <h1 className="pf-title pf-e3">Turn your goals into quests.</h1>
+            <p className="pf-sub pf-e4">PLAYFORGE helps you build habits, track workouts and daily activity, complete challenges and see your progress, so showing up feels like a game you want to keep playing.</p>
+            <div className="pf-cta pf-e5">
+              <button type="button" className="pf-primary" onClick={() => go('signup')}>Create your first quest</button>
+              <button type="button" className="pf-ghost pf-ghost-lg" onClick={() => go('signin')}>I already have an account</button>
+            </div>
+          </div>
+          <div className="pf-stage pf-e4">
+            <div className="pf-card-glow" />
+            <div className="pf-card-float">
+              <div className="pf-quest">
+                <div className="pf-quest-top"><span className="pf-quest-tag">EXAMPLE QUEST · ILLUSTRATIVE</span><span className="pf-quest-xp">+XP</span></div>
+                <h2 className="pf-quest-title">Read for 10 minutes</h2>
+                <p className="pf-quest-sub">Pick a goal, break it into a small quest, finish it today and log it. Small wins add up over days.</p>
+                <div className="pf-bar"><div className="pf-bar-fill"><div className="pf-bar-shimmer" /></div></div>
+                <div className="pf-bar-meta"><span>XP PROGRESS · EXAMPLE</span><span>EARNED AS YOU LOG</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="pf-features pf-e6">
+          <div className="pf-feature"><span className="pf-icon"><Swords size={18} strokeWidth={2.2} /></span><strong>Quests and XP</strong><p>Complete missions and earn XP from what you log.</p></div>
+          <div className="pf-feature"><span className="pf-icon"><Flame size={18} strokeWidth={2.2} /></span><strong>Habits and workouts</strong><p>Check in daily, log movement and follow training sessions.</p></div>
+          <div className="pf-feature"><span className="pf-icon"><TrendingUp size={18} strokeWidth={2.2} /></span><strong>Progress</strong><p>See your own saved activity over time.</p></div>
+        </section>
+        <section className="pf-final pf-e6">
+          <button type="button" className="pf-primary" onClick={() => go('signup')}>Create your first quest</button>
+          <p className="pf-fine">PLAYFORGE is a self-reported wellness prototype, not a medical device.</p>
+        </section>
+      </main>
+    </div>;
   }
 
   if (!session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>YOUR PROGRESS. YOUR ACCOUNT.</div><h1>{mode === 'signin' ? 'Welcome back, player.' : 'Create your player account.'}</h1><p>Sign in on any laptop to continue with the same quests, XP and progress.</p><form onSubmit={submitAuth} style={{ display: 'grid', gap: 12 }}><label style={label}>EMAIL<input style={field} type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label style={label}>PASSWORD<input style={field} type="password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button></form>{mode==='signin'&&<button type="button" style={linkButton} disabled={busy} onClick={()=>void requestPasswordReset()}>Forgot your password?</button>}{message&&<p style={success}>{message}</p>}{error&&<p style={danger}>{error}</p>}<button style={linkButton} onClick={()=>{setMode(mode==='signin'?'signup':'signin');setError('');setMessage('');}}>{mode==='signin'?'New to PLAYFORGE? Create an account':'Already have an account? Sign in'}</button><small style={{color:'#9294a7'}}>Your data is private to your account. Never share your password.</small></div></div>;

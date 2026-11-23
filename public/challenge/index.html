@@ -823,7 +823,7 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
   <div class="auth-card">
     <div class="eyebrow"><span class="pulse"></span> ONE ACCOUNT · TWO EXPERIENCES</div>
     <h1 id="authTitle">Welcome back, player.</h1>
-    <p class="auth-description" id="authDescription">Use the same email and password you already use in PLAYFORGE.</p>
+    <p class="auth-description" id="authDescription">You can preview all seven days below without an account. Sign in only when you want to save your checklist.</p>
     <form id="challengeAuthForm" class="auth-form">
       <label class="auth-field" id="authEmailLabel"><span>EMAIL</span><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required></label>
       <label class="auth-field" id="authPasswordLabel"><span>PASSWORD</span><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required></label>
@@ -855,7 +855,7 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
   <span id="challengeStatusMessage"></span>
   <button class="btn secondary" id="challengeRetry" type="button" hidden>Try again</button>
 </div>
-<main class="wrap" id="challengeContent" hidden>
+<main class="wrap" id="challengeContent">
 <section class="hero hero-world">
   <div class="hero-copy">
     <div class="eyebrow"><span class="pulse"></span> FREE · 7 DAYS · YOUR PACE</div>
@@ -896,7 +896,7 @@ body{min-width:320px;background:radial-gradient(ellipse at 82% 9%,rgba(74,90,176
 <p class="note" id="privacy">Your 7-Day Challenge completions are saved to your PLAYFORGE account so you can continue on another device. Challenge records are stored separately from your quests, workouts and player profile. Only your account can access its own challenge progress. Adjust every activity to your needs; this challenge is general motivation, not a medical or personalised training plan.</p></section>
 <section class="bottom" id="how-it-works"><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">WANT A PLAYER PROFILE?</div><h3>Bring your routine into PLAYFORGE.</h3><p>Build daily quests, track workouts and meals, and see your progress over time. Create an account to keep your app progress with you across devices.</p><a class="btn primary" href="/">Open PLAYFORGE ↗</a></div><div class="bottom-card"><div class="eyebrow" style="margin-bottom:10px">DO IT WITH A FRIEND</div><h3>Make the challenge easier to start.</h3><p>Share the same seven-day plan with someone you know. You can compare notes without competing or sharing personal data.</p><button class="btn secondary" id="copyInvite" type="button">Copy invite text</button><p id="shareStatus" role="status" style="margin-top:10px;color:#82ffd1;min-height:16px"></p></div></section>
 </main>
-<footer class="wrap footer" id="challengeFooter" hidden><span>© PLAYFORGE · Level up your real life.</span><span><a href="/">Open app</a> · <a href="https://playforge-fawn.vercel.app">Home</a></span></footer>
+<footer class="wrap footer" id="challengeFooter"><span>© PLAYFORGE · Level up your real life.</span><span><a href="/">Open app</a> · <a href="https://playforge-fawn.vercel.app">Home</a></span></footer>
 <script type="module" src="/challenge-auth.js"></script>
 
 </body></html>

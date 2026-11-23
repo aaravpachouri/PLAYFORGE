@@ -350,8 +350,8 @@ function AuthShell() {
             <p className="pf-sub pf-e4">PLAYFORGE helps you build habits, track workouts and daily activity, complete challenges and see your progress, so showing up feels like a game you want to keep playing.</p>
             <div className="pf-cta pf-e5">
               <button type="button" className="pf-primary" onClick={() => go('signup')}>Create your first quest</button>
-              <p className="pf-account-note">Free account required to save your quests and XP across devices. Preview the example first.</p>
               <button type="button" className="pf-ghost pf-ghost-lg" onClick={() => go('signin')}>I already have an account</button>
+              <p className="pf-account-note">Free account required to save your quests and XP across devices. Preview the example first.</p>
             </div>
           </div>
           <div className="pf-stage pf-e4">

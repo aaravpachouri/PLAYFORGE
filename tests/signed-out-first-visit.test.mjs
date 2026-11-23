@@ -10,7 +10,7 @@ test('signed-out visitors can read all seven challenge days and How it works', (
   assert.match(challengeHtml, /<main class="wrap" id="challengeContent">(?! hidden)/);
   assert.match(challengeHtml, /id="challenge"/);
   assert.match(challengeHtml, /id="how-it-works"/);
-  for (let day = 0; day < 7; day += 1) assert.match(challengeHtml, new RegExp('data-day="' + day + '"'));
+  for (let day = 0; day < 7; day += 1) assert.match(challengeHtml, new RegExp('data-day="' + day + '" disabled'));
   assert.match(challengeAuth, /challengeContent\.hidden = false;/);
   assert.match(challengeAuth, /challengeFooter\.hidden = false;/);
 });

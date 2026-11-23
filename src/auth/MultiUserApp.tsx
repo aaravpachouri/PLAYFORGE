@@ -109,6 +109,7 @@ function AuthShell() {
     const q = new URLSearchParams(window.location.search);
     return !(q.has('signin') || q.has('auth') || window.location.hash === '#signin' || window.location.hash === '#signup');
   });
+  const [signupIntent, setSignupIntent] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -325,7 +326,7 @@ function AuthShell() {
   if (recoveryMode && session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>ACCOUNT RECOVERY</div><h1>Set a new password.</h1><p>Choose a new password for your PLAYFORGE player account.</p><form onSubmit={saveNewPassword} style={{display:'grid',gap:12}}><label style={label}>NEW PASSWORD<input style={field} type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy?'Saving…':'Update password'}</button></form>{error&&<p style={danger}>{error}</p>}{message&&<p style={success}>{message}</p>}</div></div>;
 
   if (!session && !recoveryMode && showIntro) {
-    const go = (m: 'signin' | 'signup') => { setMode(m); setError(''); setMessage(''); setShowIntro(false); };
+    const go = (m: 'signin' | 'signup') => { if (m === 'signup') setSignupIntent(true); setMode(m); setError(''); setMessage(''); setShowIntro(false); };
     return <div className="pf-intro">
       <style>{INTRO_CSS}</style>
       <div className="pf-sky" aria-hidden="true">
@@ -348,6 +349,7 @@ function AuthShell() {
             <p className="pf-sub pf-e4">PLAYFORGE helps you build habits, track workouts and daily activity, complete challenges and see your progress, so showing up feels like a game you want to keep playing.</p>
             <div className="pf-cta pf-e5">
               <button type="button" className="pf-primary" onClick={() => go('signup')}>Create your first quest</button>
+              <p className="pf-account-note">Free account required to save your quests and XP across devices. Preview the example first.</p>
               <button type="button" className="pf-ghost pf-ghost-lg" onClick={() => go('signin')}>I already have an account</button>
             </div>
           </div>
@@ -371,13 +373,14 @@ function AuthShell() {
         </section>
         <section className="pf-final pf-e6">
           <button type="button" className="pf-primary" onClick={() => go('signup')}>Create your first quest</button>
+              <p className="pf-account-note">Free account required to save your quests and XP across devices. Preview the example first.</p>
           <p className="pf-fine">PLAYFORGE is a self-reported wellness prototype, not a medical device.</p>
         </section>
       </main>
     </div>;
   }
 
-  if (!session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>YOUR PROGRESS. YOUR ACCOUNT.</div><h1>{mode === 'signin' ? 'Welcome back, player.' : 'Create your player account.'}</h1><p>Sign in on any laptop to continue with the same quests, XP and progress.</p><form onSubmit={submitAuth} style={{ display: 'grid', gap: 12 }}><label style={label}>EMAIL<input style={field} type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label style={label}>PASSWORD<input style={field} type="password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button></form>{mode==='signin'&&<button type="button" style={linkButton} disabled={busy} onClick={()=>void requestPasswordReset()}>Forgot your password?</button>}{message&&<p style={success}>{message}</p>}{error&&<p style={danger}>{error}</p>}<button style={linkButton} onClick={()=>{setMode(mode==='signin'?'signup':'signin');setError('');setMessage('');}}>{mode==='signin'?'New to PLAYFORGE? Create an account':'Already have an account? Sign in'}</button><small style={{color:'#9294a7'}}>Your data is private to your account. Never share your password.</small></div></div>;
+  if (!session) return <div style={screen}><div style={panel}><Brand/><div style={eyebrow}>YOUR PROGRESS. YOUR ACCOUNT.</div><h1>{mode === 'signin' ? 'Welcome back, player.' : 'Create your player account.'}</h1><p>{mode === 'signup' ? 'A free account lets you save quests, XP and progress across devices.' : 'Sign in to continue with the same quests, XP and progress.'}</p>{mode === 'signup' && signupIntent && <div style={{margin:'0 0 16px',padding:'14px 15px',border:'1px solid rgba(167,139,250,.28)',borderRadius:14,background:'linear-gradient(135deg,rgba(139,92,246,.12),rgba(56,189,248,.06))'}}><div style={{fontSize:10,fontWeight:800,letterSpacing:'.12em',color:'#b9a5ff'}}>YOUR FIRST QUEST · PREVIEW</div><strong style={{display:'block',marginTop:8,color:'#f4efff',fontSize:17}}>Read for 10 minutes</strong><p style={{margin:'5px 0 0',fontSize:12,color:'#b9b4cc',lineHeight:1.6}}>Choose a small goal, complete it at your pace, then log it to earn XP. This is an example—not a task assigned to you.</p></div>}<form onSubmit={submitAuth} style={{ display: 'grid', gap: 12 }}><label style={label}>EMAIL<input style={field} type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label style={label}>PASSWORD<input style={field} type="password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label><button style={primary} disabled={busy}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button></form>{mode==='signin'&&<button type="button" style={linkButton} disabled={busy} onClick={()=>void requestPasswordReset()}>Forgot your password?</button>}{message&&<p style={success}>{message}</p>}{error&&<p style={danger}>{error}</p>}<button style={linkButton} onClick={()=>{setMode(mode==='signin'?'signup':'signin');setError('');setMessage('');}}>{mode==='signin'?'New to PLAYFORGE? Create an account':'Already have an account? Sign in'}</button><button type="button" style={linkButton} disabled={busy} onClick={()=>{setShowIntro(true);setError('');setMessage('');}}>← Back to PLAYFORGE overview</button><small style={{color:'#9294a7'}}>Your data is private to your account. Never share your password.</small></div></div>;
 
   if (syncState === 'error' && !hydratedUser) return <div style={screen}><div style={panel}><Brand/><h1>Could not load cloud save</h1><p>{error}</p><button style={primary} onClick={()=>void hydrate(session)}>Retry</button><button style={linkButton} onClick={()=>void signOut()}>Sign out</button></div></div>;
 

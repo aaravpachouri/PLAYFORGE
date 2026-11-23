@@ -47,6 +47,7 @@ body{position:relative}
 .pf-title{font-size:clamp(40px,7vw,74px);line-height:1.02;letter-spacing:-.02em;font-weight:900;margin:20px 0 18px;background:linear-gradient(115deg,#fff 25%,#d9ccff 55%,#8b5cf6 95%);-webkit-background-clip:text;background-clip:text;color:transparent;text-wrap:balance}
 .pf-sub{font-size:17px;line-height:1.6;color:#b9b4cc;max-width:46ch;margin:0}
 .pf-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+.pf-account-note{flex-basis:100%;margin:0;color:#9e98b8;font-size:12px;line-height:1.6;max-width:52ch}
 .pf-primary{padding:16px 26px;border:0;border-radius:14px;background:linear-gradient(110deg,#8b5cf6,#6d48d8,#8b5cf6);background-size:220% 220%;color:#fff;font-weight:800;font-size:15px;letter-spacing:.02em;cursor:pointer;box-shadow:0 12px 44px rgba(139,92,246,.45),inset 0 1px 0 rgba(255,255,255,.25);animation:pf-sheen 7s ease-in-out infinite;transition:transform .18s ease,box-shadow .18s ease}
 .pf-primary:hover{transform:translateY(-2px);box-shadow:0 18px 54px rgba(139,92,246,.6),inset 0 1px 0 rgba(255,255,255,.25)}
 .pf-ghost{white-space:nowrap;padding:12px 20px;border:1px solid rgba(196,181,253,.3);border-radius:12px;background:rgba(19,16,32,.5);backdrop-filter:blur(8px);color:#d8ceff;font-weight:700;font-size:14px;cursor:pointer;transition:border-color .18s ease,background .18s ease}

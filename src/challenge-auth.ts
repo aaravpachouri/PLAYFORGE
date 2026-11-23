@@ -102,8 +102,9 @@ function showSignedOut() {
   setChallengeStatus('');
   authLoading.hidden = true;
   authGate.hidden = false;
-  challengeContent.hidden = true;
-  challengeFooter.hidden = true;
+  // Keep the full seven-day challenge readable while signed out. Only progress saving is gated.
+  challengeContent.hidden = false;
+  challengeFooter.hidden = false;
   challengeAccountBar.hidden = true;
   legacyImport.hidden = true;
   dayInputs.forEach((input) => {
